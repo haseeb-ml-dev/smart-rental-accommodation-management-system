@@ -1,0 +1,173 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h1 class="mb-4">Admin Dashboard</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Landlords</div>
+                <div class="fs-3 fw-semibold">@Model.TotalLandlords</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Tenants</div>
+                <div class="fs-3 fw-semibold">@Model.TotalTenants</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Properties / Units</div>
+                <div class="fs-3 fw-semibold">@Model.TotalProperties / @Model.TotalUnits</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Overdue invoices</div>
+                <div class="fs-3 fw-semibold @(Model.OverdueInvoiceCount > 0 ? "text-danger" : "")">@Model.OverdueInvoiceCount</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Collected this month (system-wide)</div>
+                <div class="fs-3 fw-semibold text-success">@Model.CollectedThisMonth.ToString("C")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Outstanding this month (system-wide)</div>
+                <div class="fs-3 fw-semibold text-danger">@Model.OutstandingThisMonth.ToString("C")</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Collection history (last 6 months)</h5>
+        <canvas id="collectionChart" height="90"></canvas>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Properties</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Landlord</th>
+                                <th>Units</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var property in Model.Properties)
+                            {
+                                <tr>
+                                    <td>@property.Name</td>
+                                    <td>@property.Landlord?.FullName</td>
+                                    <td>@property.Units.Count</td>
+                                </tr>
+                            }
+                            @if (!Model.Properties.Any())
+                            {
+                                <tr><td colspan="3" class="text-muted">No properties yet.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Recent invoices</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>Tenant</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var invoice in Model.RecentInvoices)
+                            {
+                                <tr>
+                                    <td>@invoice.Lease?.Tenant?.FullName</td>
+                                    <td>@invoice.Amount.ToString("C")</td>
+                                    <td>
+                                        @{
+                                            var badgeClass = invoice.Status switch
+                                            {
+                                                InvoiceStatus.Paid => "text-bg-success",
+                                                InvoiceStatus.Overdue => "text-bg-danger",
+                                                _ => "text-bg-warning"
+                                            };
+                                        }
+                                        <span class="badge @badgeClass">@invoice.Status</span>
+                                    </td>
+                                </tr>
+                            }
+                            @if (!Model.RecentInvoices.Any())
+                            {
+                                <tr><td colspan="3" class="text-muted">No invoices yet.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script>
+        const ctx = document.getElementById('collectionChart');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.MonthlyCollection.Select(m => m.Label))),
+                datasets: [
+                    {
+                        label: 'Collected',
+                        data: @Html.Raw(Json.Serialize(Model.MonthlyCollection.Select(m => m.Collected))),
+                        backgroundColor: '#198754'
+                    },
+                    {
+                        label: 'Outstanding',
+                        data: @Html.Raw(Json.Serialize(Model.MonthlyCollection.Select(m => m.Outstanding))),
+                        backgroundColor: '#dc3545'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    </script>
+}

@@ -47,12 +47,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             }
 
             var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user != null && await _userManager.IsInRoleAsync(user, "Landlord"))
-            {
-                return RedirectToAction("Index", "Landlord");
-            }
-
-            return RedirectToAction("Index", "Home");
+            return await RedirectByRoleAsync(user);
         }
 
         [HttpGet]
@@ -95,9 +90,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             await _userManager.AddToRoleAsync(user, model.Role);
             await _signInManager.SignInAsync(user, isPersistent: false);
 
-            return model.Role == "Landlord"
-                ? RedirectToAction("Index", "Landlord")
-                : RedirectToAction("Index", "Home");
+            return await RedirectByRoleAsync(user);
         }
 
         [HttpPost]
@@ -111,6 +104,27 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         public IActionResult AccessDenied()
         {
             return View();
+        }
+
+        private async Task<IActionResult> RedirectByRoleAsync(ApplicationUser? user)
+        {
+            if (user != null)
+            {
+                if (await _userManager.IsInRoleAsync(user, "Admin"))
+                {
+                    return RedirectToAction("Index", "Admin");
+                }
+                if (await _userManager.IsInRoleAsync(user, "Landlord"))
+                {
+                    return RedirectToAction("Index", "Landlord");
+                }
+                if (await _userManager.IsInRoleAsync(user, "Tenant"))
+                {
+                    return RedirectToAction("Index", "Tenant");
+                }
+            }
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }

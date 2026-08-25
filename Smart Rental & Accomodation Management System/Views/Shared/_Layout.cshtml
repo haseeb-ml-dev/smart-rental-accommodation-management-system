@@ -32,6 +32,18 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Landlord" asp-action="Index">Dashboard</a>
                             </li>
                         }
+                        else if (User.IsInRole("Tenant"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Tenant" asp-action="Index">Dashboard</a>
+                            </li>
+                        }
+                        else if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Dashboard</a>
+                            </li>
+                        }
                     </ul>
                     <ul class="navbar-nav">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)

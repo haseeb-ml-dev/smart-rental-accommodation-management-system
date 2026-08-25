@@ -1,0 +1,146 @@
+@model TenantDashboardViewModel
+@{
+    ViewData["Title"] = "Tenant Dashboard";
+}
+
+<h1 class="mb-4">My Dashboard</h1>
+
+@if (!Model.HasActiveLease)
+{
+    <div class="alert alert-info">
+        You don't have an active lease yet. Once a landlord assigns you to a unit, your rent and payment details will show up here.
+    </div>
+}
+else
+{
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">My unit</div>
+                    <div class="fs-5 fw-semibold">@Model.UnitName</div>
+                    <div class="text-muted small">@Model.PropertyName</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Monthly rent</div>
+                    <div class="fs-3 fw-semibold">@Model.MonthlyRent.ToString("C")</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Total paid</div>
+                    <div class="fs-3 fw-semibold text-success">@Model.TotalPaid.ToString("C")</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Outstanding balance</div>
+                    <div class="fs-3 fw-semibold @(Model.OutstandingBalance > 0 ? "text-danger" : "")">@Model.OutstandingBalance.ToString("C")</div>
+                    @if (Model.OverdueInvoiceCount > 0)
+                    {
+                        <div class="text-danger small">@Model.OverdueInvoiceCount overdue</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.NextDueInvoice != null)
+    {
+        <div class="alert @(Model.NextDueInvoice.Status == InvoiceStatus.Overdue ? "alert-danger" : "alert-warning")">
+            Next payment due: <strong>@Model.NextDueInvoice.Amount.ToString("C")</strong> by
+            <strong>@Model.NextDueInvoice.DueDate.ToString("MMM d, yyyy")</strong>
+            (@Model.NextDueInvoice.Status)
+        </div>
+    }
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Payment history (last 6 months)</h5>
+            <canvas id="paymentChart" height="90"></canvas>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">My invoices</h5>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Period</th>
+                            <th>Amount</th>
+                            <th>Due date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var invoice in Model.Invoices)
+                        {
+                            <tr>
+                                <td>@invoice.PeriodMonth/@invoice.PeriodYear</td>
+                                <td>@invoice.Amount.ToString("C")</td>
+                                <td>@invoice.DueDate.ToString("MMM d, yyyy")</td>
+                                <td>
+                                    @{
+                                        var badgeClass = invoice.Status switch
+                                        {
+                                            InvoiceStatus.Paid => "text-bg-success",
+                                            InvoiceStatus.Overdue => "text-bg-danger",
+                                            _ => "text-bg-warning"
+                                        };
+                                    }
+                                    <span class="badge @badgeClass">@invoice.Status</span>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Invoices.Any())
+                        {
+                            <tr><td colspan="4" class="text-muted">No invoices yet.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @if (Model.HasActiveLease)
+    {
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+        <script>
+            const ctx = document.getElementById('paymentChart');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(Model.MonthlyPaymentHistory.Select(m => m.Label))),
+                    datasets: [
+                        {
+                            label: 'Paid',
+                            data: @Html.Raw(Json.Serialize(Model.MonthlyPaymentHistory.Select(m => m.Collected))),
+                            backgroundColor: '#198754'
+                        },
+                        {
+                            label: 'Outstanding',
+                            data: @Html.Raw(Json.Serialize(Model.MonthlyPaymentHistory.Select(m => m.Outstanding))),
+                            backgroundColor: '#dc3545'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        </script>
+    }
+}
