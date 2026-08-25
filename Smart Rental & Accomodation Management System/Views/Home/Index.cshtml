@@ -1,8 +1,70 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Home";
+    string? dashboardController = User.IsInRole("Landlord") ? "Landlord" : User.IsInRole("Tenant") ? "Tenant" : User.IsInRole("Admin") ? "Admin" : null;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="hero mb-5">
+    <div class="row align-items-center">
+        <div class="col-lg-8">
+            <h1 class="display-5 fw-bold mb-3">Rent, bills, and bookings &mdash; all in one place</h1>
+            <p class="fs-5 mb-4">
+                Smart Rental replaces the spreadsheets and group chats landlords and tenants use to track rent,
+                split shared utility bills, and manage room bookings &mdash; with one simple, role-based platform.
+            </p>
+            @if (User.Identity != null && User.Identity.IsAuthenticated && dashboardController != null)
+            {
+                <a asp-controller="@dashboardController" asp-action="Index" class="btn btn-light btn-lg fw-semibold">Go to my dashboard</a>
+            }
+            else
+            {
+                <div class="d-flex gap-2">
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-light btn-lg fw-semibold">Get started</a>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-light btn-lg">Log in</a>
+                </div>
+            }
+        </div>
+    </div>
 </div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 5h16M4 12h16M4 19h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+        </div>
+        <h5>Rent &amp; utility tracking</h5>
+        <p class="text-muted">Automated monthly rent invoicing with due-date and overdue tracking, plus utility bills split equally or by custom percentage across tenants.</p>
+    </div>
+    <div class="col-md-4">
+        <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="4" width="18" height="17" rx="2" stroke="currentColor" stroke-width="2" />
+                <path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+        </div>
+        <h5>Booking &amp; availability</h5>
+        <p class="text-muted">Browse private rooms, shared rooms, and family units with real-time availability, request a booking, and get approved by the landlord.</p>
+    </div>
+    <div class="col-md-4">
+        <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <path d="M7 15l4-4 3 3 5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </div>
+        <h5>Role-based dashboards</h5>
+        <p class="text-muted">Landlords, tenants, and admins each get a dashboard tailored to them &mdash; collection reports, payment history, and system-wide overviews.</p>
+    </div>
+</div>
+
+@if (User.Identity == null || !User.Identity.IsAuthenticated)
+{
+    <div class="row">
+        <div class="col-lg-8 mx-auto text-center py-4">
+            <h4 class="mb-2">Ready to get organized?</h4>
+            <p class="text-muted mb-3">Create a free account as a landlord or tenant and start tracking rent, bills, and bookings today.</p>
+            <a asp-controller="Account" asp-action="Register" class="btn btn-primary">Create an account</a>
+        </div>
+    </div>
+}

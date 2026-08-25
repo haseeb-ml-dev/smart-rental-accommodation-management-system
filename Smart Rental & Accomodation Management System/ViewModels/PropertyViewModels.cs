@@ -20,10 +20,10 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         [Required, StringLength(50)]
         public string Name { get; set; } = string.Empty;
 
-        [Required]
+        [Required, Display(Name = "Unit type")]
         public UnitType UnitType { get; set; }
 
-        [Range(0, 100000)]
+        [Range(0, 100000), Display(Name = "Monthly rent")]
         public decimal MonthlyRent { get; set; }
 
         [Range(1, 20)]

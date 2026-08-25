@@ -17,22 +17,22 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public int PropertyId { get; set; }
         public string? PropertyName { get; set; }
 
-        [Required]
+        [Required, Display(Name = "Bill type")]
         public UtilityBillType BillType { get; set; }
 
         [Range(0.01, 1000000)]
         public decimal Amount { get; set; }
 
-        [Range(1, 12)]
+        [Range(1, 12), Display(Name = "Period month")]
         public int PeriodMonth { get; set; } = DateTime.UtcNow.Month;
 
-        [Range(2000, 2100)]
+        [Range(2000, 2100), Display(Name = "Period year")]
         public int PeriodYear { get; set; } = DateTime.UtcNow.Year;
 
-        [Required]
+        [Required, Display(Name = "Due date")]
         public DateTime DueDate { get; set; } = DateTime.UtcNow.Date.AddDays(14);
 
-        [Required]
+        [Required, Display(Name = "Split method")]
         public UtilityBillSplitMethod SplitMethod { get; set; } = UtilityBillSplitMethod.Equal;
 
         public List<TenantShareInputViewModel> Tenants { get; set; } = new();

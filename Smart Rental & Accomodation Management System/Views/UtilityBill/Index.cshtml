@@ -17,10 +17,10 @@
     <div class="card mb-3">
         <div class="card-body">
             <div class="d-flex justify-content-between">
-                <h5 class="card-title">@bill.Property?.Name &mdash; @bill.BillType (@bill.PeriodMonth/@bill.PeriodYear)</h5>
+                <h5 class="card-title">@bill.Property?.Name &mdash; @bill.BillType.Humanize() (@bill.PeriodMonth/@bill.PeriodYear)</h5>
                 <div class="fw-semibold">@bill.Amount.ToString("C")</div>
             </div>
-            <div class="text-muted small mb-2">Due @bill.DueDate.ToString("MMM d, yyyy") &middot; Split: @bill.SplitMethod</div>
+            <div class="text-muted small mb-2">Due @bill.DueDate.ToString("MMM d, yyyy") &middot; Split: @bill.SplitMethod.Humanize()</div>
             <table class="table table-sm mb-0">
                 <thead>
                     <tr><th>Tenant</th><th>Share</th><th>Status</th></tr>

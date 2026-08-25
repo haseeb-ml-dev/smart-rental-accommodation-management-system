@@ -127,7 +127,7 @@
                                                 _ => "text-bg-warning"
                                             };
                                         }
-                                        <span class="badge @badgeClass">@invoice.Status</span>
+                                        <span class="badge @badgeClass">@invoice.Status.Humanize()</span>
                                     </td>
                                 </tr>
                             }

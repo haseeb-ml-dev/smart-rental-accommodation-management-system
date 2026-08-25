@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Smart_Rental___Accomodation_Management_System.Models
@@ -13,6 +14,7 @@ namespace Smart_Rental___Accomodation_Management_System.Models
     public enum UtilityBillSplitMethod
     {
         Equal,
+        [Display(Name = "Custom Percentage")]
         CustomPercentage
     }
 

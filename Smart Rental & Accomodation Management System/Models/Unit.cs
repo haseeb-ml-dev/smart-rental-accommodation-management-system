@@ -5,8 +5,11 @@ namespace Smart_Rental___Accomodation_Management_System.Models
 {
     public enum UnitType
     {
+        [Display(Name = "Private Room")]
         PrivateRoom,
+        [Display(Name = "Shared Room")]
         SharedRoom,
+        [Display(Name = "Family Unit")]
         FamilyUnit
     }
 

@@ -32,7 +32,7 @@
                                 _ => "text-bg-warning"
                             };
                         }
-                        <span class="badge @badgeClass">@booking.Status</span>
+                        <span class="badge @badgeClass">@booking.Status.Humanize()</span>
                     </td>
                     <td>@booking.CreatedAt.ToString("MMM d, yyyy")</td>
                 </tr>

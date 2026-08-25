@@ -58,7 +58,7 @@ else
         <div class="alert @(Model.NextDueInvoice.Status == InvoiceStatus.Overdue ? "alert-danger" : "alert-warning")">
             Next payment due: <strong>@Model.NextDueInvoice.Amount.ToString("C")</strong> by
             <strong>@Model.NextDueInvoice.DueDate.ToString("MMM d, yyyy")</strong>
-            (@Model.NextDueInvoice.Status)
+            (@Model.NextDueInvoice.Status.Humanize())
         </div>
     }
 
@@ -98,7 +98,7 @@ else
                                             _ => "text-bg-warning"
                                         };
                                     }
-                                    <span class="badge @badgeClass">@invoice.Status</span>
+                                    <span class="badge @badgeClass">@invoice.Status.Humanize()</span>
                                 </td>
                             </tr>
                         }
@@ -136,7 +136,7 @@ else
                         {
                             <tr>
                                 <td>@share.UtilityBill?.Property?.Name</td>
-                                <td>@share.UtilityBill?.BillType</td>
+                                <td>@share.UtilityBill?.BillType.Humanize()</td>
                                 <td>@share.ShareAmount.ToString("C")</td>
                                 <td>@share.UtilityBill?.DueDate.ToString("MMM d, yyyy")</td>
                                 <td>
