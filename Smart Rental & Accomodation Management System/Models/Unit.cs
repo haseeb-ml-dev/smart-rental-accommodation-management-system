@@ -25,6 +25,9 @@ namespace Smart_Rental___Accomodation_Management_System.Models
         [Column(TypeName = "decimal(10,2)")]
         public decimal MonthlyRent { get; set; }
 
+        public int Capacity { get; set; } = 1;
+
         public List<Lease> Leases { get; set; } = new();
+        public List<Booking> Bookings { get; set; } = new();
     }
 }

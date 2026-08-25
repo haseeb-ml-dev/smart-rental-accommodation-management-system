@@ -41,9 +41,9 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 Address = "12 Greenview Road, Colombo"
             };
 
-            var unit1 = new Unit { Property = property, Name = "Room A1", UnitType = UnitType.PrivateRoom, MonthlyRent = 350m };
-            var unit2 = new Unit { Property = property, Name = "Room A2", UnitType = UnitType.SharedRoom, MonthlyRent = 220m };
-            var unit3 = new Unit { Property = property, Name = "Family Unit B1", UnitType = UnitType.FamilyUnit, MonthlyRent = 600m };
+            var unit1 = new Unit { Property = property, Name = "Room A1", UnitType = UnitType.PrivateRoom, MonthlyRent = 350m, Capacity = 1 };
+            var unit2 = new Unit { Property = property, Name = "Room A2", UnitType = UnitType.SharedRoom, MonthlyRent = 220m, Capacity = 2 };
+            var unit3 = new Unit { Property = property, Name = "Family Unit B1", UnitType = UnitType.FamilyUnit, MonthlyRent = 600m, Capacity = 1 };
             property.Units.AddRange(new[] { unit1, unit2, unit3 });
 
             context.Properties.Add(property);
@@ -85,6 +85,24 @@ namespace Smart_Rental___Accomodation_Management_System.Data
             }
 
             context.RentInvoices.AddRange(invoices);
+            await context.SaveChangesAsync();
+
+            var utilityBill = new UtilityBill
+            {
+                PropertyId = property.Id,
+                BillType = UtilityBillType.Electricity,
+                Amount = 60m,
+                PeriodMonth = today.Month,
+                PeriodYear = today.Year,
+                DueDate = new DateTime(today.Year, today.Month, 20),
+                SplitMethod = UtilityBillSplitMethod.Equal,
+                Shares = new List<UtilityBillShare>
+                {
+                    new() { TenantId = tenant1.Id, ShareAmount = 30m },
+                    new() { TenantId = tenant2.Id, ShareAmount = 30m }
+                }
+            };
+            context.UtilityBills.Add(utilityBill);
             await context.SaveChangesAsync();
         }
 

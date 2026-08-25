@@ -1,0 +1,76 @@
+@model UtilityBillFormViewModel
+@{
+    ViewData["Title"] = "Add Utility Bill";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <h1 class="mb-4">Add Utility Bill &mdash; @Model.PropertyName</h1>
+        <form asp-action="Create" method="post">
+            <input type="hidden" asp-for="PropertyId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="BillType" class="form-label"></label>
+                    <select asp-for="BillType" class="form-select" asp-items="Html.GetEnumSelectList<UtilityBillType>()"></select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Amount" class="form-label"></label>
+                    <input asp-for="Amount" class="form-control" type="number" step="0.01" />
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label asp-for="PeriodMonth" class="form-label"></label>
+                    <input asp-for="PeriodMonth" class="form-control" type="number" min="1" max="12" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label asp-for="PeriodYear" class="form-label"></label>
+                    <input asp-for="PeriodYear" class="form-control" type="number" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label asp-for="DueDate" class="form-label"></label>
+                    <input asp-for="DueDate" class="form-control" type="date" value="@Model.DueDate.ToString("yyyy-MM-dd")" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="SplitMethod" class="form-label"></label>
+                <select asp-for="SplitMethod" class="form-select" asp-items="Html.GetEnumSelectList<UtilityBillSplitMethod>()"></select>
+                <div class="form-text">Equal splits the amount evenly across all active tenants. Custom lets you set each tenant's percentage (must total 100%).</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Active tenants (used for Custom % split)</label>
+                <table class="table table-sm">
+                    <thead><tr><th>Tenant</th><th style="width: 140px;">Percentage</th></tr></thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Tenants.Count; i++)
+                        {
+                            <tr>
+                                <td>
+                                    @Model.Tenants[i].TenantName
+                                    <input type="hidden" asp-for="Tenants[i].TenantId" />
+                                    <input type="hidden" asp-for="Tenants[i].TenantName" />
+                                </td>
+                                <td>
+                                    <input asp-for="Tenants[i].Percentage" class="form-control form-control-sm" type="number" step="0.01" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-controller="Property" asp-action="Index" class="btn btn-link">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

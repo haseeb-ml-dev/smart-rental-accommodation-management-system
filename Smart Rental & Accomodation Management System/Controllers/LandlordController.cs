@@ -75,6 +75,10 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 });
             }
 
+            vm.OutstandingUtilities = await _context.UtilityBillShares
+                .Where(s => !s.IsPaid && s.UtilityBill!.Property!.LandlordId == landlordId)
+                .SumAsync(s => s.ShareAmount);
+
             return View(vm);
         }
     }

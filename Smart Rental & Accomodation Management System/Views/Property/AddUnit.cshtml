@@ -1,0 +1,41 @@
+@model UnitFormViewModel
+@{
+    ViewData["Title"] = "Add Unit";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h1 class="mb-4">Add Unit to @Model.PropertyName</h1>
+        <form asp-action="AddUnit" method="post">
+            <input type="hidden" asp-for="PropertyId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" placeholder="e.g. Room A1" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="UnitType" class="form-label"></label>
+                <select asp-for="UnitType" class="form-select" asp-items="Html.GetEnumSelectList<UnitType>()"></select>
+                <span asp-validation-for="UnitType" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="MonthlyRent" class="form-label"></label>
+                <input asp-for="MonthlyRent" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="MonthlyRent" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Capacity" class="form-label"></label>
+                <input asp-for="Capacity" class="form-control" type="number" />
+                <div class="form-text">Max tenants who can hold an active lease on this unit at once (use 2+ for shared rooms).</div>
+                <span asp-validation-for="Capacity" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-action="Index" class="btn btn-link">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

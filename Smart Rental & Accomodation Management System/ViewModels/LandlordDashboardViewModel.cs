@@ -23,5 +23,7 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
 
         public List<MonthlyCollectionPoint> MonthlyCollection { get; set; } = new();
         public List<RentInvoice> RecentInvoices { get; set; } = new();
+
+        public decimal OutstandingUtilities { get; set; }
     }
 }

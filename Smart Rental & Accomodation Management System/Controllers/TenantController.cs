@@ -72,6 +72,15 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 });
             }
 
+            vm.UtilityShares = await _context.UtilityBillShares
+                .Include(s => s.UtilityBill)
+                    .ThenInclude(b => b!.Property)
+                .Where(s => s.TenantId == tenantId)
+                .OrderByDescending(s => s.UtilityBill!.DueDate)
+                .Take(10)
+                .ToListAsync();
+            vm.UtilityOutstandingBalance = vm.UtilityShares.Where(s => !s.IsPaid).Sum(s => s.ShareAmount);
+
             return View(vm);
         }
     }

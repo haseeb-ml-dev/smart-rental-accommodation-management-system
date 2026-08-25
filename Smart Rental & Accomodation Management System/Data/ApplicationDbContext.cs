@@ -15,6 +15,9 @@ namespace Smart_Rental___Accomodation_Management_System.Data
         public DbSet<Unit> Units { get; set; } = null!;
         public DbSet<Lease> Leases { get; set; } = null!;
         public DbSet<RentInvoice> RentInvoices { get; set; } = null!;
+        public DbSet<Booking> Bookings { get; set; } = null!;
+        public DbSet<UtilityBill> UtilityBills { get; set; } = null!;
+        public DbSet<UtilityBillShare> UtilityBillShares { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -49,6 +52,36 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 .WithMany(l => l.RentInvoices)
                 .HasForeignKey(r => r.LeaseId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Booking>()
+                .HasOne(b => b.Unit)
+                .WithMany(u => u.Bookings)
+                .HasForeignKey(b => b.UnitId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Booking>()
+                .HasOne(b => b.Tenant)
+                .WithMany()
+                .HasForeignKey(b => b.TenantId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<UtilityBill>()
+                .HasOne(u => u.Property)
+                .WithMany()
+                .HasForeignKey(u => u.PropertyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<UtilityBillShare>()
+                .HasOne(s => s.UtilityBill)
+                .WithMany(b => b.Shares)
+                .HasForeignKey(s => s.UtilityBillId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<UtilityBillShare>()
+                .HasOne(s => s.Tenant)
+                .WithMany()
+                .HasForeignKey(s => s.TenantId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

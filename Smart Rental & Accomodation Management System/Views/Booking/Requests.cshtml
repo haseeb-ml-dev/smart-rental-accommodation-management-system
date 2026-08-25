@@ -1,0 +1,52 @@
+@model List<BookingListItemViewModel>
+@{
+    ViewData["Title"] = "Booking Requests";
+}
+
+<h1 class="mb-4">Booking Requests</h1>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">@TempData["Message"]</div>
+}
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Property</th>
+                <th>Unit</th>
+                <th>Tenant</th>
+                <th>Requested start</th>
+                <th>Requested on</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var booking in Model)
+            {
+                <tr>
+                    <td>@booking.PropertyName</td>
+                    <td>@booking.UnitName</td>
+                    <td>@booking.TenantName</td>
+                    <td>@booking.StartDate.ToString("MMM d, yyyy")</td>
+                    <td>@booking.CreatedAt.ToString("MMM d, yyyy")</td>
+                    <td class="d-flex gap-2">
+                        <form asp-action="Approve" method="post">
+                            <input type="hidden" name="bookingId" value="@booking.BookingId" />
+                            <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                        </form>
+                        <form asp-action="Reject" method="post">
+                            <input type="hidden" name="bookingId" value="@booking.BookingId" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Any())
+            {
+                <tr><td colspan="6" class="text-muted">No pending requests.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

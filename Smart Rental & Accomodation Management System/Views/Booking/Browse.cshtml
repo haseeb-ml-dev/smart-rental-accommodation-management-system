@@ -1,0 +1,65 @@
+@model List<UnitAvailabilityViewModel>
+@{
+    ViewData["Title"] = "Browse & Book";
+}
+
+<h1 class="mb-4">Browse Units</h1>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">@TempData["Message"]</div>
+}
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Property</th>
+                <th>Unit</th>
+                <th>Type</th>
+                <th>Monthly rent</th>
+                <th>Availability</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var unit in Model)
+            {
+                <tr>
+                    <td>@unit.PropertyName</td>
+                    <td>@unit.UnitName</td>
+                    <td>@unit.UnitType</td>
+                    <td>@unit.MonthlyRent.ToString("C")</td>
+                    <td>
+                        @if (unit.IsAvailable)
+                        {
+                            <span class="badge text-bg-success">Available (@unit.ActiveLeaseCount/@unit.Capacity)</span>
+                        }
+                        else
+                        {
+                            <span class="badge text-bg-secondary">Full (@unit.ActiveLeaseCount/@unit.Capacity)</span>
+                        }
+                    </td>
+                    <td>
+                        @if (unit.HasPendingRequestFromCurrentTenant)
+                        {
+                            <span class="text-muted small">Request pending</span>
+                        }
+                        else if (unit.IsAvailable)
+                        {
+                            <form asp-action="RequestBooking" method="post" class="d-flex gap-2">
+                                <input type="hidden" name="unitId" value="@unit.UnitId" />
+                                <input type="date" name="startDate" class="form-control form-control-sm" value="@DateTime.UtcNow.ToString("yyyy-MM-dd")" style="width: auto;" />
+                                <button type="submit" class="btn btn-sm btn-primary">Request to book</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+            @if (!Model.Any())
+            {
+                <tr><td colspan="6" class="text-muted">No units listed yet.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

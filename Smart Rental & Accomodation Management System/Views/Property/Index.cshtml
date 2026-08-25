@@ -1,0 +1,60 @@
+@model List<Property>
+@{
+    ViewData["Title"] = "My Properties";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>My Properties</h1>
+    <a asp-action="Create" class="btn btn-primary">Add Property</a>
+</div>
+
+@foreach (var property in Model)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h5 class="card-title mb-1">@property.Name</h5>
+                    <div class="text-muted small mb-3">@property.Address</div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a asp-action="AddUnit" asp-route-propertyId="@property.Id" class="btn btn-sm btn-outline-primary">Add Unit</a>
+                    <a asp-controller="UtilityBill" asp-action="Create" asp-route-propertyId="@property.Id" class="btn btn-sm btn-outline-secondary">Add Utility Bill</a>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Unit</th>
+                            <th>Type</th>
+                            <th>Monthly rent</th>
+                            <th>Capacity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var unit in property.Units)
+                        {
+                            <tr>
+                                <td>@unit.Name</td>
+                                <td>@unit.UnitType</td>
+                                <td>@unit.MonthlyRent.ToString("C")</td>
+                                <td>@unit.Capacity</td>
+                            </tr>
+                        }
+                        @if (!property.Units.Any())
+                        {
+                            <tr><td colspan="4" class="text-muted">No units yet.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">You haven't added any properties yet.</div>
+}

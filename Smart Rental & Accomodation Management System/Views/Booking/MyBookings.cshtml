@@ -1,0 +1,46 @@
+@model List<BookingListItemViewModel>
+@{
+    ViewData["Title"] = "My Bookings";
+}
+
+<h1 class="mb-4">My Bookings</h1>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Property</th>
+                <th>Unit</th>
+                <th>Requested start</th>
+                <th>Status</th>
+                <th>Requested on</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var booking in Model)
+            {
+                <tr>
+                    <td>@booking.PropertyName</td>
+                    <td>@booking.UnitName</td>
+                    <td>@booking.StartDate.ToString("MMM d, yyyy")</td>
+                    <td>
+                        @{
+                            var badgeClass = booking.Status switch
+                            {
+                                BookingStatus.Approved => "text-bg-success",
+                                BookingStatus.Rejected => "text-bg-danger",
+                                _ => "text-bg-warning"
+                            };
+                        }
+                        <span class="badge @badgeClass">@booking.Status</span>
+                    </td>
+                    <td>@booking.CreatedAt.ToString("MMM d, yyyy")</td>
+                </tr>
+            }
+            @if (!Model.Any())
+            {
+                <tr><td colspan="5" class="text-muted">You haven't requested any bookings yet.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

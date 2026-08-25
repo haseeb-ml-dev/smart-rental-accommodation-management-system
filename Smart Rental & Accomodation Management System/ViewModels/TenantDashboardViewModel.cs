@@ -16,5 +16,8 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
 
         public List<MonthlyCollectionPoint> MonthlyPaymentHistory { get; set; } = new();
         public List<RentInvoice> Invoices { get; set; } = new();
+
+        public decimal UtilityOutstandingBalance { get; set; }
+        public List<UtilityBillShare> UtilityShares { get; set; } = new();
     }
 }
