@@ -1,0 +1,44 @@
+@model MessMenuFormViewModel
+@{
+    ViewData["Title"] = "Mess Menu";
+    var days = Model.Entries.Select(e => e.DayOfWeek).Distinct().ToList();
+    var meals = Model.Entries.Select(e => e.MealType).Distinct().ToList();
+}
+
+<h1 class="mb-4">Weekly Mess Menu &mdash; @Model.PropertyName</h1>
+
+<form asp-action="Manage" method="post">
+    <input type="hidden" asp-for="PropertyId" />
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th style="width: 110px;">Day</th>
+                    @foreach (var meal in meals)
+                    {
+                        <th>@meal</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var day in days)
+                {
+                    <tr>
+                        <td class="fw-semibold">@day</td>
+                        @foreach (var meal in meals)
+                        {
+                            var index = Model.Entries.FindIndex(e => e.DayOfWeek == day && e.MealType == meal);
+                            <td>
+                                <input type="hidden" asp-for="Entries[index].DayOfWeek" />
+                                <input type="hidden" asp-for="Entries[index].MealType" />
+                                <textarea asp-for="Entries[index].Description" class="form-control form-control-sm" rows="2" placeholder="Leave blank to skip"></textarea>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <button type="submit" class="btn btn-primary">Save menu</button>
+    <a asp-controller="Property" asp-action="Index" class="btn btn-link">Back to properties</a>
+</form>

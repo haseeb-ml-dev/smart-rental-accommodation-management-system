@@ -35,6 +35,32 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             return View(bills);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkSharePaid(int shareId)
+        {
+            var landlordId = _userManager.GetUserId(User)!;
+
+            var share = await _context.UtilityBillShares
+                .Include(s => s.UtilityBill)
+                    .ThenInclude(b => b!.Property)
+                .FirstOrDefaultAsync(s => s.Id == shareId && s.UtilityBill!.Property!.LandlordId == landlordId);
+
+            if (share == null)
+            {
+                return NotFound();
+            }
+
+            if (!share.IsPaid)
+            {
+                share.IsPaid = true;
+                share.PaidDate = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
         [HttpGet]
         public async Task<IActionResult> Create(int propertyId)
         {

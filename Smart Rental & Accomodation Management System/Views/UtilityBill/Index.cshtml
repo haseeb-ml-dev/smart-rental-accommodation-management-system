@@ -23,7 +23,7 @@
             <div class="text-muted small mb-2">Due @bill.DueDate.ToString("MMM d, yyyy") &middot; Split: @bill.SplitMethod.Humanize()</div>
             <table class="table table-sm mb-0">
                 <thead>
-                    <tr><th>Tenant</th><th>Share</th><th>Status</th></tr>
+                    <tr><th>Tenant</th><th>Share</th><th>Status</th><th></th></tr>
                 </thead>
                 <tbody>
                     @foreach (var share in bill.Shares)
@@ -36,9 +36,22 @@
                                 {
                                     <span class="badge text-bg-success">Paid</span>
                                 }
+                                else if (bill.DueDate < DateTime.UtcNow.Date)
+                                {
+                                    <span class="badge text-bg-danger">Overdue</span>
+                                }
                                 else
                                 {
                                     <span class="badge text-bg-warning">Pending</span>
+                                }
+                            </td>
+                            <td>
+                                @if (!share.IsPaid)
+                                {
+                                    <form asp-action="MarkSharePaid" method="post">
+                                        <input type="hidden" name="shareId" value="@share.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-success">Mark paid</button>
+                                    </form>
                                 }
                             </td>
                         </tr>

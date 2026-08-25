@@ -77,6 +77,7 @@
                         <th>Amount</th>
                         <th>Due date</th>
                         <th>Status</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -99,11 +100,20 @@
                                 }
                                 <span class="badge @badgeClass">@invoice.Status.Humanize()</span>
                             </td>
+                            <td>
+                                @if (invoice.Status != InvoiceStatus.Paid)
+                                {
+                                    <form asp-action="MarkInvoicePaid" method="post">
+                                        <input type="hidden" name="invoiceId" value="@invoice.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-success">Mark paid</button>
+                                    </form>
+                                }
+                            </td>
                         </tr>
                     }
                     @if (!Model.RecentInvoices.Any())
                     {
-                        <tr><td colspan="6" class="text-muted">No invoices yet.</td></tr>
+                        <tr><td colspan="7" class="text-muted">No invoices yet.</td></tr>
                     }
                 </tbody>
             </table>

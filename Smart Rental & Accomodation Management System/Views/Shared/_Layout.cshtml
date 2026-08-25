@@ -50,6 +50,9 @@
                             <li class="nav-item">
                                 <a class="@navClass("Booking")" asp-area="" asp-controller="Booking" asp-action="MyBookings">My Bookings</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="@navClass("Mess")" asp-area="" asp-controller="Mess" asp-action="Index">Mess Menu</a>
+                            </li>
                         }
                         else if (User.IsInRole("Admin"))
                         {

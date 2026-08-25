@@ -104,6 +104,25 @@ namespace Smart_Rental___Accomodation_Management_System.Data
             };
             context.UtilityBills.Add(utilityBill);
             await context.SaveChangesAsync();
+
+            var menu = new List<MessMenu>
+            {
+                new() { PropertyId = property.Id, DayOfWeek = DayOfWeek.Monday, MealType = MealType.Breakfast, Description = "Toast, eggs, and fruit" },
+                new() { PropertyId = property.Id, DayOfWeek = DayOfWeek.Monday, MealType = MealType.Lunch, Description = "Rice, chicken curry, and salad" },
+                new() { PropertyId = property.Id, DayOfWeek = DayOfWeek.Monday, MealType = MealType.Dinner, Description = "Noodles and vegetable stir-fry" },
+                new() { PropertyId = property.Id, DayOfWeek = DayOfWeek.Tuesday, MealType = MealType.Lunch, Description = "Rice, fish curry, and greens" },
+                new() { PropertyId = property.Id, DayOfWeek = DayOfWeek.Wednesday, MealType = MealType.Dinner, Description = "Pasta with tomato sauce" }
+            };
+            context.MessMenus.AddRange(menu);
+            await context.SaveChangesAsync();
+
+            var feedback = new List<MessFeedback>
+            {
+                new() { PropertyId = property.Id, TenantId = tenant1.Id, DayOfWeek = DayOfWeek.Monday, MealType = MealType.Lunch, Rating = 4, Comment = "Good portion size" },
+                new() { PropertyId = property.Id, TenantId = tenant2.Id, DayOfWeek = DayOfWeek.Monday, MealType = MealType.Lunch, Rating = 5, Comment = "Loved the curry" }
+            };
+            context.MessFeedbacks.AddRange(feedback);
+            await context.SaveChangesAsync();
         }
 
         private static async Task<ApplicationUser> CreateUserAsync(UserManager<ApplicationUser> userManager, string email, string fullName, string role)

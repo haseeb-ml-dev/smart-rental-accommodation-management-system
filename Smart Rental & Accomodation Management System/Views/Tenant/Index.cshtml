@@ -144,6 +144,10 @@ else
                                     {
                                         <span class="badge text-bg-success">Paid</span>
                                     }
+                                    else if (share.UtilityBill != null && share.UtilityBill.DueDate < DateTime.UtcNow.Date)
+                                    {
+                                        <span class="badge text-bg-danger">Overdue</span>
+                                    }
                                     else
                                     {
                                         <span class="badge text-bg-warning">Pending</span>

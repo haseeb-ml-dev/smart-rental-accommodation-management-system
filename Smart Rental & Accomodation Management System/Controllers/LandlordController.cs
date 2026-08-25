@@ -81,5 +81,32 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
 
             return View(vm);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkInvoicePaid(int invoiceId)
+        {
+            var landlordId = _userManager.GetUserId(User)!;
+
+            var invoice = await _context.RentInvoices
+                .Include(i => i.Lease)
+                    .ThenInclude(l => l!.Unit)
+                        .ThenInclude(u => u!.Property)
+                .FirstOrDefaultAsync(i => i.Id == invoiceId && i.Lease!.Unit!.Property!.LandlordId == landlordId);
+
+            if (invoice == null)
+            {
+                return NotFound();
+            }
+
+            if (invoice.Status != InvoiceStatus.Paid)
+            {
+                invoice.Status = InvoiceStatus.Paid;
+                invoice.PaidDate = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

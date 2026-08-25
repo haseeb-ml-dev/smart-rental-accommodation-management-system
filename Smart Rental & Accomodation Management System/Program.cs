@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Smart_Rental___Accomodation_Management_System.Data;
 using Smart_Rental___Accomodation_Management_System.Models;
+using Smart_Rental___Accomodation_Management_System.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/Account/Login";
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
+
+builder.Services.AddScoped<BillingService>();
+builder.Services.AddHostedService<BillingBackgroundService>();
 
 var app = builder.Build();
 
