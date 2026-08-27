@@ -29,6 +29,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 .Include(u => u.Property)
                 .Include(u => u.Leases)
                 .Include(u => u.Bookings)
+                .Where(u => u.Property!.IsActive)
                 .ToListAsync();
 
             var vm = units.Select(u => new UnitAvailabilityViewModel
@@ -56,6 +57,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             var tenantId = _userManager.GetUserId(User)!;
 
             var unit = await _context.Units
+                .Include(u => u.Property)
                 .Include(u => u.Leases)
                 .Include(u => u.Bookings)
                 .FirstOrDefaultAsync(u => u.Id == unitId);
@@ -68,7 +70,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             var activeLeaseCount = unit.Leases.Count(l => l.EndDate == null);
             var alreadyPending = unit.Bookings.Any(b => b.TenantId == tenantId && b.Status == BookingStatus.Pending);
 
-            if (activeLeaseCount < unit.Capacity && !alreadyPending)
+            if (unit.Property!.IsActive && activeLeaseCount < unit.Capacity && !alreadyPending)
             {
                 _context.Bookings.Add(new Booking
                 {

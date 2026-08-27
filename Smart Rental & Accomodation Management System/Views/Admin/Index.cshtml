@@ -3,7 +3,13 @@
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<h1 class="mb-4">Admin Dashboard</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Admin Dashboard</h1>
+    <div class="d-flex gap-2">
+        <a asp-action="Users" class="btn btn-outline-primary">Users</a>
+        <a asp-action="Bookings" class="btn btn-outline-primary">Bookings</a>
+    </div>
+</div>
 
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
@@ -78,6 +84,8 @@
                                 <th>Name</th>
                                 <th>Landlord</th>
                                 <th>Units</th>
+                                <th>Status</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -87,11 +95,34 @@
                                     <td>@property.Name</td>
                                     <td>@property.Landlord?.FullName</td>
                                     <td>@property.Units.Count</td>
+                                    <td>
+                                        @if (property.IsActive)
+                                        {
+                                            <span class="badge text-bg-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge text-bg-secondary">Delisted</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <form asp-action="TogglePropertyActive" method="post">
+                                            <input type="hidden" name="propertyId" value="@property.Id" />
+                                            @if (property.IsActive)
+                                            {
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary">Delist</button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit" class="btn btn-sm btn-outline-success">Relist</button>
+                                            }
+                                        </form>
+                                    </td>
                                 </tr>
                             }
                             @if (!Model.Properties.Any())
                             {
-                                <tr><td colspan="3" class="text-muted">No properties yet.</td></tr>
+                                <tr><td colspan="5" class="text-muted">No properties yet.</td></tr>
                             }
                         </tbody>
                     </table>

@@ -16,6 +16,8 @@ namespace Smart_Rental___Accomodation_Management_System.Models
         [Required, StringLength(300)]
         public string Address { get; set; } = string.Empty;
 
+        public bool IsActive { get; set; } = true;
+
         public List<Unit> Units { get; set; } = new();
     }
 }

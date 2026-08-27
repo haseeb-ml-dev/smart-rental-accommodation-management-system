@@ -1,0 +1,58 @@
+@model List<BookingListItemViewModel>
+@{
+    ViewData["Title"] = "Bookings";
+}
+
+<h1 class="mb-4">All Bookings</h1>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Property</th>
+                <th>Unit</th>
+                <th>Tenant</th>
+                <th>Requested start</th>
+                <th>Requested on</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var booking in Model)
+            {
+                <tr>
+                    <td>@booking.PropertyName</td>
+                    <td>@booking.UnitName</td>
+                    <td>@booking.TenantName</td>
+                    <td>@booking.StartDate.ToString("MMM d, yyyy")</td>
+                    <td>@booking.CreatedAt.ToString("MMM d, yyyy")</td>
+                    <td>
+                        @{
+                            var badgeClass = booking.Status switch
+                            {
+                                BookingStatus.Approved => "text-bg-success",
+                                BookingStatus.Rejected => "text-bg-danger",
+                                _ => "text-bg-warning"
+                            };
+                        }
+                        <span class="badge @badgeClass">@booking.Status.Humanize()</span>
+                    </td>
+                    <td>
+                        @if (booking.Status == BookingStatus.Pending)
+                        {
+                            <form asp-action="RejectBooking" method="post">
+                                <input type="hidden" name="bookingId" value="@booking.BookingId" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+            @if (!Model.Any())
+            {
+                <tr><td colspan="7" class="text-muted">No bookings yet.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

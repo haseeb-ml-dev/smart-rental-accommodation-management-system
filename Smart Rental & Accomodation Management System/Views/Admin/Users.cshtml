@@ -1,0 +1,62 @@
+@model List<AdminUserViewModel>
+@{
+    ViewData["Title"] = "Users";
+}
+
+<h1 class="mb-4">Users</h1>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">@TempData["Message"]</div>
+}
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                var isAdmin = user.Roles.Contains("Admin");
+                <tr>
+                    <td>@user.FullName</td>
+                    <td>@user.Email</td>
+                    <td>@string.Join(", ", user.Roles)</td>
+                    <td>
+                        @if (user.IsLockedOut)
+                        {
+                            <span class="badge text-bg-danger">Suspended</span>
+                        }
+                        else
+                        {
+                            <span class="badge text-bg-success">Active</span>
+                        }
+                    </td>
+                    <td>
+                        @if (!isAdmin)
+                        {
+                            <form asp-action="ToggleUserLockout" method="post">
+                                <input type="hidden" name="userId" value="@user.Id" />
+                                @if (user.IsLockedOut)
+                                {
+                                    <button type="submit" class="btn btn-sm btn-outline-success">Reactivate</button>
+                                }
+                                else
+                                {
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Suspend</button>
+                                }
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

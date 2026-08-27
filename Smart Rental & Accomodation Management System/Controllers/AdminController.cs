@@ -68,5 +68,121 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
 
             return View(vm);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TogglePropertyActive(int propertyId)
+        {
+            var property = await _context.Properties.FirstOrDefaultAsync(p => p.Id == propertyId);
+            if (property == null)
+            {
+                return NotFound();
+            }
+
+            property.IsActive = !property.IsActive;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Users()
+        {
+            var users = await _userManager.Users.ToListAsync();
+            var vm = new List<AdminUserViewModel>();
+
+            foreach (var user in users)
+            {
+                vm.Add(new AdminUserViewModel
+                {
+                    Id = user.Id,
+                    FullName = user.FullName,
+                    Email = user.Email ?? string.Empty,
+                    Roles = (await _userManager.GetRolesAsync(user)).ToList(),
+                    IsLockedOut = await _userManager.IsLockedOutAsync(user)
+                });
+            }
+
+            return View(vm.OrderBy(u => u.FullName).ToList());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleUserLockout(string userId)
+        {
+            var currentAdminId = _userManager.GetUserId(User)!;
+            if (userId == currentAdminId)
+            {
+                TempData["Message"] = "You can't suspend your own account.";
+                return RedirectToAction(nameof(Users));
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            if (await _userManager.IsInRoleAsync(user, "Admin"))
+            {
+                TempData["Message"] = "Admin accounts can't be suspended.";
+                return RedirectToAction(nameof(Users));
+            }
+
+            if (await _userManager.IsLockedOutAsync(user))
+            {
+                await _userManager.SetLockoutEndDateAsync(user, null);
+                TempData["Message"] = $"{user.FullName} has been reactivated.";
+            }
+            else
+            {
+                await _userManager.SetLockoutEnabledAsync(user, true);
+                await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+                TempData["Message"] = $"{user.FullName} has been suspended.";
+            }
+
+            return RedirectToAction(nameof(Users));
+        }
+
+        public async Task<IActionResult> Bookings()
+        {
+            var bookings = await _context.Bookings
+                .Include(b => b.Unit)
+                    .ThenInclude(u => u!.Property)
+                .Include(b => b.Tenant)
+                .OrderByDescending(b => b.CreatedAt)
+                .Select(b => new BookingListItemViewModel
+                {
+                    BookingId = b.Id,
+                    PropertyName = b.Unit!.Property!.Name,
+                    UnitName = b.Unit.Name,
+                    TenantName = b.Tenant!.FullName,
+                    StartDate = b.StartDate,
+                    Status = b.Status,
+                    CreatedAt = b.CreatedAt
+                })
+                .ToListAsync();
+
+            return View(bookings);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectBooking(int bookingId)
+        {
+            var booking = await _context.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId);
+            if (booking == null)
+            {
+                return NotFound();
+            }
+
+            if (booking.Status == BookingStatus.Pending)
+            {
+                booking.Status = BookingStatus.Rejected;
+                booking.DecisionDate = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Bookings));
+        }
     }
 }
