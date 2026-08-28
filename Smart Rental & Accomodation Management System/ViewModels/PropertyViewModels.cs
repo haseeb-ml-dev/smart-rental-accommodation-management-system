@@ -51,6 +51,7 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public int LeaseId { get; set; }
         public string TenantName { get; set; } = string.Empty;
         public DateTime StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 
     public class TenantOptionViewModel

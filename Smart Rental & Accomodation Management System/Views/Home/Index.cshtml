@@ -1,70 +1,78 @@
+@model List<PublicListingViewModel>
 @{
-    ViewData["Title"] = "Home";
-    string? dashboardController = User.IsInRole("Landlord") ? "Landlord" : User.IsInRole("Tenant") ? "Tenant" : User.IsInRole("Admin") ? "Admin" : null;
+    ViewData["Title"] = "Find a place to stay";
 }
 
 <div class="hero mb-5">
     <div class="row align-items-center">
         <div class="col-lg-8">
-            <h1 class="display-5 fw-bold mb-3">Rent, bills, and bookings &mdash; all in one place</h1>
+            <h1 class="display-6 fw-bold mb-3">Find your next place to stay</h1>
             <p class="fs-5 mb-4">
-                Smart Rental replaces the spreadsheets and group chats landlords and tenants use to track rent,
-                split shared utility bills, and manage room bookings &mdash; with one simple, role-based platform.
+                Browse private rooms, shared rooms, and family units. Create a free tenant account when you're
+                ready to request a booking.
             </p>
-            @if (User.Identity != null && User.Identity.IsAuthenticated && dashboardController != null)
-            {
-                <a asp-controller="@dashboardController" asp-action="Index" class="btn btn-light btn-lg fw-semibold">Go to my dashboard</a>
-            }
-            else
-            {
-                <div class="d-flex gap-2">
-                    <a asp-controller="Account" asp-action="Register" class="btn btn-light btn-lg fw-semibold">Get started</a>
-                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-light btn-lg">Log in</a>
-                </div>
-            }
+            <div class="d-flex gap-2">
+                <a asp-controller="Account" asp-action="Register" class="btn btn-light btn-lg fw-semibold">Get started</a>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-light btn-lg">Log in</a>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="row g-4 mb-5">
-    <div class="col-md-4">
-        <div class="feature-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 5h16M4 12h16M4 19h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            </svg>
-        </div>
-        <h5>Rent &amp; utility tracking</h5>
-        <p class="text-muted">Automated monthly rent invoicing with due-date and overdue tracking, plus utility bills split equally or by custom percentage across tenants.</p>
-    </div>
-    <div class="col-md-4">
-        <div class="feature-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="3" y="4" width="18" height="17" rx="2" stroke="currentColor" stroke-width="2" />
-                <path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            </svg>
-        </div>
-        <h5>Booking &amp; availability</h5>
-        <p class="text-muted">Browse private rooms, shared rooms, and family units with real-time availability, request a booking, and get approved by the landlord.</p>
-    </div>
-    <div class="col-md-4">
-        <div class="feature-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                <path d="M7 15l4-4 3 3 5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-        </div>
-        <h5>Role-based dashboards</h5>
-        <p class="text-muted">Landlords, tenants, and admins each get a dashboard tailored to them &mdash; collection reports, payment history, and system-wide overviews.</p>
-    </div>
-</div>
+<h2 class="h4 mb-3">Available properties</h2>
 
-@if (User.Identity == null || !User.Identity.IsAuthenticated)
+@if (!Model.Any())
 {
-    <div class="row">
-        <div class="col-lg-8 mx-auto text-center py-4">
-            <h4 class="mb-2">Ready to get organized?</h4>
-            <p class="text-muted mb-3">Create a free account as a landlord or tenant and start tracking rent, bills, and bookings today.</p>
-            <a asp-controller="Account" asp-action="Register" class="btn btn-primary">Create an account</a>
-        </div>
-    </div>
+    <div class="alert alert-info">No listings yet — check back soon.</div>
 }
+
+<div class="row g-4">
+    @foreach (var unit in Model)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                @if (unit.CoverImageFileName != null)
+                {
+                    <img src="/uploads/units/@unit.UnitId/@unit.CoverImageFileName" class="card-img-top" style="height: 12rem; object-fit: cover;" alt="@unit.UnitName" />
+                }
+                else
+                {
+                    <div class="bg-light d-flex align-items-center justify-content-center text-muted" style="height: 12rem;">No photo</div>
+                }
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title mb-1">@unit.UnitName</h5>
+                    <div class="text-muted small mb-2">
+                        @unit.PropertyName &middot; @(string.IsNullOrEmpty(unit.City) ? unit.Address : unit.City)
+                        @if (unit.Latitude.HasValue && unit.Longitude.HasValue)
+                        {
+                            <a href="https://www.google.com/maps?q=@(unit.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)),@(unit.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))" target="_blank" rel="noopener" class="ms-1">(map)</a>
+                        }
+                    </div>
+                    <div class="mb-2">
+                        @unit.UnitType.Humanize()
+                        @if (unit.BhkType != null)
+                        {
+                            <text> &middot; @unit.BhkType.Value.Humanize()</text>
+                        }
+                        @if (unit.UnitType != UnitType.SharedRoom)
+                        {
+                            <span class="text-muted small"> (sleeps @unit.Capacity)</span>
+                        }
+                    </div>
+                    <div class="fs-5 fw-semibold mb-2">@unit.MonthlyRent.ToString("C") <span class="fs-6 text-muted fw-normal">/ month</span></div>
+                    <div class="mb-3">
+                        @if (unit.IsAvailable)
+                        {
+                            <span class="badge text-bg-success">Available</span>
+                        }
+                        else
+                        {
+                            <span class="badge text-bg-secondary">Full</span>
+                        }
+                    </div>
+                    <a asp-controller="Booking" asp-action="Details" asp-route-unitId="@unit.UnitId" class="btn btn-primary mt-auto">View / Book</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

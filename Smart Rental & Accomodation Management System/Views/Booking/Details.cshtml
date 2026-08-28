@@ -92,7 +92,20 @@
                         <input type="hidden" name="unitId" value="@Model.UnitId" />
                         <div class="mb-2">
                             <label class="form-label">Move-in date</label>
-                            <input type="date" name="startDate" class="form-control" value="@DateTime.UtcNow.ToString("yyyy-MM-dd")" />
+                            <input type="date" id="startDate" name="startDate" class="form-control" value="@DateTime.UtcNow.ToString("yyyy-MM-dd")" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Move-out date (optional)</label>
+                            <input type="date" id="endDate" name="endDate" class="form-control" />
+                            <div class="form-text">Let the landlord know how long you want the unit for.</div>
+                        </div>
+                        <div id="estimatedTotalBox" class="alert alert-light border py-2 mb-2 d-none">
+                            Estimated total: <strong id="estimatedTotalValue"></strong>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Propose a different monthly rent (optional)</label>
+                            <input type="number" name="proposedRent" class="form-control" step="0.01" min="0" placeholder="e.g. @((Model.MonthlyRent * 0.9m).ToString("0"))" />
+                            <div class="form-text">Listed rent is @Model.MonthlyRent.ToString("C") / month. If you offer a different amount, the landlord sees it as a starting point — final terms are worked out with them directly.</div>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Request to book</button>
                     </form>
@@ -105,3 +118,37 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var monthlyRent = @Model.MonthlyRent.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            var startInput = document.getElementById('startDate');
+            var endInput = document.getElementById('endDate');
+            var box = document.getElementById('estimatedTotalBox');
+            var valueEl = document.getElementById('estimatedTotalValue');
+
+            if (!startInput || !endInput) return;
+
+            function update() {
+                var start = new Date(startInput.value);
+                var end = new Date(endInput.value);
+
+                if (!endInput.value || isNaN(start) || isNaN(end) || end <= start) {
+                    box.classList.add('d-none');
+                    return;
+                }
+
+                var days = (end - start) / (1000 * 60 * 60 * 24);
+                var months = Math.max(1, Math.ceil(days / 30.4375));
+                var total = months * monthlyRent;
+
+                valueEl.textContent = '$' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' (~' + months + ' month' + (months === 1 ? '' : 's') + ')';
+                box.classList.remove('d-none');
+            }
+
+            startInput.addEventListener('change', update);
+            endInput.addEventListener('change', update);
+        })();
+    </script>
+}

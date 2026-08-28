@@ -45,6 +45,9 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public string UnitName { get; set; } = string.Empty;
         public string? TenantName { get; set; }
         public DateTime StartDate { get; set; }
+        public DateTime? RequestedEndDate { get; set; }
+        public decimal MonthlyRent { get; set; }
+        public decimal? ProposedRent { get; set; }
         public BookingStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
     }

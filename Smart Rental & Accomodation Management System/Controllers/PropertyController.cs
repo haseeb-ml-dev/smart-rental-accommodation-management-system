@@ -213,7 +213,8 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 ModelState.AddModelError(nameof(model.BhkType), "Select a BHK configuration for a Family Unit / apartment listing.");
             }
 
-            var activeLeaseCount = unit.Leases.Count(l => l.EndDate == null);
+            var today = DateTime.UtcNow.Date;
+            var activeLeaseCount = unit.Leases.Count(l => l.EndDate == null || l.EndDate >= today);
             var newBookableSlots = model.UnitType == UnitType.SharedRoom ? model.Capacity : 1;
             if (newBookableSlots < activeLeaseCount)
             {
@@ -250,7 +251,8 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 return NotFound();
             }
 
-            var activeLeases = unit.Leases.Where(l => l.EndDate == null).OrderBy(l => l.StartDate).ToList();
+            var today = DateTime.UtcNow.Date;
+            var activeLeases = unit.Leases.Where(l => l.EndDate == null || l.EndDate >= today).OrderBy(l => l.StartDate).ToList();
             var activeTenantIds = activeLeases.Select(l => l.TenantId).ToHashSet();
 
             var tenantUsers = await _userManager.GetUsersInRoleAsync("Tenant");
@@ -267,7 +269,8 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 {
                     LeaseId = l.Id,
                     TenantName = l.Tenant!.FullName,
-                    StartDate = l.StartDate
+                    StartDate = l.StartDate,
+                    EndDate = l.EndDate
                 }).ToList(),
                 AvailableTenants = tenantUsers
                     .Where(t => !activeTenantIds.Contains(t.Id))
@@ -289,8 +292,9 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 return NotFound();
             }
 
-            var activeLeaseCount = unit.Leases.Count(l => l.EndDate == null);
-            var alreadyActive = unit.Leases.Any(l => l.EndDate == null && l.TenantId == tenantId);
+            var today = DateTime.UtcNow.Date;
+            var activeLeaseCount = unit.Leases.Count(l => l.EndDate == null || l.EndDate >= today);
+            var alreadyActive = unit.Leases.Any(l => (l.EndDate == null || l.EndDate >= today) && l.TenantId == tenantId);
 
             if (activeLeaseCount < unit.BookableSlots && !alreadyActive)
             {
@@ -327,9 +331,11 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 return NotFound();
             }
 
-            if (lease.EndDate == null)
+            var today = DateTime.UtcNow.Date;
+
+            if (lease.EndDate == null || lease.EndDate > today)
             {
-                lease.EndDate = DateTime.UtcNow.Date;
+                lease.EndDate = today;
                 await _context.SaveChangesAsync();
                 TempData["Message"] = "Tenant removed from unit.";
             }

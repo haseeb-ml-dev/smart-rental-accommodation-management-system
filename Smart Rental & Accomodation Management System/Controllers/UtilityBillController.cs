@@ -289,8 +289,9 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
 
         private async Task<List<ApplicationUser>> GetActiveTenantsAsync(int propertyId, UtilityBillType billType)
         {
+            var today = DateTime.UtcNow.Date;
             var query = _context.Leases
-                .Where(l => l.EndDate == null && l.Unit!.PropertyId == propertyId);
+                .Where(l => (l.EndDate == null || l.EndDate >= today) && l.Unit!.PropertyId == propertyId);
 
             query = billType switch
             {
@@ -309,8 +310,9 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         // can reveal/hide tenants without a round-trip. Real exclusion is enforced in POST via GetActiveTenantsAsync.
         private async Task<List<ApplicationUser>> GetAllActiveTenantsAsync(int propertyId)
         {
+            var today = DateTime.UtcNow.Date;
             return await _context.Leases
-                .Where(l => l.EndDate == null && l.Unit!.PropertyId == propertyId)
+                .Where(l => (l.EndDate == null || l.EndDate >= today) && l.Unit!.PropertyId == propertyId)
                 .Select(l => l.Tenant!)
                 .Distinct()
                 .ToListAsync();
@@ -318,8 +320,9 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
 
         private async Task<List<TenantShareInputViewModel>> BuildTenantInputsAsync(int propertyId, List<ApplicationUser> tenants)
         {
+            var today = DateTime.UtcNow.Date;
             var meterFlags = await _context.Leases
-                .Where(l => l.EndDate == null && l.Unit!.PropertyId == propertyId)
+                .Where(l => (l.EndDate == null || l.EndDate >= today) && l.Unit!.PropertyId == propertyId)
                 .Select(l => new { l.TenantId, l.Unit!.HasIndividualElectricityMeter, l.Unit.HasIndividualWaterMeter })
                 .ToListAsync();
 

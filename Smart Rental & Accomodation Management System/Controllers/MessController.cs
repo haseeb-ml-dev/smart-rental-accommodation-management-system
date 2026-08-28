@@ -119,11 +119,12 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         public async Task<IActionResult> Index()
         {
             var tenantId = _userManager.GetUserId(User)!;
+            var today = DateTime.UtcNow.Date;
 
             var lease = await _context.Leases
                 .Include(l => l.Unit)
                     .ThenInclude(u => u!.Property)
-                .Where(l => l.TenantId == tenantId && l.EndDate == null)
+                .Where(l => l.TenantId == tenantId && (l.EndDate == null || l.EndDate >= today))
                 .OrderByDescending(l => l.StartDate)
                 .FirstOrDefaultAsync();
 
@@ -215,10 +216,11 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         public async Task<IActionResult> SubmitFeedback(MessFeedbackFormViewModel model)
         {
             var tenantId = _userManager.GetUserId(User)!;
+            var today = DateTime.UtcNow.Date;
 
             var lease = await _context.Leases
                 .Include(l => l.Unit)
-                .Where(l => l.TenantId == tenantId && l.EndDate == null)
+                .Where(l => l.TenantId == tenantId && (l.EndDate == null || l.EndDate >= today))
                 .OrderByDescending(l => l.StartDate)
                 .FirstOrDefaultAsync();
 

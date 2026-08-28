@@ -15,7 +15,9 @@ namespace Smart_Rental___Accomodation_Management_System.Models
 
         public DateTime StartDate { get; set; }
 
-        // Null EndDate means the lease is currently active.
+        // Null EndDate means open-ended (indefinite). A future EndDate means a fixed-term lease that is still
+        // active — check IsCurrentlyActive-style logic (EndDate == null || EndDate >= today), never EndDate == null
+        // alone, when determining occupancy/billing eligibility.
         public DateTime? EndDate { get; set; }
 
         public List<RentInvoice> RentInvoices { get; set; } = new();

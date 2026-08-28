@@ -24,6 +24,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         public async Task<IActionResult> Browse()
         {
             var tenantId = _userManager.GetUserId(User)!;
+            var today = DateTime.UtcNow.Date;
 
             var units = await _context.Units
                 .Include(u => u.Property)
@@ -45,7 +46,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 MonthlyRent = u.MonthlyRent,
                 Capacity = u.Capacity,
                 BookableSlots = u.BookableSlots,
-                ActiveLeaseCount = u.Leases.Count(l => l.EndDate == null),
+                ActiveLeaseCount = u.Leases.Count(l => l.EndDate == null || l.EndDate >= today),
                 HasPendingRequestFromCurrentTenant = u.Bookings.Any(b => b.TenantId == tenantId && b.Status == BookingStatus.Pending)
             })
             .OrderBy(u => u.PropertyName).ThenBy(u => u.UnitName)
@@ -58,6 +59,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         public async Task<IActionResult> Details(int unitId)
         {
             var tenantId = _userManager.GetUserId(User)!;
+            var today = DateTime.UtcNow.Date;
 
             var unit = await _context.Units
                 .Include(u => u.Property)
@@ -84,7 +86,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 MonthlyRent = unit.MonthlyRent,
                 Capacity = unit.Capacity,
                 BookableSlots = unit.BookableSlots,
-                ActiveLeaseCount = unit.Leases.Count(l => l.EndDate == null),
+                ActiveLeaseCount = unit.Leases.Count(l => l.EndDate == null || l.EndDate >= today),
                 HasPendingRequestFromCurrentTenant = unit.Bookings.Any(b => b.TenantId == tenantId && b.Status == BookingStatus.Pending),
                 Images = unit.Images.OrderByDescending(i => i.IsCover).ThenBy(i => i.Id).ToList()
             };
@@ -95,7 +97,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         [HttpPost]
         [Authorize(Roles = "Tenant")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RequestBooking(int unitId, DateTime startDate)
+        public async Task<IActionResult> RequestBooking(int unitId, DateTime startDate, DateTime? endDate, decimal? proposedRent)
         {
             var tenantId = _userManager.GetUserId(User)!;
 
@@ -110,8 +112,16 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 return NotFound();
             }
 
-            var activeLeaseCount = unit.Leases.Count(l => l.EndDate == null);
+            var today = DateTime.UtcNow.Date;
+            var activeLeaseCount = unit.Leases.Count(l => l.EndDate == null || l.EndDate >= today);
             var alreadyPending = unit.Bookings.Any(b => b.TenantId == tenantId && b.Status == BookingStatus.Pending);
+            var resolvedStartDate = startDate == default ? today : startDate.Date;
+
+            if (endDate.HasValue && endDate.Value.Date <= resolvedStartDate)
+            {
+                TempData["Message"] = "The move-out date must be after the move-in date.";
+                return RedirectToAction(nameof(Details), new { unitId });
+            }
 
             if (unit.Property!.IsActive && activeLeaseCount < unit.BookableSlots && !alreadyPending)
             {
@@ -119,7 +129,9 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 {
                     UnitId = unitId,
                     TenantId = tenantId,
-                    StartDate = startDate == default ? DateTime.UtcNow.Date : startDate.Date,
+                    StartDate = resolvedStartDate,
+                    RequestedEndDate = endDate?.Date,
+                    ProposedRent = proposedRent is > 0 ? proposedRent : null,
                     Status = BookingStatus.Pending
                 });
                 await _context.SaveChangesAsync();
@@ -151,6 +163,9 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                     PropertyName = b.Unit!.Property!.Name,
                     UnitName = b.Unit.Name,
                     StartDate = b.StartDate,
+                    RequestedEndDate = b.RequestedEndDate,
+                    MonthlyRent = b.Unit.MonthlyRent,
+                    ProposedRent = b.ProposedRent,
                     Status = b.Status,
                     CreatedAt = b.CreatedAt
                 })
@@ -177,6 +192,9 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                     UnitName = b.Unit.Name,
                     TenantName = b.Tenant!.FullName,
                     StartDate = b.StartDate,
+                    RequestedEndDate = b.RequestedEndDate,
+                    MonthlyRent = b.Unit.MonthlyRent,
+                    ProposedRent = b.ProposedRent,
                     Status = b.Status,
                     CreatedAt = b.CreatedAt
                 })
@@ -235,7 +253,8 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 return RedirectToAction(nameof(Requests));
             }
 
-            var activeLeaseCount = booking.Unit!.Leases.Count(l => l.EndDate == null);
+            var today = DateTime.UtcNow.Date;
+            var activeLeaseCount = booking.Unit!.Leases.Count(l => l.EndDate == null || l.EndDate >= today);
             if (activeLeaseCount >= booking.Unit.BookableSlots)
             {
                 TempData["Message"] = "This unit filled up since the request was made. Reject it or free up capacity first.";
@@ -246,7 +265,8 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             {
                 UnitId = booking.UnitId,
                 TenantId = booking.TenantId,
-                StartDate = booking.StartDate
+                StartDate = booking.StartDate,
+                EndDate = booking.RequestedEndDate
             });
 
             booking.Status = BookingStatus.Approved;
@@ -347,7 +367,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                         TenantName = lease.Tenant?.FullName ?? "Unknown",
                         StartDate = lease.StartDate,
                         EndDate = lease.EndDate,
-                        IsActive = lease.EndDate == null,
+                        IsActive = lease.EndDate == null || lease.EndDate >= today,
                         LeftPercent = left,
                         WidthPercent = width
                     });

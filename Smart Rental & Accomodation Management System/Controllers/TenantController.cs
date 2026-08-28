@@ -27,12 +27,13 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         public async Task<IActionResult> Index()
         {
             var tenantId = _userManager.GetUserId(User)!;
+            var today = DateTime.UtcNow.Date;
 
             var lease = await _context.Leases
                 .Include(l => l.Unit)
                     .ThenInclude(u => u!.Property)
                 .Include(l => l.Occupants)
-                .Where(l => l.TenantId == tenantId && l.EndDate == null)
+                .Where(l => l.TenantId == tenantId && (l.EndDate == null || l.EndDate >= today))
                 .OrderByDescending(l => l.StartDate)
                 .FirstOrDefaultAsync();
 
@@ -55,8 +56,6 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 .Where(i => i.LeaseId == lease.Id)
                 .OrderByDescending(i => i.DueDate)
                 .ToListAsync();
-
-            var today = DateTime.UtcNow.Date;
 
             vm.TotalPaid = invoices.Where(i => i.Status == InvoiceStatus.Paid).Sum(i => i.Amount);
             vm.OutstandingBalance = invoices.Where(i => i.Status != InvoiceStatus.Paid).Sum(i => i.Amount);
@@ -254,9 +253,10 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         private async Task<Lease?> GetOwnedFamilyUnitLeaseAsync(int leaseId)
         {
             var tenantId = _userManager.GetUserId(User)!;
+            var today = DateTime.UtcNow.Date;
             return await _context.Leases
                 .Include(l => l.Unit)
-                .FirstOrDefaultAsync(l => l.Id == leaseId && l.TenantId == tenantId && l.EndDate == null && l.Unit!.UnitType == UnitType.FamilyUnit);
+                .FirstOrDefaultAsync(l => l.Id == leaseId && l.TenantId == tenantId && (l.EndDate == null || l.EndDate >= today) && l.Unit!.UnitType == UnitType.FamilyUnit);
         }
     }
 }

@@ -17,7 +17,8 @@
                 <th>Property</th>
                 <th>Unit</th>
                 <th>Tenant</th>
-                <th>Requested start</th>
+                <th>Requested dates</th>
+                <th>Rent</th>
                 <th>Requested on</th>
                 <th></th>
             </tr>
@@ -29,7 +30,24 @@
                     <td>@booking.PropertyName</td>
                     <td>@booking.UnitName</td>
                     <td>@booking.TenantName</td>
-                    <td>@booking.StartDate.ToString("MMM d, yyyy")</td>
+                    <td>
+                        @booking.StartDate.ToString("MMM d, yyyy")
+                        @if (booking.RequestedEndDate.HasValue)
+                        {
+                            <text> &ndash; @booking.RequestedEndDate.Value.ToString("MMM d, yyyy")</text>
+                        }
+                        else
+                        {
+                            <span class="text-muted small d-block">No end date given</span>
+                        }
+                    </td>
+                    <td>
+                        @booking.MonthlyRent.ToString("C") / mo
+                        @if (booking.ProposedRent.HasValue)
+                        {
+                            <div class="small text-warning-emphasis">Tenant offered @booking.ProposedRent.Value.ToString("C") / mo</div>
+                        }
+                    </td>
                     <td>@booking.CreatedAt.ToString("MMM d, yyyy")</td>
                     <td class="d-flex gap-2">
                         <form asp-action="Approve" method="post">
@@ -45,7 +63,7 @@
             }
             @if (!Model.Any())
             {
-                <tr><td colspan="6" class="text-muted">No pending requests.</td></tr>
+                <tr><td colspan="7" class="text-muted">No pending requests.</td></tr>
             }
         </tbody>
     </table>

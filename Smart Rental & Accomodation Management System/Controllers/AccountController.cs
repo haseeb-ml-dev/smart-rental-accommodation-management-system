@@ -51,15 +51,18 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         }
 
         [HttpGet]
-        public IActionResult Register()
+        public IActionResult Register(string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             return View(new RegisterViewModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public async Task<IActionResult> Register(RegisterViewModel model, string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
+
             if (model.Role != "Landlord" && model.Role != "Tenant")
             {
                 ModelState.AddModelError(nameof(model.Role), "Invalid role selected.");
@@ -89,6 +92,11 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
 
             await _userManager.AddToRoleAsync(user, model.Role);
             await _signInManager.SignInAsync(user, isPersistent: false);
+
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
 
             return await RedirectByRoleAsync(user);
         }

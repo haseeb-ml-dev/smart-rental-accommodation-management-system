@@ -26,6 +26,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         public async Task<IActionResult> Index()
         {
             var landlordId = _userManager.GetUserId(User)!;
+            var today = DateTime.UtcNow.Date;
 
             var units = await _context.Units
                 .Include(u => u.Property)
@@ -37,7 +38,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
 
             var activeLeaseUnitIds = units
                 .SelectMany(u => u.Leases)
-                .Where(l => l.EndDate == null)
+                .Where(l => l.EndDate == null || l.EndDate >= today)
                 .Select(l => l.UnitId)
                 .ToHashSet();
 
@@ -50,15 +51,13 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 .OrderByDescending(i => i.DueDate)
                 .ToListAsync();
 
-            var today = DateTime.UtcNow.Date;
-
             var vm = new LandlordDashboardViewModel
             {
                 TotalProperties = units.Select(u => u.PropertyId).Distinct().Count(),
                 TotalUnits = units.Count,
                 OccupiedUnits = activeLeaseUnitIds.Count,
                 VacantUnits = units.Count - activeLeaseUnitIds.Count,
-                ActiveTenants = units.SelectMany(u => u.Leases).Where(l => l.EndDate == null).Select(l => l.TenantId).Distinct().Count(),
+                ActiveTenants = units.SelectMany(u => u.Leases).Where(l => l.EndDate == null || l.EndDate >= today).Select(l => l.TenantId).Distinct().Count(),
                 CollectedThisMonth = invoices.Where(i => i.DueDate.Year == today.Year && i.DueDate.Month == today.Month && i.Status == InvoiceStatus.Paid).Sum(i => i.Amount),
                 OutstandingThisMonth = invoices.Where(i => i.DueDate.Year == today.Year && i.DueDate.Month == today.Month && i.Status != InvoiceStatus.Paid).Sum(i => i.Amount),
                 OverdueInvoiceCount = invoices.Count(i => i.Status == InvoiceStatus.Overdue),
@@ -182,6 +181,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         {
             var landlordId = _userManager.GetUserId(User)!;
             var landlord = await _userManager.GetUserAsync(User);
+            var today = DateTime.UtcNow.Date;
 
             var units = await _context.Units
                 .Include(u => u.Property)
@@ -193,7 +193,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
 
             var activeLeaseUnitIds = units
                 .SelectMany(u => u.Leases)
-                .Where(l => l.EndDate == null)
+                .Where(l => l.EndDate == null || l.EndDate >= today)
                 .Select(l => l.UnitId)
                 .ToHashSet();
 
@@ -207,8 +207,6 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 .OrderByDescending(i => i.DueDate)
                 .ToListAsync();
 
-            var today = DateTime.UtcNow.Date;
-
             var data = new LandlordReportData
             {
                 LandlordName = landlord?.FullName ?? "Landlord",
@@ -216,7 +214,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 TotalUnits = units.Count,
                 OccupiedUnits = activeLeaseUnitIds.Count,
                 VacantUnits = units.Count - activeLeaseUnitIds.Count,
-                ActiveTenants = units.SelectMany(u => u.Leases).Where(l => l.EndDate == null).Select(l => l.TenantId).Distinct().Count(),
+                ActiveTenants = units.SelectMany(u => u.Leases).Where(l => l.EndDate == null || l.EndDate >= today).Select(l => l.TenantId).Distinct().Count(),
                 CollectedThisMonth = invoices.Where(i => i.DueDate.Year == today.Year && i.DueDate.Month == today.Month && i.Status == InvoiceStatus.Paid).Sum(i => i.Amount),
                 OutstandingThisMonth = invoices.Where(i => i.DueDate.Year == today.Year && i.DueDate.Month == today.Month && i.Status != InvoiceStatus.Paid).Sum(i => i.Amount),
                 OverdueInvoiceCount = invoices.Count(i => i.Status == InvoiceStatus.Overdue)

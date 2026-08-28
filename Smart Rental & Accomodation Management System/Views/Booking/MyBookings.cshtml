@@ -11,7 +11,8 @@
             <tr>
                 <th>Property</th>
                 <th>Unit</th>
-                <th>Requested start</th>
+                <th>Requested dates</th>
+                <th>Rent</th>
                 <th>Status</th>
                 <th>Requested on</th>
                 <th></th>
@@ -23,7 +24,20 @@
                 <tr>
                     <td>@booking.PropertyName</td>
                     <td>@booking.UnitName</td>
-                    <td>@booking.StartDate.ToString("MMM d, yyyy")</td>
+                    <td>
+                        @booking.StartDate.ToString("MMM d, yyyy")
+                        @if (booking.RequestedEndDate.HasValue)
+                        {
+                            <text> &ndash; @booking.RequestedEndDate.Value.ToString("MMM d, yyyy")</text>
+                        }
+                    </td>
+                    <td>
+                        @booking.MonthlyRent.ToString("C") / mo
+                        @if (booking.ProposedRent.HasValue)
+                        {
+                            <div class="small text-warning-emphasis">You offered @booking.ProposedRent.Value.ToString("C") / mo</div>
+                        }
+                    </td>
                     <td>
                         @{
                             var badgeClass = booking.Status switch
@@ -50,7 +64,7 @@
             }
             @if (!Model.Any())
             {
-                <tr><td colspan="6" class="text-muted">You haven't requested any bookings yet.</td></tr>
+                <tr><td colspan="7" class="text-muted">You haven't requested any bookings yet.</td></tr>
             }
         </tbody>
     </table>

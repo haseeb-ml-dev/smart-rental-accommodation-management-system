@@ -1,6 +1,11 @@
 @model BookingCalendarViewModel
 @{
     ViewData["Title"] = "Booking Calendar";
+    var today = DateTime.UtcNow.Date;
+    var totalDays = (decimal)(Model.RangeEnd - Model.RangeStart).TotalDays;
+    var todayPercent = today >= Model.RangeStart && today <= Model.RangeEnd
+        ? (decimal)(today - Model.RangeStart).TotalDays / totalDays * 100m
+        : (decimal?)null;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -16,35 +21,59 @@
     </div>
 </div>
 
-<div class="mb-3 small text-muted d-flex gap-3">
-    <span><span class="d-inline-block rounded" style="width:12px;height:12px;background:#0d6efd;"></span> Active lease</span>
-    <span><span class="d-inline-block rounded" style="width:12px;height:12px;background:#adb5bd;"></span> Ended lease</span>
-    <span><span class="d-inline-block rounded-circle" style="width:10px;height:10px;background:#fd7e14;"></span> Pending request</span>
+<div class="mb-3 small d-flex flex-wrap gap-4 align-items-center">
+    <span><span class="d-inline-block rounded" style="width:14px;height:14px;background:#0d6efd;vertical-align:middle;"></span> Active lease (dates shown on the bar)</span>
+    <span><span class="d-inline-block rounded" style="width:14px;height:14px;background:#adb5bd;vertical-align:middle;"></span> Ended lease</span>
+    <span><span class="d-inline-block rounded" style="width:14px;height:14px;background:#fd7e14;vertical-align:middle;"></span> Pending request (listed below each unit's bar)</span>
+    <span><span class="d-inline-block" style="width:2px;height:14px;background:#dc3545;vertical-align:middle;"></span> Today</span>
 </div>
 
 <div class="card">
     <div class="card-body">
+        @* Shared month header so the reader only has to line dates up once. *@
+        <div class="position-relative mb-2" style="height: 22px; margin-left: 12rem;">
+            @foreach (var marker in Model.MonthMarkers)
+            {
+                <div class="position-absolute small fw-semibold text-muted" style="left: @marker.LeftPercent.ToString("0.###")%;">@marker.Label</div>
+            }
+        </div>
+
         @foreach (var unit in Model.Units)
         {
-            <div class="mb-4">
-                <div class="fw-semibold mb-1">@unit.UnitName <span class="text-muted small">(@unit.UnitType.Humanize())</span></div>
-                <div class="position-relative bg-light rounded" style="height: 36px;">
-                    @foreach (var marker in Model.MonthMarkers)
+            <div class="d-flex align-items-start mb-3 pb-3 border-bottom">
+                <div style="width: 12rem; flex-shrink: 0;">
+                    <div class="fw-semibold">@unit.UnitName</div>
+                    <div class="text-muted small">@unit.UnitType.Humanize()</div>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="position-relative bg-light rounded" style="height: 44px;">
+                        @foreach (var marker in Model.MonthMarkers)
+                        {
+                            <div class="position-absolute top-0 bottom-0 border-start border-secondary-subtle" style="left: @marker.LeftPercent.ToString("0.###")%;"></div>
+                        }
+                        @if (todayPercent.HasValue)
+                        {
+                            <div class="position-absolute top-0 bottom-0 border-start border-danger" style="left: @todayPercent.Value.ToString("0.###")%; border-width: 2px !important;"></div>
+                        }
+                        @foreach (var bar in unit.Bars)
+                        {
+                            <div class="position-absolute top-0 bottom-0 rounded d-flex align-items-center overflow-hidden text-white px-2"
+                                 style="left: @bar.LeftPercent.ToString("0.###")%; width: @bar.WidthPercent.ToString("0.###")%; background: @(bar.IsActive ? "#0d6efd" : "#adb5bd"); font-size: 0.72rem; line-height: 1.1; white-space: nowrap;"
+                                 title="@bar.TenantName &#10;@bar.StartDate.ToString("MMM d, yyyy") - @(bar.EndDate.HasValue ? bar.EndDate.Value.ToString("MMM d, yyyy") : "ongoing")">
+                                <span class="text-truncate">@bar.TenantName</span>
+                            </div>
+                        }
+                    </div>
+                    @if (unit.PendingMarkers.Any())
                     {
-                        <div class="position-absolute top-0 bottom-0 border-start border-secondary-subtle" style="left: @marker.LeftPercent.ToString("0.###")%;"></div>
-                    }
-                    @foreach (var bar in unit.Bars)
-                    {
-                        <div class="position-absolute top-0 bottom-0 rounded"
-                             style="left: @bar.LeftPercent.ToString("0.###")%; width: @bar.WidthPercent.ToString("0.###")%; background: @(bar.IsActive ? "#0d6efd" : "#adb5bd");"
-                             title="@bar.TenantName (@bar.StartDate.ToString("MMM d, yyyy")) - @(bar.EndDate.HasValue ? bar.EndDate.Value.ToString("MMM d, yyyy") : "ongoing")">
-                        </div>
-                    }
-                    @foreach (var marker in unit.PendingMarkers)
-                    {
-                        <div class="position-absolute rounded-circle"
-                             style="left: calc(@marker.LeftPercent.ToString("0.###")% - 5px); top: 13px; width: 10px; height: 10px; background: #fd7e14;"
-                             title="@marker.TenantName requested @marker.RequestedDate.ToString("MMM d, yyyy")">
+                        <div class="mt-1 d-flex flex-wrap gap-2">
+                            @foreach (var marker in unit.PendingMarkers)
+                            {
+                                <span class="badge text-bg-warning-subtle text-warning-emphasis border border-warning-subtle">
+                                    <span class="d-inline-block rounded-circle me-1" style="width:6px;height:6px;background:#fd7e14;"></span>
+                                    @marker.TenantName requested @marker.RequestedDate.ToString("MMM d, yyyy")
+                                </span>
+                            }
                         </div>
                     }
                 </div>
@@ -54,12 +83,5 @@
         {
             <div class="text-muted">This property has no units yet.</div>
         }
-
-        <div class="position-relative" style="height: 20px;">
-            @foreach (var marker in Model.MonthMarkers)
-            {
-                <div class="position-absolute small text-muted" style="left: @marker.LeftPercent.ToString("0.###")%;">@marker.Label</div>
-            }
-        </div>
     </div>
 </div>

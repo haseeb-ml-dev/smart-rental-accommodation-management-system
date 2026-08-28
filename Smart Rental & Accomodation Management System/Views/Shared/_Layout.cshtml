@@ -35,9 +35,12 @@
                         Func<string, string> navClass = c => "nav-link text-dark" + (string.Equals(currentController, c, StringComparison.OrdinalIgnoreCase) ? " active" : "");
                     }
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="@navClass("Home")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
+                        @if (User.Identity == null || !User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="@navClass("Home")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                        }
                         @if (User.IsInRole("Landlord"))
                         {
                             <li class="nav-item">
