@@ -41,4 +41,14 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public int Rating { get; set; }
         public string? Comment { get; set; }
     }
+
+    public class PropertyMessRatingViewModel
+    {
+        public int PropertyId { get; set; }
+        public string PropertyName { get; set; } = string.Empty;
+        public string LandlordName { get; set; } = string.Empty;
+        public int FeedbackCount { get; set; }
+        public double AverageRating { get; set; }
+        public List<MessFeedback> RecentFeedback { get; set; } = new();
+    }
 }

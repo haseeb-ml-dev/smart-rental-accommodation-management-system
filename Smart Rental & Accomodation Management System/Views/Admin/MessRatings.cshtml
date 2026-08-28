@@ -1,0 +1,60 @@
+@model List<PropertyMessRatingViewModel>
+@{
+    ViewData["Title"] = "Mess Ratings";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Mess Ratings</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary">Back to Dashboard</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No mess feedback has been submitted yet.</div>
+}
+
+@foreach (var property in Model)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                    <h5 class="card-title mb-1">@property.PropertyName</h5>
+                    <div class="text-muted small">Landlord: @property.LandlordName</div>
+                </div>
+                <div class="text-end">
+                    <div class="fs-3 fw-semibold">@property.AverageRating.ToString("0.0") <span class="fs-6 text-muted">/ 5</span></div>
+                    <div class="text-muted small">@property.FeedbackCount rating@(property.FeedbackCount == 1 ? "" : "s")</div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Tenant</th>
+                            <th>Day</th>
+                            <th>Meal</th>
+                            <th>Rating</th>
+                            <th>Comment</th>
+                            <th>Submitted</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var f in property.RecentFeedback)
+                        {
+                            <tr>
+                                <td>@f.Tenant?.FullName</td>
+                                <td>@f.DayOfWeek</td>
+                                <td>@f.MealType.Humanize()</td>
+                                <td>@f.Rating / 5</td>
+                                <td>@f.Comment</td>
+                                <td>@f.CreatedAt.ToString("MMM d, yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}

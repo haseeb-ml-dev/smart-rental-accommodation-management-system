@@ -8,6 +8,7 @@
     <div class="d-flex gap-2">
         <a asp-action="Users" class="btn btn-outline-primary">Users</a>
         <a asp-action="Bookings" class="btn btn-outline-primary">Bookings</a>
+        <a asp-action="MessRatings" class="btn btn-outline-primary">Mess Ratings</a>
     </div>
 </div>
 
@@ -41,6 +42,22 @@
             <div class="card-body">
                 <div class="text-muted small">Overdue invoices</div>
                 <div class="fs-3 fw-semibold @(Model.OverdueInvoiceCount > 0 ? "text-danger" : "")">@Model.OverdueInvoiceCount</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Top-rated mess</div>
+                @if (Model.TopRatedPropertyName != null)
+                {
+                    <div class="fs-3 fw-semibold">@Model.TopRatedPropertyAverage!.Value.ToString("0.0") <span class="fs-6 text-muted">/ 5</span></div>
+                    <div class="text-muted small text-truncate">@Model.TopRatedPropertyName</div>
+                }
+                else
+                {
+                    <div class="text-muted small">Not enough ratings yet</div>
+                }
             </div>
         </div>
     </div>

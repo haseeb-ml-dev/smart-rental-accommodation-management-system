@@ -66,6 +66,45 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 });
             }
 
+            var topRated = await _context.MessFeedbacks
+                .GroupBy(f => f.PropertyId)
+                .Select(g => new { PropertyId = g.Key, Average = g.Average(f => f.Rating), Count = g.Count() })
+                .Where(g => g.Count >= 3)
+                .OrderByDescending(g => g.Average)
+                .FirstOrDefaultAsync();
+
+            if (topRated != null)
+            {
+                vm.TopRatedPropertyName = properties.FirstOrDefault(p => p.Id == topRated.PropertyId)?.Name;
+                vm.TopRatedPropertyAverage = topRated.Average;
+            }
+
+            return View(vm);
+        }
+
+        public async Task<IActionResult> MessRatings()
+        {
+            var feedback = await _context.MessFeedbacks
+                .Include(f => f.Property)
+                    .ThenInclude(p => p!.Landlord)
+                .Include(f => f.Tenant)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
+
+            var vm = feedback
+                .GroupBy(f => f.PropertyId)
+                .Select(g => new PropertyMessRatingViewModel
+                {
+                    PropertyId = g.Key,
+                    PropertyName = g.First().Property?.Name ?? "(deleted property)",
+                    LandlordName = g.First().Property?.Landlord?.FullName ?? string.Empty,
+                    FeedbackCount = g.Count(),
+                    AverageRating = g.Average(f => f.Rating),
+                    RecentFeedback = g.OrderByDescending(f => f.CreatedAt).Take(5).ToList()
+                })
+                .OrderByDescending(p => p.AverageRating)
+                .ToList();
+
             return View(vm);
         }
 
