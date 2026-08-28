@@ -39,8 +39,9 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            ViewBag.Cities = await _context.SupportedCities.OrderBy(c => c.Name).Select(c => c.Name).ToListAsync();
             return View(new PropertyFormViewModel());
         }
 
@@ -50,6 +51,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         {
             if (!ModelState.IsValid)
             {
+                ViewBag.Cities = await _context.SupportedCities.OrderBy(c => c.Name).Select(c => c.Name).ToListAsync();
                 return View(model);
             }
 
@@ -57,7 +59,8 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             {
                 LandlordId = _userManager.GetUserId(User)!,
                 Name = model.Name,
-                Address = model.Address
+                Address = model.Address,
+                City = string.IsNullOrWhiteSpace(model.City) ? null : model.City.Trim()
             };
 
             var geocode = await _geocodingService.GeocodeAsync(model.Address);
@@ -130,7 +133,8 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 return NotFound();
             }
 
-            return View(new PropertyFormViewModel { Id = property.Id, Name = property.Name, Address = property.Address });
+            ViewBag.Cities = await _context.SupportedCities.OrderBy(c => c.Name).Select(c => c.Name).ToListAsync();
+            return View(new PropertyFormViewModel { Id = property.Id, Name = property.Name, Address = property.Address, City = property.City });
         }
 
         [HttpPost]
@@ -145,6 +149,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
 
             if (!ModelState.IsValid)
             {
+                ViewBag.Cities = await _context.SupportedCities.OrderBy(c => c.Name).Select(c => c.Name).ToListAsync();
                 return View(model);
             }
 
@@ -152,6 +157,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
 
             property.Name = model.Name;
             property.Address = model.Address;
+            property.City = string.IsNullOrWhiteSpace(model.City) ? null : model.City.Trim();
 
             if (addressChanged)
             {

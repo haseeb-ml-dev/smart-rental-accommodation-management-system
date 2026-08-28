@@ -100,8 +100,9 @@ namespace Smart_Rental___Accomodation_Management_System.Services
 
         public async Task SendRentDueSoonRemindersAsync()
         {
+            var settings = await GetSettingsAsync();
             var today = DateTime.UtcNow.Date;
-            var horizon = today.AddDays(3);
+            var horizon = today.AddDays(settings.RentReminderDaysBefore);
 
             var upcomingInvoices = await _context.RentInvoices
                 .Include(i => i.Lease)
@@ -137,8 +138,9 @@ namespace Smart_Rental___Accomodation_Management_System.Services
 
         public async Task SendUtilityRemindersAsync()
         {
+            var settings = await GetSettingsAsync();
             var today = DateTime.UtcNow.Date;
-            var horizon = today.AddDays(3);
+            var horizon = today.AddDays(settings.UtilityReminderDaysBefore);
 
             var unpaidShares = await _context.UtilityBillShares
                 .Include(s => s.UtilityBill)
@@ -177,6 +179,13 @@ namespace Smart_Rental___Accomodation_Management_System.Services
             {
                 await _context.SaveChangesAsync();
             }
+        }
+
+        // Falls back to the model defaults if the singleton settings row is somehow missing —
+        // SeedData creates it on startup, but a reminder pass must never throw over this.
+        private async Task<AppSetting> GetSettingsAsync()
+        {
+            return await _context.AppSettings.FirstOrDefaultAsync() ?? new AppSetting();
         }
     }
 }

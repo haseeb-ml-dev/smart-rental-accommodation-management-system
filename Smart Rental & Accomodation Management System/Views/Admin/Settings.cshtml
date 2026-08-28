@@ -1,0 +1,81 @@
+@model SettingsFormViewModel
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Settings</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary">Back to Dashboard</a>
+</div>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">@TempData["Message"]</div>
+}
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Billing defaults</h5>
+                <form asp-action="Settings" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="mb-3">
+                        <label asp-for="DefaultUtilitySplitMethod" class="form-label"></label>
+                        <select asp-for="DefaultUtilitySplitMethod" class="form-select" asp-items="Html.GetEnumSelectList<UtilityBillSplitMethod>()"></select>
+                        <div class="form-text">Pre-selected split method when a landlord creates a new utility bill.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="RentReminderDaysBefore" class="form-label"></label>
+                        <input asp-for="RentReminderDaysBefore" class="form-control" type="number" />
+                        <span asp-validation-for="RentReminderDaysBefore" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="UtilityReminderDaysBefore" class="form-label"></label>
+                        <input asp-for="UtilityReminderDaysBefore" class="form-control" type="number" />
+                        <span asp-validation-for="UtilityReminderDaysBefore" class="text-danger"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Supported cities</h5>
+                <div class="form-text mb-3">Cities landlords can pick from when adding a property. Leave empty to allow any address with no city dropdown.</div>
+
+                <form asp-action="AddCity" method="post" class="d-flex gap-2 mb-3">
+                    <input type="text" name="name" class="form-control" placeholder="e.g. Colombo" maxlength="100" required />
+                    <button type="submit" class="btn btn-outline-primary text-nowrap">Add City</button>
+                </form>
+
+                @if (Model.Cities.Any())
+                {
+                    <ul class="list-group">
+                        @foreach (var city in Model.Cities)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @city.Name
+                                <form asp-action="DeleteCity" method="post" onsubmit="return confirm('Remove this city?');">
+                                    <input type="hidden" name="cityId" value="@city.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted">No cities configured yet.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

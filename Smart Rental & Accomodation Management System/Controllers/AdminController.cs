@@ -223,5 +223,88 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
 
             return RedirectToAction(nameof(Bookings));
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Settings()
+        {
+            var settings = await GetOrCreateSettingsAsync();
+            var cities = await _context.SupportedCities.OrderBy(c => c.Name).ToListAsync();
+
+            var vm = new SettingsFormViewModel
+            {
+                DefaultUtilitySplitMethod = settings.DefaultUtilitySplitMethod,
+                RentReminderDaysBefore = settings.RentReminderDaysBefore,
+                UtilityReminderDaysBefore = settings.UtilityReminderDaysBefore,
+                Cities = cities
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Settings(SettingsFormViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.Cities = await _context.SupportedCities.OrderBy(c => c.Name).ToListAsync();
+                return View(model);
+            }
+
+            var settings = await GetOrCreateSettingsAsync();
+            settings.DefaultUtilitySplitMethod = model.DefaultUtilitySplitMethod;
+            settings.RentReminderDaysBefore = model.RentReminderDaysBefore;
+            settings.UtilityReminderDaysBefore = model.UtilityReminderDaysBefore;
+
+            await _context.SaveChangesAsync();
+            TempData["Message"] = "Settings saved.";
+
+            return RedirectToAction(nameof(Settings));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddCity(string name)
+        {
+            var trimmed = name?.Trim();
+            if (!string.IsNullOrEmpty(trimmed))
+            {
+                var exists = await _context.SupportedCities.AnyAsync(c => c.Name.ToLower() == trimmed.ToLower());
+                if (!exists)
+                {
+                    _context.SupportedCities.Add(new SupportedCity { Name = trimmed });
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            return RedirectToAction(nameof(Settings));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteCity(int cityId)
+        {
+            var city = await _context.SupportedCities.FirstOrDefaultAsync(c => c.Id == cityId);
+            if (city != null)
+            {
+                _context.SupportedCities.Remove(city);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Settings));
+        }
+
+        private async Task<AppSetting> GetOrCreateSettingsAsync()
+        {
+            var settings = await _context.AppSettings.FirstOrDefaultAsync();
+            if (settings == null)
+            {
+                settings = new AppSetting();
+                _context.AppSettings.Add(settings);
+                await _context.SaveChangesAsync();
+            }
+
+            return settings;
+        }
     }
 }

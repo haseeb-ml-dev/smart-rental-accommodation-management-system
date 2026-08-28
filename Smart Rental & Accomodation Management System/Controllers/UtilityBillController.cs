@@ -166,10 +166,13 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            var settings = await _context.AppSettings.FirstOrDefaultAsync();
+
             var model = new UtilityBillFormViewModel
             {
                 PropertyId = property.Id,
                 PropertyName = property.Name,
+                SplitMethod = settings?.DefaultUtilitySplitMethod ?? UtilityBillSplitMethod.Equal,
                 Tenants = await BuildTenantInputsAsync(propertyId, tenants)
             };
 

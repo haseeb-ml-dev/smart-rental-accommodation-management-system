@@ -12,6 +12,9 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
 
         [Required, StringLength(300)]
         public string Address { get; set; } = string.Empty;
+
+        [StringLength(100)]
+        public string? City { get; set; }
     }
 
     public class UnitFormViewModel

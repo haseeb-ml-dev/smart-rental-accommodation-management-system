@@ -22,6 +22,8 @@ namespace Smart_Rental___Accomodation_Management_System.Data
         public DbSet<MessFeedback> MessFeedbacks { get; set; } = null!;
         public DbSet<Notification> Notifications { get; set; } = null!;
         public DbSet<UnitImage> UnitImages { get; set; } = null!;
+        public DbSet<AppSetting> AppSettings { get; set; } = null!;
+        public DbSet<SupportedCity> SupportedCities { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

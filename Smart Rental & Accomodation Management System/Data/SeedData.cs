@@ -24,6 +24,12 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 }
             }
 
+            if (!await context.AppSettings.AnyAsync())
+            {
+                context.AppSettings.Add(new AppSetting());
+                await context.SaveChangesAsync();
+            }
+
             if (await context.Properties.AnyAsync())
             {
                 return;
