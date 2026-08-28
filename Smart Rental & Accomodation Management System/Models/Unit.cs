@@ -52,5 +52,6 @@ namespace Smart_Rental___Accomodation_Management_System.Models
 
         public List<Lease> Leases { get; set; } = new();
         public List<Booking> Bookings { get; set; } = new();
+        public List<UnitImage> Images { get; set; } = new();
     }
 }

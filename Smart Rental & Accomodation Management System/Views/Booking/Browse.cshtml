@@ -14,6 +14,7 @@
     <table class="table align-middle">
         <thead>
             <tr>
+                <th></th>
                 <th>Property</th>
                 <th>Unit</th>
                 <th>Type</th>
@@ -26,6 +27,16 @@
             @foreach (var unit in Model)
             {
                 <tr>
+                    <td>
+                        @if (unit.CoverImageFileName != null)
+                        {
+                            <img src="/uploads/units/@unit.UnitId/@unit.CoverImageFileName" style="width: 3.5rem; height: 3.5rem; object-fit: cover;" class="rounded" alt="@unit.UnitName" />
+                        }
+                        else
+                        {
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center text-muted" style="width: 3.5rem; height: 3.5rem; font-size: 0.7rem;">No photo</div>
+                        }
+                    </td>
                     <td>@unit.PropertyName</td>
                     <td>@unit.UnitName</td>
                     <td>
@@ -64,7 +75,7 @@
             }
             @if (!Model.Any())
             {
-                <tr><td colspan="6" class="text-muted">No units listed yet.</td></tr>
+                <tr><td colspan="7" class="text-muted">No units listed yet.</td></tr>
             }
         </tbody>
     </table>

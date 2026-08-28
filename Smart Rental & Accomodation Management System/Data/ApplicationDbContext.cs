@@ -21,6 +21,7 @@ namespace Smart_Rental___Accomodation_Management_System.Data
         public DbSet<MessMenu> MessMenus { get; set; } = null!;
         public DbSet<MessFeedback> MessFeedbacks { get; set; } = null!;
         public DbSet<Notification> Notifications { get; set; } = null!;
+        public DbSet<UnitImage> UnitImages { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -109,6 +110,12 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 .WithMany()
                 .HasForeignKey(n => n.RecipientId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<UnitImage>()
+                .HasOne(i => i.Unit)
+                .WithMany(u => u.Images)
+                .HasForeignKey(i => i.UnitId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

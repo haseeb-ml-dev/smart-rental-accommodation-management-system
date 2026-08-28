@@ -28,6 +28,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddScoped<BillingService>();
 builder.Services.AddHostedService<BillingBackgroundService>();
+builder.Services.AddSingleton<UnitImageStorage>();
 
 var app = builder.Build();
 
@@ -46,6 +47,10 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+// MapStaticAssets below only serves build-time wwwroot content; uploaded unit photos are written
+// at runtime, so they need the regular static file middleware.
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();

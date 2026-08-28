@@ -29,12 +29,14 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 .Include(u => u.Property)
                 .Include(u => u.Leases)
                 .Include(u => u.Bookings)
+                .Include(u => u.Images)
                 .Where(u => u.Property!.IsActive)
                 .ToListAsync();
 
             var vm = units.Select(u => new UnitAvailabilityViewModel
             {
                 UnitId = u.Id,
+                CoverImageFileName = (u.Images.FirstOrDefault(i => i.IsCover) ?? u.Images.FirstOrDefault())?.FileName,
                 PropertyName = u.Property?.Name ?? string.Empty,
                 UnitName = u.Name,
                 UnitType = u.UnitType,

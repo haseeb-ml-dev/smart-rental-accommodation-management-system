@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Smart_Rental___Accomodation_Management_System.Data;
 using Smart_Rental___Accomodation_Management_System.Models;
+using Smart_Rental___Accomodation_Management_System.Services;
 using Smart_Rental___Accomodation_Management_System.ViewModels;
 
 namespace Smart_Rental___Accomodation_Management_System.Controllers
@@ -13,11 +14,13 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UnitImageStorage _imageStorage;
 
-        public PropertyController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public PropertyController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, UnitImageStorage imageStorage)
         {
             _context = context;
             _userManager = userManager;
+            _imageStorage = imageStorage;
         }
 
         public async Task<IActionResult> Index()
@@ -26,6 +29,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
 
             var properties = await _context.Properties
                 .Include(p => p.Units)
+                    .ThenInclude(u => u.Images)
                 .Where(p => p.LandlordId == landlordId)
                 .ToListAsync();
 
@@ -108,7 +112,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             _context.Units.Add(unit);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(EditUnit), new { id = unit.Id });
         }
 
         [HttpGet]
@@ -154,6 +158,9 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 return NotFound();
             }
 
+            ViewBag.UnitImages = unit.Images.OrderByDescending(i => i.IsCover).ThenBy(i => i.Id).ToList();
+            ViewBag.MaxImagesPerUnit = UnitImageStorage.MaxImagesPerUnit;
+
             return View(new UnitFormViewModel
             {
                 Id = unit.Id,
@@ -194,6 +201,8 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             if (!ModelState.IsValid)
             {
                 model.PropertyName = unit.Property!.Name;
+                ViewBag.UnitImages = unit.Images.OrderByDescending(i => i.IsCover).ThenBy(i => i.Id).ToList();
+                ViewBag.MaxImagesPerUnit = UnitImageStorage.MaxImagesPerUnit;
                 return View(model);
             }
 
@@ -320,7 +329,120 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 .Include(u => u.Property)
                 .Include(u => u.Leases)
                     .ThenInclude(l => l.Tenant)
+                .Include(u => u.Images)
                 .FirstOrDefaultAsync(u => u.Id == unitId && u.Property!.LandlordId == landlordId);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [RequestSizeLimit(UnitImageStorage.MaxFileSizeBytes * UnitImageStorage.MaxImagesPerUnit)]
+        public async Task<IActionResult> UploadImages(int unitId, List<IFormFile> files)
+        {
+            var unit = await GetOwnedUnitAsync(unitId);
+            if (unit == null)
+            {
+                return NotFound();
+            }
+
+            var remainingSlots = Math.Max(0, UnitImageStorage.MaxImagesPerUnit - unit.Images.Count);
+            var hasCover = unit.Images.Any(i => i.IsCover);
+            var skippedAny = files.Count > remainingSlots;
+
+            foreach (var file in files.Take(remainingSlots))
+            {
+                if (!_imageStorage.IsAllowed(file, out var extension))
+                {
+                    skippedAny = true;
+                    continue;
+                }
+
+                var fileName = await _imageStorage.SaveAsync(unitId, file, extension);
+                _context.UnitImages.Add(new UnitImage
+                {
+                    UnitId = unitId,
+                    FileName = fileName,
+                    IsCover = !hasCover
+                });
+                hasCover = true;
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["Message"] = skippedAny
+                ? $"Some files were skipped — up to {UnitImageStorage.MaxImagesPerUnit} photos per unit, JPG/PNG/WEBP up to 5 MB each."
+                : "Photos uploaded.";
+
+            return RedirectToAction(nameof(EditUnit), new { id = unitId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteImage(int imageId)
+        {
+            var landlordId = _userManager.GetUserId(User)!;
+
+            var image = await _context.UnitImages
+                .Include(i => i.Unit)
+                    .ThenInclude(u => u!.Property)
+                .FirstOrDefaultAsync(i => i.Id == imageId && i.Unit!.Property!.LandlordId == landlordId);
+
+            if (image == null)
+            {
+                return NotFound();
+            }
+
+            var unitId = image.UnitId;
+            var wasCover = image.IsCover;
+
+            _imageStorage.Delete(unitId, image.FileName);
+            _context.UnitImages.Remove(image);
+            await _context.SaveChangesAsync();
+
+            if (wasCover)
+            {
+                var nextCover = await _context.UnitImages
+                    .Where(i => i.UnitId == unitId)
+                    .OrderBy(i => i.Id)
+                    .FirstOrDefaultAsync();
+
+                if (nextCover != null)
+                {
+                    nextCover.IsCover = true;
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            return RedirectToAction(nameof(EditUnit), new { id = unitId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetCoverImage(int imageId)
+        {
+            var landlordId = _userManager.GetUserId(User)!;
+
+            var image = await _context.UnitImages
+                .Include(i => i.Unit)
+                    .ThenInclude(u => u!.Property)
+                .FirstOrDefaultAsync(i => i.Id == imageId && i.Unit!.Property!.LandlordId == landlordId);
+
+            if (image == null)
+            {
+                return NotFound();
+            }
+
+            var currentCover = await _context.UnitImages
+                .FirstOrDefaultAsync(i => i.UnitId == image.UnitId && i.IsCover);
+
+            if (currentCover != null)
+            {
+                currentCover.IsCover = false;
+            }
+            image.IsCover = true;
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(EditUnit), new { id = image.UnitId });
         }
     }
 }

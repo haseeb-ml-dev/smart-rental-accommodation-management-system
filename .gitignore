@@ -30,3 +30,7 @@ Thumbs.db
 project.lock.json
 project.fragment.lock.json
 artifacts/
+
+## User-uploaded content (runtime data, not source)
+**/wwwroot/uploads/*
+!**/wwwroot/uploads/.gitkeep

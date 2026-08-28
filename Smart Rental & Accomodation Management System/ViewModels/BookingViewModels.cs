@@ -5,6 +5,7 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
     public class UnitAvailabilityViewModel
     {
         public int UnitId { get; set; }
+        public string? CoverImageFileName { get; set; }
         public string PropertyName { get; set; } = string.Empty;
         public string UnitName { get; set; } = string.Empty;
         public UnitType UnitType { get; set; }

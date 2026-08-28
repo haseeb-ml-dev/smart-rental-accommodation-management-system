@@ -31,6 +31,7 @@
                 <table class="table table-sm align-middle mb-0">
                     <thead>
                         <tr>
+                            <th></th>
                             <th>Unit</th>
                             <th>Type</th>
                             <th>BHK</th>
@@ -43,7 +44,18 @@
                     <tbody>
                         @foreach (var unit in property.Units)
                         {
+                            var cover = unit.Images.FirstOrDefault(i => i.IsCover) ?? unit.Images.FirstOrDefault();
                             <tr>
+                                <td>
+                                    @if (cover != null)
+                                    {
+                                        <img src="/uploads/units/@unit.Id/@cover.FileName" style="width: 3.5rem; height: 3.5rem; object-fit: cover;" class="rounded" alt="@unit.Name" />
+                                    }
+                                    else
+                                    {
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center text-muted" style="width: 3.5rem; height: 3.5rem; font-size: 0.7rem;">No photo</div>
+                                    }
+                                </td>
                                 <td>@unit.Name</td>
                                 <td>@unit.UnitType.Humanize()</td>
                                 <td>@(unit.BhkType?.Humanize() ?? "—")</td>
@@ -67,7 +79,7 @@
                         }
                         @if (!property.Units.Any())
                         {
-                            <tr><td colspan="7" class="text-muted">No units yet.</td></tr>
+                            <tr><td colspan="8" class="text-muted">No units yet.</td></tr>
                         }
                     </tbody>
                 </table>

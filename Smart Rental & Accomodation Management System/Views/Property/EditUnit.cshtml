@@ -55,6 +55,63 @@
             <button type="submit" class="btn btn-primary">Save</button>
             <a asp-action="Index" class="btn btn-link">Cancel</a>
         </form>
+
+        <hr class="my-4" />
+
+        <h2 class="h5 mb-3">Photos</h2>
+
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert alert-info">@TempData["Message"]</div>
+        }
+
+        @{
+            var images = (List<UnitImage>)ViewBag.UnitImages;
+            var maxImages = (int)ViewBag.MaxImagesPerUnit;
+        }
+
+        @if (images.Any())
+        {
+            <div class="d-flex flex-wrap gap-3 mb-3">
+                @foreach (var image in images)
+                {
+                    <div class="card" style="width: 10rem;">
+                        <img src="/uploads/units/@Model.Id/@image.FileName" class="card-img-top" style="height: 8rem; object-fit: cover;" alt="Unit photo" />
+                        <div class="card-body p-2 text-center">
+                            @if (image.IsCover)
+                            {
+                                <span class="badge text-bg-primary d-block mb-2">Cover</span>
+                            }
+                            else
+                            {
+                                <form asp-action="SetCoverImage" method="post" class="mb-2">
+                                    <input type="hidden" name="imageId" value="@image.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary w-100">Set as cover</button>
+                                </form>
+                            }
+                            <form asp-action="DeleteImage" method="post" onsubmit="return confirm('Delete this photo?');">
+                                <input type="hidden" name="imageId" value="@image.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger w-100">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">No photos yet.</p>
+        }
+
+        @if (images.Count < maxImages)
+        {
+            <form asp-action="UploadImages" method="post" enctype="multipart/form-data" class="d-flex gap-2 align-items-center">
+                <input type="hidden" name="unitId" value="@Model.Id" />
+                <input type="file" name="files" class="form-control" accept="image/jpeg,image/png,image/webp" multiple />
+                <button type="submit" class="btn btn-outline-primary text-nowrap">Upload</button>
+            </form>
+            <div class="form-text">JPG, PNG, or WEBP, up to 5 MB each. Up to @maxImages photos per unit.</div>
+        }
     </div>
 </div>
 
