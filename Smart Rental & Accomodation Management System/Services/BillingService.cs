@@ -19,7 +19,7 @@ namespace Smart_Rental___Accomodation_Management_System.Services
 
             var activeLeases = await _context.Leases
                 .Include(l => l.Unit)
-                .Where(l => l.EndDate == null || l.EndDate >= today)
+                .Where(l => l.StartDate <= today && (l.EndDate == null || l.EndDate >= today))
                 .ToListAsync();
 
             foreach (var lease in activeLeases)
