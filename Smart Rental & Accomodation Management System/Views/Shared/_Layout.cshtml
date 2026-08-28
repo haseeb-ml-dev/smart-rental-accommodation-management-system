@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using Smart_Rental___Accomodation_Management_System.Data
+@inject ApplicationDbContext DbContext
+@inject UserManager<ApplicationUser> UserManager
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -64,6 +69,17 @@
                     <ul class="navbar-nav align-items-sm-center">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
+                            var currentUserId = UserManager.GetUserId(User);
+                            var unreadCount = await DbContext.Notifications.CountAsync(n => n.RecipientId == currentUserId && !n.IsRead);
+                            <li class="nav-item">
+                                <a class="@navClass("Notification")" asp-area="" asp-controller="Notification" asp-action="Index">
+                                    🔔 Notifications
+                                    @if (unreadCount > 0)
+                                    {
+                                        <span class="badge text-bg-danger rounded-pill">@unreadCount</span>
+                                    }
+                                </a>
+                            </li>
                             <li class="nav-item">
                                 <span class="nav-link text-muted">Hi, @User.Identity.Name</span>
                             </li>

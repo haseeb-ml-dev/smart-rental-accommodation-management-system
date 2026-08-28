@@ -20,6 +20,7 @@ namespace Smart_Rental___Accomodation_Management_System.Data
         public DbSet<UtilityBillShare> UtilityBillShares { get; set; } = null!;
         public DbSet<MessMenu> MessMenus { get; set; } = null!;
         public DbSet<MessFeedback> MessFeedbacks { get; set; } = null!;
+        public DbSet<Notification> Notifications { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -101,6 +102,12 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 .HasOne(f => f.Tenant)
                 .WithMany()
                 .HasForeignKey(f => f.TenantId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Notification>()
+                .HasOne(n => n.Recipient)
+                .WithMany()
+                .HasForeignKey(n => n.RecipientId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

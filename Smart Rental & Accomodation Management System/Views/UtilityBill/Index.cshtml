@@ -54,17 +54,49 @@
                                 {
                                     <span class="badge text-bg-warning">Pending</span>
                                 }
+                                @if (share.DisputeStatus == DisputeStatus.Open)
+                                {
+                                    <span class="badge text-bg-danger">Disputed</span>
+                                }
+                                else if (share.DisputeStatus == DisputeStatus.Resolved)
+                                {
+                                    <span class="badge text-bg-secondary">Dispute resolved</span>
+                                }
                             </td>
                             <td>
                                 @if (!share.IsPaid)
                                 {
-                                    <form asp-action="MarkSharePaid" method="post">
+                                    <form asp-action="MarkSharePaid" method="post" class="d-inline">
                                         <input type="hidden" name="shareId" value="@share.Id" />
                                         <button type="submit" class="btn btn-sm btn-outline-success">Mark paid</button>
                                     </form>
                                 }
                             </td>
                         </tr>
+                        @if (share.DisputeStatus == DisputeStatus.Open)
+                        {
+                            <tr>
+                                <td colspan="4">
+                                    <div class="alert alert-warning py-2 mb-0">
+                                        <div class="small mb-2"><strong>Dispute reason:</strong> @share.DisputeReason</div>
+                                        <form asp-action="ResolveDispute" method="post" class="row g-2 align-items-end">
+                                            <input type="hidden" name="shareId" value="@share.Id" />
+                                            <div class="col-md-6">
+                                                <label class="form-label small mb-0">Resolution note</label>
+                                                <input type="text" name="resolution" class="form-control form-control-sm" required />
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label small mb-0">Adjusted amount (optional)</label>
+                                                <input type="number" step="0.01" name="adjustedAmount" class="form-control form-control-sm" />
+                                            </div>
+                                            <div class="col-md-3">
+                                                <button type="submit" class="btn btn-sm btn-primary">Resolve dispute</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>

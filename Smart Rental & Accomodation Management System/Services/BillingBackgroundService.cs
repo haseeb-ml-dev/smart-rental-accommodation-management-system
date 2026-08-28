@@ -35,6 +35,8 @@ namespace Smart_Rental___Accomodation_Management_System.Services
 
             await billingService.GenerateMonthlyInvoicesAsync();
             await billingService.FlagOverdueInvoicesAsync();
+            await billingService.SendRentDueSoonRemindersAsync();
+            await billingService.SendUtilityRemindersAsync();
         }
     }
 }

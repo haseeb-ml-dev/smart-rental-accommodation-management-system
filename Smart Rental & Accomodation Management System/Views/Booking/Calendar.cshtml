@@ -1,0 +1,65 @@
+@model BookingCalendarViewModel
+@{
+    ViewData["Title"] = "Booking Calendar";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1">Booking Calendar</h1>
+        <div class="text-muted">@Model.PropertyName &middot; @Model.RangeStart.ToString("MMM d, yyyy") &ndash; @Model.RangeEnd.ToString("MMM d, yyyy")</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Calendar" asp-route-propertyId="@Model.PropertyId" asp-route-monthOffset="@(Model.MonthOffset - 1)" class="btn btn-outline-secondary btn-sm">&laquo; Prev</a>
+        <a asp-action="Calendar" asp-route-propertyId="@Model.PropertyId" asp-route-monthOffset="0" class="btn btn-outline-secondary btn-sm">Today</a>
+        <a asp-action="Calendar" asp-route-propertyId="@Model.PropertyId" asp-route-monthOffset="@(Model.MonthOffset + 1)" class="btn btn-outline-secondary btn-sm">Next &raquo;</a>
+        <a asp-controller="Property" asp-action="Index" class="btn btn-link btn-sm">Back to Properties</a>
+    </div>
+</div>
+
+<div class="mb-3 small text-muted d-flex gap-3">
+    <span><span class="d-inline-block rounded" style="width:12px;height:12px;background:#0d6efd;"></span> Active lease</span>
+    <span><span class="d-inline-block rounded" style="width:12px;height:12px;background:#adb5bd;"></span> Ended lease</span>
+    <span><span class="d-inline-block rounded-circle" style="width:10px;height:10px;background:#fd7e14;"></span> Pending request</span>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        @foreach (var unit in Model.Units)
+        {
+            <div class="mb-4">
+                <div class="fw-semibold mb-1">@unit.UnitName <span class="text-muted small">(@unit.UnitType.Humanize())</span></div>
+                <div class="position-relative bg-light rounded" style="height: 36px;">
+                    @foreach (var marker in Model.MonthMarkers)
+                    {
+                        <div class="position-absolute top-0 bottom-0 border-start border-secondary-subtle" style="left: @marker.LeftPercent.ToString("0.###")%;"></div>
+                    }
+                    @foreach (var bar in unit.Bars)
+                    {
+                        <div class="position-absolute top-0 bottom-0 rounded"
+                             style="left: @bar.LeftPercent.ToString("0.###")%; width: @bar.WidthPercent.ToString("0.###")%; background: @(bar.IsActive ? "#0d6efd" : "#adb5bd");"
+                             title="@bar.TenantName (@bar.StartDate.ToString("MMM d, yyyy")) - @(bar.EndDate.HasValue ? bar.EndDate.Value.ToString("MMM d, yyyy") : "ongoing")">
+                        </div>
+                    }
+                    @foreach (var marker in unit.PendingMarkers)
+                    {
+                        <div class="position-absolute rounded-circle"
+                             style="left: calc(@marker.LeftPercent.ToString("0.###")% - 5px); top: 13px; width: 10px; height: 10px; background: #fd7e14;"
+                             title="@marker.TenantName requested @marker.RequestedDate.ToString("MMM d, yyyy")">
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        @if (!Model.Units.Any())
+        {
+            <div class="text-muted">This property has no units yet.</div>
+        }
+
+        <div class="position-relative" style="height: 20px;">
+            @foreach (var marker in Model.MonthMarkers)
+            {
+                <div class="position-absolute small text-muted" style="left: @marker.LeftPercent.ToString("0.###")%;">@marker.Label</div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,7 +1,15 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Smart_Rental___Accomodation_Management_System.Models
 {
+    public enum DisputeStatus
+    {
+        None,
+        Open,
+        Resolved
+    }
+
     public class UtilityBillShare
     {
         public int Id { get; set; }
@@ -24,5 +32,13 @@ namespace Smart_Rental___Accomodation_Management_System.Models
 
         public bool IsPaid { get; set; }
         public DateTime? PaidDate { get; set; }
+
+        public DisputeStatus DisputeStatus { get; set; } = DisputeStatus.None;
+        [StringLength(500)]
+        public string? DisputeReason { get; set; }
+        public DateTime? DisputeRaisedAt { get; set; }
+        [StringLength(500)]
+        public string? DisputeResolution { get; set; }
+        public DateTime? DisputeResolvedAt { get; set; }
     }
 }

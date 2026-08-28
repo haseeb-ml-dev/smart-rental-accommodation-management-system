@@ -129,6 +129,7 @@ else
                             <th>Your share</th>
                             <th>Due date</th>
                             <th>Status</th>
+                            <th>Dispute</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -153,11 +154,29 @@ else
                                         <span class="badge text-bg-warning">Pending</span>
                                     }
                                 </td>
+                                <td>
+                                    @if (share.DisputeStatus == DisputeStatus.None)
+                                    {
+                                        <form asp-controller="UtilityBill" asp-action="RaiseDispute" method="post" class="d-flex gap-1">
+                                            <input type="hidden" name="shareId" value="@share.Id" />
+                                            <input type="text" name="reason" class="form-control form-control-sm" placeholder="Reason" style="width: 140px;" required />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Dispute</button>
+                                        </form>
+                                    }
+                                    else if (share.DisputeStatus == DisputeStatus.Open)
+                                    {
+                                        <span class="badge text-bg-warning">Dispute pending</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge text-bg-secondary" title="@share.DisputeResolution">Resolved</span>
+                                    }
+                                </td>
                             </tr>
                         }
                         @if (!Model.UtilityShares.Any())
                         {
-                            <tr><td colspan="5" class="text-muted">No utility bills yet.</td></tr>
+                            <tr><td colspan="6" class="text-muted">No utility bills yet.</td></tr>
                         }
                     </tbody>
                 </table>

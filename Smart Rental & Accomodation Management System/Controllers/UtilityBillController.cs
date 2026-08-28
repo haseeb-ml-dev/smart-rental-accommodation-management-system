@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Smart_Rental___Accomodation_Management_System.Data;
+using Smart_Rental___Accomodation_Management_System.Extensions;
 using Smart_Rental___Accomodation_Management_System.Models;
 using Smart_Rental___Accomodation_Management_System.ViewModels;
 
 namespace Smart_Rental___Accomodation_Management_System.Controllers
 {
-    [Authorize(Roles = "Landlord")]
+    [Authorize]
     public class UtilityBillController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -20,6 +21,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             _userManager = userManager;
         }
 
+        [Authorize(Roles = "Landlord")]
         public async Task<IActionResult> Index()
         {
             var landlordId = _userManager.GetUserId(User)!;
@@ -36,6 +38,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Landlord")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> MarkSharePaid(int shareId)
         {
@@ -61,7 +64,93 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        [Authorize(Roles = "Tenant")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RaiseDispute(int shareId, string reason)
+        {
+            var tenantId = _userManager.GetUserId(User)!;
+
+            var share = await _context.UtilityBillShares
+                .Include(s => s.UtilityBill)
+                    .ThenInclude(b => b!.Property)
+                .FirstOrDefaultAsync(s => s.Id == shareId && s.TenantId == tenantId);
+
+            if (share == null)
+            {
+                return NotFound();
+            }
+
+            if (share.DisputeStatus == DisputeStatus.None)
+            {
+                share.DisputeStatus = DisputeStatus.Open;
+                share.DisputeReason = string.IsNullOrWhiteSpace(reason) ? null : reason.Trim();
+                share.DisputeRaisedAt = DateTime.UtcNow;
+
+                var landlordId = share.UtilityBill!.Property!.LandlordId;
+                _context.Notifications.Add(new Notification
+                {
+                    RecipientId = landlordId,
+                    Type = NotificationType.DisputeRaised,
+                    Message = $"A tenant disputed a {share.UtilityBill.BillType.Humanize()} charge of {share.ShareAmount:C}.",
+                    LinkController = "UtilityBill",
+                    LinkAction = "Index",
+                    RelatedEntityId = share.Id
+                });
+
+                await _context.SaveChangesAsync();
+                TempData["Message"] = "Dispute submitted. The landlord has been notified.";
+            }
+
+            return RedirectToAction("Index", "Tenant");
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Landlord")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResolveDispute(int shareId, string resolution, decimal? adjustedAmount)
+        {
+            var landlordId = _userManager.GetUserId(User)!;
+
+            var share = await _context.UtilityBillShares
+                .Include(s => s.UtilityBill)
+                    .ThenInclude(b => b!.Property)
+                .FirstOrDefaultAsync(s => s.Id == shareId && s.UtilityBill!.Property!.LandlordId == landlordId);
+
+            if (share == null)
+            {
+                return NotFound();
+            }
+
+            if (share.DisputeStatus == DisputeStatus.Open)
+            {
+                share.DisputeStatus = DisputeStatus.Resolved;
+                share.DisputeResolution = string.IsNullOrWhiteSpace(resolution) ? null : resolution.Trim();
+                share.DisputeResolvedAt = DateTime.UtcNow;
+
+                if (adjustedAmount is > 0)
+                {
+                    share.ShareAmount = adjustedAmount.Value;
+                }
+
+                _context.Notifications.Add(new Notification
+                {
+                    RecipientId = share.TenantId,
+                    Type = NotificationType.DisputeResolved,
+                    Message = $"Your dispute was resolved: {share.DisputeResolution ?? "no additional notes"}.",
+                    LinkController = "Tenant",
+                    LinkAction = "Index",
+                    RelatedEntityId = share.Id
+                });
+
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
         [HttpGet]
+        [Authorize(Roles = "Landlord")]
         public async Task<IActionResult> Create(int propertyId)
         {
             var property = await GetOwnedPropertyAsync(propertyId);
@@ -88,6 +177,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Landlord")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(UtilityBillFormViewModel model)
         {

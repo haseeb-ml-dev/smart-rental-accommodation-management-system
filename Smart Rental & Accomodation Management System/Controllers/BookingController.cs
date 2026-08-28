@@ -217,5 +217,99 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             TempData["Message"] = "Booking rejected.";
             return RedirectToAction(nameof(Requests));
         }
+
+        [Authorize(Roles = "Landlord")]
+        public async Task<IActionResult> Calendar(int propertyId, int monthOffset = 0)
+        {
+            var property = await GetOwnedPropertyAsync(propertyId);
+            if (property == null)
+            {
+                return NotFound();
+            }
+
+            var units = await _context.Units
+                .Include(u => u.Leases)
+                    .ThenInclude(l => l.Tenant)
+                .Include(u => u.Bookings.Where(b => b.Status == BookingStatus.Pending))
+                    .ThenInclude(b => b.Tenant)
+                .Where(u => u.PropertyId == propertyId)
+                .OrderBy(u => u.Name)
+                .ToListAsync();
+
+            var today = DateTime.UtcNow.Date;
+            var rangeStart = new DateTime(today.Year, today.Month, 1).AddMonths(monthOffset);
+            var rangeEnd = rangeStart.AddMonths(3);
+            var totalDays = (decimal)(rangeEnd - rangeStart).TotalDays;
+
+            decimal PercentOf(DateTime date) => (decimal)(date - rangeStart).TotalDays / totalDays * 100m;
+
+            var vm = new BookingCalendarViewModel
+            {
+                PropertyId = property.Id,
+                PropertyName = property.Name,
+                RangeStart = rangeStart,
+                RangeEnd = rangeEnd,
+                MonthOffset = monthOffset
+            };
+
+            for (var month = rangeStart; month < rangeEnd; month = month.AddMonths(1))
+            {
+                vm.MonthMarkers.Add(new MonthMarkerViewModel { Label = month.ToString("MMM yyyy"), LeftPercent = PercentOf(month) });
+            }
+
+            foreach (var unit in units)
+            {
+                var unitVm = new UnitTimelineViewModel { UnitId = unit.Id, UnitName = unit.Name, UnitType = unit.UnitType };
+
+                foreach (var lease in unit.Leases)
+                {
+                    if (lease.EndDate < rangeStart || lease.StartDate > rangeEnd)
+                    {
+                        continue;
+                    }
+
+                    var clampedStart = lease.StartDate < rangeStart ? rangeStart : lease.StartDate;
+                    var clampedEnd = (lease.EndDate ?? rangeEnd) > rangeEnd ? rangeEnd : (lease.EndDate ?? rangeEnd);
+
+                    var left = PercentOf(clampedStart);
+                    var width = Math.Max(PercentOf(clampedEnd) - left, 2m);
+
+                    unitVm.Bars.Add(new TimelineBarViewModel
+                    {
+                        TenantName = lease.Tenant?.FullName ?? "Unknown",
+                        StartDate = lease.StartDate,
+                        EndDate = lease.EndDate,
+                        IsActive = lease.EndDate == null,
+                        LeftPercent = left,
+                        WidthPercent = width
+                    });
+                }
+
+                foreach (var booking in unit.Bookings)
+                {
+                    if (booking.StartDate < rangeStart || booking.StartDate > rangeEnd)
+                    {
+                        continue;
+                    }
+
+                    unitVm.PendingMarkers.Add(new TimelineMarkerViewModel
+                    {
+                        TenantName = booking.Tenant?.FullName ?? "Unknown",
+                        RequestedDate = booking.StartDate,
+                        LeftPercent = PercentOf(booking.StartDate)
+                    });
+                }
+
+                vm.Units.Add(unitVm);
+            }
+
+            return View(vm);
+        }
+
+        private async Task<Property?> GetOwnedPropertyAsync(int propertyId)
+        {
+            var landlordId = _userManager.GetUserId(User)!;
+            return await _context.Properties.FirstOrDefaultAsync(p => p.Id == propertyId && p.LandlordId == landlordId);
+        }
     }
 }
