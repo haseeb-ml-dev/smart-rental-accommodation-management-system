@@ -82,6 +82,58 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             return View(vm);
         }
 
+        public async Task<IActionResult> OverdueTenants()
+        {
+            var landlordId = _userManager.GetUserId(User)!;
+
+            var overdueInvoices = await _context.RentInvoices
+                .Include(i => i.Lease)
+                    .ThenInclude(l => l!.Unit)
+                        .ThenInclude(u => u!.Property)
+                .Include(i => i.Lease)
+                    .ThenInclude(l => l!.Tenant)
+                .Where(i => i.Status == InvoiceStatus.Overdue && i.Lease!.Unit!.Property!.LandlordId == landlordId)
+                .ToListAsync();
+
+            var today = DateTime.UtcNow.Date;
+            var overdueShares = await _context.UtilityBillShares
+                .Include(s => s.UtilityBill)
+                    .ThenInclude(b => b!.Property)
+                .Include(s => s.Tenant)
+                .Where(s => !s.IsPaid && s.UtilityBill!.DueDate < today && s.UtilityBill.Property!.LandlordId == landlordId)
+                .ToListAsync();
+
+            var groups = new List<OverdueTenantGroupViewModel>();
+
+            foreach (var invoiceGroup in overdueInvoices.GroupBy(i => i.Lease!.TenantId))
+            {
+                var first = invoiceGroup.First();
+                groups.Add(new OverdueTenantGroupViewModel
+                {
+                    TenantName = first.Lease!.Tenant!.FullName,
+                    PropertyName = first.Lease.Unit!.Property!.Name,
+                    UnitName = first.Lease.Unit.Name,
+                    OverdueInvoices = invoiceGroup.OrderBy(i => i.DueDate).ToList(),
+                    OverdueUtilityShares = overdueShares.Where(s => s.TenantId == invoiceGroup.Key).ToList()
+                });
+            }
+
+            var invoiceTenantIds = overdueInvoices.Select(i => i.Lease!.TenantId).ToHashSet();
+            foreach (var shareGroup in overdueShares.Where(s => !invoiceTenantIds.Contains(s.TenantId)).GroupBy(s => s.TenantId))
+            {
+                var first = shareGroup.First();
+                groups.Add(new OverdueTenantGroupViewModel
+                {
+                    TenantName = first.Tenant!.FullName,
+                    PropertyName = first.UtilityBill!.Property!.Name,
+                    UnitName = string.Empty,
+                    OverdueUtilityShares = shareGroup.ToList()
+                });
+            }
+
+            return View(groups.OrderByDescending(g => g.TotalOverdue).ToList());
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> MarkInvoicePaid(int invoiceId)

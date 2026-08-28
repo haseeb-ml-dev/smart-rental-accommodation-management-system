@@ -40,6 +40,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 UnitType = u.UnitType,
                 MonthlyRent = u.MonthlyRent,
                 Capacity = u.Capacity,
+                BookableSlots = u.BookableSlots,
                 ActiveLeaseCount = u.Leases.Count(l => l.EndDate == null),
                 HasPendingRequestFromCurrentTenant = u.Bookings.Any(b => b.TenantId == tenantId && b.Status == BookingStatus.Pending)
             })
@@ -70,7 +71,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             var activeLeaseCount = unit.Leases.Count(l => l.EndDate == null);
             var alreadyPending = unit.Bookings.Any(b => b.TenantId == tenantId && b.Status == BookingStatus.Pending);
 
-            if (unit.Property!.IsActive && activeLeaseCount < unit.Capacity && !alreadyPending)
+            if (unit.Property!.IsActive && activeLeaseCount < unit.BookableSlots && !alreadyPending)
             {
                 _context.Bookings.Add(new Booking
                 {
@@ -167,7 +168,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             }
 
             var activeLeaseCount = booking.Unit!.Leases.Count(l => l.EndDate == null);
-            if (activeLeaseCount >= booking.Unit.Capacity)
+            if (activeLeaseCount >= booking.Unit.BookableSlots)
             {
                 TempData["Message"] = "This unit filled up since the request was made. Reject it or free up capacity first.";
                 return RedirectToAction(nameof(Requests));

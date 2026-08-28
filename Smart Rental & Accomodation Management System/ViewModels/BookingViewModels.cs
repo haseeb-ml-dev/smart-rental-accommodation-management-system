@@ -10,8 +10,9 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public UnitType UnitType { get; set; }
         public decimal MonthlyRent { get; set; }
         public int Capacity { get; set; }
+        public int BookableSlots { get; set; }
         public int ActiveLeaseCount { get; set; }
-        public bool IsAvailable => ActiveLeaseCount < Capacity;
+        public bool IsAvailable => ActiveLeaseCount < BookableSlots;
         public bool HasPendingRequestFromCurrentTenant { get; set; }
     }
 

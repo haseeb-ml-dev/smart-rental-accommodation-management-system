@@ -138,9 +138,40 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             vm.HasProperty = true;
             vm.PropertyId = propertyId;
             vm.PropertyName = lease.Unit.Property.Name;
+            vm.Menu = await BuildMealSlotsAsync(propertyId);
+            vm.RecentFeedback = await GetRecentFeedbackAsync(propertyId);
 
+            return View(vm);
+        }
+
+        [Authorize(Roles = "Landlord")]
+        [HttpGet]
+        public async Task<IActionResult> Feedback(int propertyId)
+        {
+            var property = await GetOwnedPropertyAsync(propertyId);
+            if (property == null)
+            {
+                return NotFound();
+            }
+
+            var vm = new MessTenantViewModel
+            {
+                HasProperty = true,
+                PropertyId = property.Id,
+                PropertyName = property.Name,
+                Menu = await BuildMealSlotsAsync(propertyId),
+                RecentFeedback = await GetRecentFeedbackAsync(propertyId)
+            };
+
+            return View(vm);
+        }
+
+        private async Task<List<MessMealSlotViewModel>> BuildMealSlotsAsync(int propertyId)
+        {
             var menuEntries = await _context.MessMenus.Where(m => m.PropertyId == propertyId).ToListAsync();
             var feedback = await _context.MessFeedbacks.Where(f => f.PropertyId == propertyId).ToListAsync();
+
+            var slots = new List<MessMealSlotViewModel>();
 
             foreach (var day in Days)
             {
@@ -154,7 +185,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
 
                     var ratings = feedback.Where(f => f.DayOfWeek == day && f.MealType == meal).Select(f => f.Rating).ToList();
 
-                    vm.Menu.Add(new MessMealSlotViewModel
+                    slots.Add(new MessMealSlotViewModel
                     {
                         DayOfWeek = day,
                         MealType = meal,
@@ -165,14 +196,17 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 }
             }
 
-            vm.RecentFeedback = await _context.MessFeedbacks
+            return slots;
+        }
+
+        private async Task<List<MessFeedback>> GetRecentFeedbackAsync(int propertyId)
+        {
+            return await _context.MessFeedbacks
                 .Include(f => f.Tenant)
                 .Where(f => f.PropertyId == propertyId)
                 .OrderByDescending(f => f.CreatedAt)
                 .Take(10)
                 .ToListAsync();
-
-            return View(vm);
         }
 
         [Authorize(Roles = "Tenant")]

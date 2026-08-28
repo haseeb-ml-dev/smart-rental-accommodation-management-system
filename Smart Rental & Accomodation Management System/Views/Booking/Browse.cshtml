@@ -28,16 +28,22 @@
                 <tr>
                     <td>@unit.PropertyName</td>
                     <td>@unit.UnitName</td>
-                    <td>@unit.UnitType.Humanize()</td>
+                    <td>
+                        @unit.UnitType.Humanize()
+                        @if (unit.UnitType != UnitType.SharedRoom)
+                        {
+                            <span class="text-muted small">(sleeps @unit.Capacity)</span>
+                        }
+                    </td>
                     <td>@unit.MonthlyRent.ToString("C")</td>
                     <td>
                         @if (unit.IsAvailable)
                         {
-                            <span class="badge text-bg-success">Available (@unit.ActiveLeaseCount/@unit.Capacity)</span>
+                            <span class="badge text-bg-success">Available (@unit.ActiveLeaseCount/@unit.BookableSlots)</span>
                         }
                         else
                         {
-                            <span class="badge text-bg-secondary">Full (@unit.ActiveLeaseCount/@unit.Capacity)</span>
+                            <span class="badge text-bg-secondary">Full (@unit.ActiveLeaseCount/@unit.BookableSlots)</span>
                         }
                     </td>
                     <td>

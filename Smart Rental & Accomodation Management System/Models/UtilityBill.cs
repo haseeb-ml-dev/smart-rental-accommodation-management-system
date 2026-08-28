@@ -15,7 +15,9 @@ namespace Smart_Rental___Accomodation_Management_System.Models
     {
         Equal,
         [Display(Name = "Custom Percentage")]
-        CustomPercentage
+        CustomPercentage,
+        [Display(Name = "Per Unit Consumption")]
+        PerUnitConsumption
     }
 
     public class UtilityBill
@@ -35,6 +37,10 @@ namespace Smart_Rental___Accomodation_Management_System.Models
         public DateTime DueDate { get; set; }
 
         public UtilityBillSplitMethod SplitMethod { get; set; }
+
+        // Only set when SplitMethod is PerUnitConsumption — the meter reading total the bill amount is based on.
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal? TotalUnitsConsumed { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

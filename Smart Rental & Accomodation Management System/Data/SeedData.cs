@@ -43,7 +43,7 @@ namespace Smart_Rental___Accomodation_Management_System.Data
 
             var unit1 = new Unit { Property = property, Name = "Room A1", UnitType = UnitType.PrivateRoom, MonthlyRent = 350m, Capacity = 1 };
             var unit2 = new Unit { Property = property, Name = "Room A2", UnitType = UnitType.SharedRoom, MonthlyRent = 220m, Capacity = 2 };
-            var unit3 = new Unit { Property = property, Name = "Family Unit B1", UnitType = UnitType.FamilyUnit, MonthlyRent = 600m, Capacity = 1 };
+            var unit3 = new Unit { Property = property, Name = "Family Unit B1", UnitType = UnitType.FamilyUnit, BhkType = BhkType.TwoBHK, MonthlyRent = 600m, Capacity = 6 };
             property.Units.AddRange(new[] { unit1, unit2, unit3 });
 
             context.Properties.Add(property);

@@ -1,0 +1,106 @@
+@model MessTenantViewModel
+@{
+    ViewData["Title"] = "Mess Feedback";
+    var ratedSlots = Model.Menu.Where(s => s.AverageRating != null).ToList();
+    var overallAverage = ratedSlots.Any() ? ratedSlots.Average(s => s.AverageRating!.Value) : (double?)null;
+    var totalRatings = Model.Menu.Sum(s => s.RatingCount);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Mess Feedback</h1>
+    <a asp-action="Manage" asp-route-propertyId="@Model.PropertyId" class="btn btn-outline-secondary">Edit Menu</a>
+</div>
+<h5 class="text-muted mb-3">@Model.PropertyName</h5>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Overall average rating</div>
+                <div class="fs-3 fw-semibold">
+                    @if (overallAverage != null)
+                    {
+                        <span>&#9733; @overallAverage.Value.ToString("0.0")</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">&mdash;</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Total ratings submitted</div>
+                <div class="fs-3 fw-semibold">@totalRatings</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive mb-4">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Meal</th>
+                <th>Menu</th>
+                <th>Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var slot in Model.Menu)
+            {
+                <tr>
+                    <td>@slot.DayOfWeek</td>
+                    <td>@slot.MealType</td>
+                    <td>@slot.Description</td>
+                    <td>
+                        @if (slot.AverageRating != null)
+                        {
+                            <span>&#9733; @slot.AverageRating.Value.ToString("0.0")</span>
+                            <span class="text-muted small">(@slot.RatingCount)</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted small">No ratings yet</span>
+                        }
+                    </td>
+                </tr>
+            }
+            @if (!Model.Menu.Any())
+            {
+                <tr><td colspan="4" class="text-muted">The menu hasn't been set up yet.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Recent feedback</h5>
+        <table class="table table-sm mb-0">
+            <thead>
+                <tr><th>Tenant</th><th>Day</th><th>Meal</th><th>Rating</th><th>Comment</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var fb in Model.RecentFeedback)
+                {
+                    <tr>
+                        <td>@fb.Tenant?.FullName</td>
+                        <td>@fb.DayOfWeek</td>
+                        <td>@fb.MealType</td>
+                        <td>&#9733; @fb.Rating</td>
+                        <td>@fb.Comment</td>
+                    </tr>
+                }
+                @if (!Model.RecentFeedback.Any())
+                {
+                    <tr><td colspan="5" class="text-muted">No feedback yet.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

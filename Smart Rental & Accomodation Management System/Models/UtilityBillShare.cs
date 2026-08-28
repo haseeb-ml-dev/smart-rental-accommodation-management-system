@@ -15,6 +15,10 @@ namespace Smart_Rental___Accomodation_Management_System.Models
         [Column(TypeName = "decimal(5,2)")]
         public decimal? Percentage { get; set; }
 
+        // Only set when the bill's SplitMethod is PerUnitConsumption.
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal? UnitsConsumed { get; set; }
+
         [Column(TypeName = "decimal(10,2)")]
         public decimal ShareAmount { get; set; }
 

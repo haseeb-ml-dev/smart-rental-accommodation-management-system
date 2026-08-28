@@ -11,14 +11,20 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="row">
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <label asp-for="BillType" class="form-label"></label>
-                    <select asp-for="BillType" class="form-select" asp-items="Html.GetEnumSelectList<UtilityBillType>()"></select>
+                    <select asp-for="BillType" id="BillType" class="form-select" asp-items="Html.GetEnumSelectList<UtilityBillType>()"></select>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <label asp-for="Amount" class="form-label"></label>
                     <input asp-for="Amount" class="form-control" type="number" step="0.01" />
                     <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+                <div class="col-md-4 mb-3" id="totalUnitsGroup">
+                    <label asp-for="TotalUnitsConsumed" class="form-label"></label>
+                    <input asp-for="TotalUnitsConsumed" class="form-control" type="number" step="0.01" />
+                    <div class="form-text">Total meter units this bill covers (used to derive the per-unit rate).</div>
+                    <span asp-validation-for="TotalUnitsConsumed" class="text-danger"></span>
                 </div>
             </div>
 
@@ -39,25 +45,47 @@
 
             <div class="mb-3">
                 <label asp-for="SplitMethod" class="form-label"></label>
-                <select asp-for="SplitMethod" class="form-select" asp-items="Html.GetEnumSelectList<UtilityBillSplitMethod>()"></select>
-                <div class="form-text">Equal splits the amount evenly across all active tenants. Custom lets you set each tenant's percentage (must total 100%).</div>
+                <select asp-for="SplitMethod" id="SplitMethod" class="form-select" asp-items="Html.GetEnumSelectList<UtilityBillSplitMethod>()"></select>
+                <div class="form-text">Equal splits the amount evenly across all active tenants. Custom Percentage lets you set each tenant's share (must total 100%). Per Unit Consumption divides the bill by total units consumed, then charges each tenant units &times; per-unit rate.</div>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Active tenants (used for Custom % split)</label>
+                <label class="form-label">Active tenants</label>
+                <div class="form-text mb-1">Tenants whose unit has its own meter for the selected bill type are excluded from this shared split automatically.</div>
                 <table class="table table-sm">
-                    <thead><tr><th>Tenant</th><th style="width: 140px;">Percentage</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Tenant</th>
+                            <th style="width: 140px;" class="split-col" data-split="@((int)UtilityBillSplitMethod.CustomPercentage)">Percentage</th>
+                            <th style="width: 140px;" class="split-col" data-split="@((int)UtilityBillSplitMethod.PerUnitConsumption)">Units consumed</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         @for (int i = 0; i < Model.Tenants.Count; i++)
                         {
-                            <tr>
+                            <tr data-excluded-electricity="@Model.Tenants[i].ExcludedForElectricity.ToString().ToLowerInvariant()"
+                                data-excluded-water="@Model.Tenants[i].ExcludedForWater.ToString().ToLowerInvariant()">
                                 <td>
                                     @Model.Tenants[i].TenantName
+                                    @if (Model.Tenants[i].ExcludedForElectricity)
+                                    {
+                                        <span class="badge text-bg-light border">⚡ own meter</span>
+                                    }
+                                    @if (Model.Tenants[i].ExcludedForWater)
+                                    {
+                                        <span class="badge text-bg-light border">💧 own meter</span>
+                                    }
+                                    <span class="excluded-note text-muted small d-none">— excluded from this bill (own meter)</span>
                                     <input type="hidden" asp-for="Tenants[i].TenantId" />
                                     <input type="hidden" asp-for="Tenants[i].TenantName" />
+                                    <input type="hidden" asp-for="Tenants[i].ExcludedForElectricity" />
+                                    <input type="hidden" asp-for="Tenants[i].ExcludedForWater" />
                                 </td>
-                                <td>
+                                <td class="split-col" data-split="@((int)UtilityBillSplitMethod.CustomPercentage)">
                                     <input asp-for="Tenants[i].Percentage" class="form-control form-control-sm" type="number" step="0.01" />
+                                </td>
+                                <td class="split-col" data-split="@((int)UtilityBillSplitMethod.PerUnitConsumption)">
+                                    <input asp-for="Tenants[i].UnitsConsumed" class="form-control form-control-sm" type="number" step="0.01" />
                                 </td>
                             </tr>
                         }
@@ -73,4 +101,54 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        (function () {
+            var billTypeSelect = document.getElementById('BillType');
+            var splitMethodSelect = document.getElementById('SplitMethod');
+            var totalUnitsGroup = document.getElementById('totalUnitsGroup');
+            var electricityValue = '@((int)UtilityBillType.Electricity)';
+            var waterValue = '@((int)UtilityBillType.Water)';
+            var perUnitConsumptionValue = '@((int)UtilityBillSplitMethod.PerUnitConsumption)';
+
+            function updateSplitColumns() {
+                document.querySelectorAll('.split-col').forEach(function (el) {
+                    el.style.display = el.getAttribute('data-split') === splitMethodSelect.value ? '' : 'none';
+                });
+            }
+
+            function updateTotalUnitsVisibility() {
+                totalUnitsGroup.style.display = splitMethodSelect.value === perUnitConsumptionValue ? '' : 'none';
+            }
+
+            function updateExclusions() {
+                var billType = billTypeSelect.value;
+                var excludeKey = billType === electricityValue ? 'excludedElectricity' : (billType === waterValue ? 'excludedWater' : null);
+
+                document.querySelectorAll('tbody tr[data-excluded-electricity]').forEach(function (row) {
+                    var excluded = excludeKey === 'excludedElectricity'
+                        ? row.dataset.excludedElectricity === 'true'
+                        : (excludeKey === 'excludedWater' ? row.dataset.excludedWater === 'true' : false);
+
+                    row.classList.toggle('text-muted', excluded);
+                    var note = row.querySelector('.excluded-note');
+                    if (note) {
+                        note.classList.toggle('d-none', !excluded);
+                    }
+                    row.querySelectorAll('input[type="number"]').forEach(function (input) {
+                        input.disabled = excluded;
+                    });
+                });
+            }
+
+            billTypeSelect.addEventListener('change', updateExclusions);
+            splitMethodSelect.addEventListener('change', function () {
+                updateSplitColumns();
+                updateTotalUnitsVisibility();
+            });
+
+            updateSplitColumns();
+            updateTotalUnitsVisibility();
+            updateExclusions();
+        })();
+    </script>
 }

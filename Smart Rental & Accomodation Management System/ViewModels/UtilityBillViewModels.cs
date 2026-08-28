@@ -10,6 +10,13 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
 
         [Range(0, 100)]
         public decimal Percentage { get; set; }
+
+        [Range(0, 1000000), Display(Name = "Units consumed")]
+        public decimal? UnitsConsumed { get; set; }
+
+        // Visual-only hints for the Create view; server-side filtering is authoritative.
+        public bool ExcludedForElectricity { get; set; }
+        public bool ExcludedForWater { get; set; }
     }
 
     public class UtilityBillFormViewModel
@@ -34,6 +41,9 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
 
         [Required, Display(Name = "Split method")]
         public UtilityBillSplitMethod SplitMethod { get; set; } = UtilityBillSplitMethod.Equal;
+
+        [Range(0.01, 10000000), Display(Name = "Total units consumed")]
+        public decimal? TotalUnitsConsumed { get; set; }
 
         public List<TenantShareInputViewModel> Tenants { get; set; } = new();
     }

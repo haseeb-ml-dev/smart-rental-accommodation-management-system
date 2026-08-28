@@ -18,9 +18,11 @@
                     <div class="text-muted small mb-3">@property.Address</div>
                 </div>
                 <div class="d-flex gap-2">
+                    <a asp-action="EditProperty" asp-route-id="@property.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
                     <a asp-action="AddUnit" asp-route-propertyId="@property.Id" class="btn btn-sm btn-outline-primary">Add Unit</a>
                     <a asp-controller="UtilityBill" asp-action="Create" asp-route-propertyId="@property.Id" class="btn btn-sm btn-outline-secondary">Add Utility Bill</a>
                     <a asp-controller="Mess" asp-action="Manage" asp-route-propertyId="@property.Id" class="btn btn-sm btn-outline-secondary">Mess Menu</a>
+                    <a asp-controller="Mess" asp-action="Feedback" asp-route-propertyId="@property.Id" class="btn btn-sm btn-outline-secondary">Mess Feedback</a>
                 </div>
             </div>
 
@@ -30,8 +32,11 @@
                         <tr>
                             <th>Unit</th>
                             <th>Type</th>
+                            <th>BHK</th>
                             <th>Monthly rent</th>
                             <th>Capacity</th>
+                            <th>Meters</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -40,13 +45,28 @@
                             <tr>
                                 <td>@unit.Name</td>
                                 <td>@unit.UnitType.Humanize()</td>
+                                <td>@(unit.BhkType?.Humanize() ?? "—")</td>
                                 <td>@unit.MonthlyRent.ToString("C")</td>
                                 <td>@unit.Capacity</td>
+                                <td>
+                                    @if (unit.HasIndividualElectricityMeter)
+                                    {
+                                        <span class="badge text-bg-light border me-1">⚡ own meter</span>
+                                    }
+                                    @if (unit.HasIndividualWaterMeter)
+                                    {
+                                        <span class="badge text-bg-light border">💧 own meter</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <a asp-action="ManageTenants" asp-route-unitId="@unit.Id" class="btn btn-sm btn-outline-primary">Tenants</a>
+                                    <a asp-action="EditUnit" asp-route-id="@unit.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                </td>
                             </tr>
                         }
                         @if (!property.Units.Any())
                         {
-                            <tr><td colspan="4" class="text-muted">No units yet.</td></tr>
+                            <tr><td colspan="7" class="text-muted">No units yet.</td></tr>
                         }
                     </tbody>
                 </table>

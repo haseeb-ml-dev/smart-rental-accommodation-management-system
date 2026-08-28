@@ -70,7 +70,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 return NotFound();
             }
 
-            var tenants = await GetActiveTenantsAsync(propertyId);
+            var tenants = await GetAllActiveTenantsAsync(propertyId);
             if (!tenants.Any())
             {
                 TempData["Message"] = "This property has no active tenants to split a bill across yet.";
@@ -81,7 +81,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             {
                 PropertyId = property.Id,
                 PropertyName = property.Name,
-                Tenants = tenants.Select(t => new TenantShareInputViewModel { TenantId = t.Id, TenantName = t.FullName }).ToList()
+                Tenants = await BuildTenantInputsAsync(propertyId, tenants)
             };
 
             return View(model);
@@ -97,7 +97,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 return NotFound();
             }
 
-            var activeTenants = await GetActiveTenantsAsync(model.PropertyId);
+            var activeTenants = await GetActiveTenantsAsync(model.PropertyId, model.BillType);
             var activeTenantIds = activeTenants.Select(t => t.Id).ToHashSet();
 
             if (model.SplitMethod == UtilityBillSplitMethod.CustomPercentage)
@@ -108,11 +108,19 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                     ModelState.AddModelError(string.Empty, $"Custom percentages must add up to 100% (currently {total}%).");
                 }
             }
+            else if (model.SplitMethod == UtilityBillSplitMethod.PerUnitConsumption)
+            {
+                if (model.TotalUnitsConsumed is null || model.TotalUnitsConsumed <= 0)
+                {
+                    ModelState.AddModelError(nameof(model.TotalUnitsConsumed), "Enter the total units consumed for this bill.");
+                }
+            }
 
             if (!ModelState.IsValid)
             {
+                var allTenants = await GetAllActiveTenantsAsync(model.PropertyId);
                 model.PropertyName = property.Name;
-                model.Tenants = activeTenants.Select(t => new TenantShareInputViewModel { TenantId = t.Id, TenantName = t.FullName }).ToList();
+                model.Tenants = await BuildTenantInputsAsync(model.PropertyId, allTenants);
                 return View(model);
             }
 
@@ -124,7 +132,8 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 PeriodMonth = model.PeriodMonth,
                 PeriodYear = model.PeriodYear,
                 DueDate = model.DueDate,
-                SplitMethod = model.SplitMethod
+                SplitMethod = model.SplitMethod,
+                TotalUnitsConsumed = model.SplitMethod == UtilityBillSplitMethod.PerUnitConsumption ? model.TotalUnitsConsumed : null
             };
 
             var shares = new List<UtilityBillShare>();
@@ -141,6 +150,21 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                     {
                         TenantId = activeTenants[i].Id,
                         ShareAmount = i == count - 1 ? baseShare + remainder : baseShare
+                    });
+                }
+            }
+            else if (model.SplitMethod == UtilityBillSplitMethod.PerUnitConsumption)
+            {
+                var rate = model.Amount / model.TotalUnitsConsumed!.Value;
+
+                foreach (var input in model.Tenants.Where(t => activeTenantIds.Contains(t.TenantId)))
+                {
+                    var units = input.UnitsConsumed ?? 0m;
+                    shares.Add(new UtilityBillShare
+                    {
+                        TenantId = input.TenantId,
+                        UnitsConsumed = units,
+                        ShareAmount = Math.Round(rate * units, 2)
                     });
                 }
             }
@@ -170,13 +194,49 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             return await _context.Properties.FirstOrDefaultAsync(p => p.Id == propertyId && p.LandlordId == landlordId);
         }
 
-        private async Task<List<ApplicationUser>> GetActiveTenantsAsync(int propertyId)
+        private async Task<List<ApplicationUser>> GetActiveTenantsAsync(int propertyId, UtilityBillType billType)
+        {
+            var query = _context.Leases
+                .Where(l => l.EndDate == null && l.Unit!.PropertyId == propertyId);
+
+            query = billType switch
+            {
+                UtilityBillType.Electricity => query.Where(l => !l.Unit!.HasIndividualElectricityMeter),
+                UtilityBillType.Water => query.Where(l => !l.Unit!.HasIndividualWaterMeter),
+                _ => query
+            };
+
+            return await query
+                .Select(l => l.Tenant!)
+                .Distinct()
+                .ToListAsync();
+        }
+
+        // Unfiltered by meter flags — used to render the form so switching Bill Type client-side
+        // can reveal/hide tenants without a round-trip. Real exclusion is enforced in POST via GetActiveTenantsAsync.
+        private async Task<List<ApplicationUser>> GetAllActiveTenantsAsync(int propertyId)
         {
             return await _context.Leases
                 .Where(l => l.EndDate == null && l.Unit!.PropertyId == propertyId)
                 .Select(l => l.Tenant!)
                 .Distinct()
                 .ToListAsync();
+        }
+
+        private async Task<List<TenantShareInputViewModel>> BuildTenantInputsAsync(int propertyId, List<ApplicationUser> tenants)
+        {
+            var meterFlags = await _context.Leases
+                .Where(l => l.EndDate == null && l.Unit!.PropertyId == propertyId)
+                .Select(l => new { l.TenantId, l.Unit!.HasIndividualElectricityMeter, l.Unit.HasIndividualWaterMeter })
+                .ToListAsync();
+
+            return tenants.Select(t => new TenantShareInputViewModel
+            {
+                TenantId = t.Id,
+                TenantName = t.FullName,
+                ExcludedForElectricity = meterFlags.Any(f => f.TenantId == t.Id && f.HasIndividualElectricityMeter),
+                ExcludedForWater = meterFlags.Any(f => f.TenantId == t.Id && f.HasIndividualWaterMeter)
+            }).ToList();
         }
     }
 }

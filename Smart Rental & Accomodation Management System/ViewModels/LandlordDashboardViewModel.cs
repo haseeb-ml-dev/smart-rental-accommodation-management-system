@@ -26,4 +26,16 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
 
         public decimal OutstandingUtilities { get; set; }
     }
+
+    public class OverdueTenantGroupViewModel
+    {
+        public string TenantName { get; set; } = string.Empty;
+        public string PropertyName { get; set; } = string.Empty;
+        public string UnitName { get; set; } = string.Empty;
+
+        public List<RentInvoice> OverdueInvoices { get; set; } = new();
+        public List<UtilityBillShare> OverdueUtilityShares { get; set; } = new();
+
+        public decimal TotalOverdue => OverdueInvoices.Sum(i => i.Amount) + OverdueUtilityShares.Sum(s => s.ShareAmount);
+    }
 }

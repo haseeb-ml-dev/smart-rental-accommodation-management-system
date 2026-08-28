@@ -1,0 +1,75 @@
+@model List<OverdueTenantGroupViewModel>
+@{
+    ViewData["Title"] = "Overdue Tenants";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Overdue Tenants</h1>
+    <a asp-action="Index" class="btn btn-link">Back to Dashboard</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-success">No overdue tenants right now.</div>
+}
+
+@foreach (var group in Model)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                    <h5 class="card-title mb-1">@group.TenantName</h5>
+                    <div class="text-muted small">@group.PropertyName@(string.IsNullOrEmpty(group.UnitName) ? "" : $" · {group.UnitName}")</div>
+                </div>
+                <div class="fs-5 fw-semibold text-danger">@group.TotalOverdue.ToString("C")</div>
+            </div>
+
+            @if (group.OverdueInvoices.Any())
+            {
+                <table class="table table-sm mb-2">
+                    <thead><tr><th>Rent period</th><th>Amount</th><th>Due date</th><th></th></tr></thead>
+                    <tbody>
+                        @foreach (var invoice in group.OverdueInvoices)
+                        {
+                            <tr>
+                                <td>@invoice.PeriodMonth/@invoice.PeriodYear</td>
+                                <td>@invoice.Amount.ToString("C")</td>
+                                <td>@invoice.DueDate.ToString("MMM d, yyyy")</td>
+                                <td>
+                                    <form asp-action="MarkInvoicePaid" method="post">
+                                        <input type="hidden" name="invoiceId" value="@invoice.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-success">Mark paid</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+
+            @if (group.OverdueUtilityShares.Any())
+            {
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Utility bill</th><th>Share</th><th>Due date</th><th></th></tr></thead>
+                    <tbody>
+                        @foreach (var share in group.OverdueUtilityShares)
+                        {
+                            <tr>
+                                <td>@share.UtilityBill!.BillType.Humanize() (@share.UtilityBill.PeriodMonth/@share.UtilityBill.PeriodYear)</td>
+                                <td>@share.ShareAmount.ToString("C")</td>
+                                <td>@share.UtilityBill.DueDate.ToString("MMM d, yyyy")</td>
+                                <td>
+                                    <form asp-controller="UtilityBill" asp-action="MarkSharePaid" method="post">
+                                        <input type="hidden" name="shareId" value="@share.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-success">Mark paid</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+}
