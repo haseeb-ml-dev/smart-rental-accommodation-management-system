@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Infrastructure;
 using Smart_Rental___Accomodation_Management_System.Data;
 using Smart_Rental___Accomodation_Management_System.Models;
 using Smart_Rental___Accomodation_Management_System.Services;
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +33,7 @@ builder.Services.AddScoped<BillingService>();
 builder.Services.AddHostedService<BillingBackgroundService>();
 builder.Services.AddSingleton<UnitImageStorage>();
 builder.Services.AddHttpClient<GeocodingService>();
+builder.Services.AddSingleton<ReportExportService>();
 
 var app = builder.Build();
 
