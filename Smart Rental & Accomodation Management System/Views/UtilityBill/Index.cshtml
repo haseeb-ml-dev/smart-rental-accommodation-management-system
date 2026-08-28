@@ -66,6 +66,16 @@
                             <td>
                                 @if (!share.IsPaid)
                                 {
+                                    @if (share.TenantMarkedPaidAt != null)
+                                    {
+                                        <div class="small text-info mb-1">
+                                            Tenant marked paid
+                                            @if (share.PaymentSlipFileName != null)
+                                            {
+                                                <a href="/uploads/payment-slips/utility/@share.Id/@share.PaymentSlipFileName" target="_blank" rel="noopener">(view slip)</a>
+                                            }
+                                        </div>
+                                    }
                                     <form asp-action="MarkSharePaid" method="post" class="d-inline">
                                         <input type="hidden" name="shareId" value="@share.Id" />
                                         <button type="submit" class="btn btn-sm btn-outline-success">Mark paid</button>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Smart_Rental___Accomodation_Management_System.Data;
 
@@ -11,9 +12,11 @@ using Smart_Rental___Accomodation_Management_System.Data;
 namespace Smart_Rental___Accomodation_Management_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260828134555_AddTenantPaymentMarking")]
+    partial class AddTenantPaymentMarking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -310,33 +313,6 @@ namespace Smart_Rental___Accomodation_Management_System.Migrations
                     b.HasIndex("UnitId");
 
                     b.ToTable("Leases");
-                });
-
-            modelBuilder.Entity("Smart_Rental___Accomodation_Management_System.Models.LeaseOccupant", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("LeaseId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Phone")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LeaseId");
-
-                    b.ToTable("LeaseOccupants");
                 });
 
             modelBuilder.Entity("Smart_Rental___Accomodation_Management_System.Models.MessFeedback", b =>
@@ -812,17 +788,6 @@ namespace Smart_Rental___Accomodation_Management_System.Migrations
                     b.Navigation("Unit");
                 });
 
-            modelBuilder.Entity("Smart_Rental___Accomodation_Management_System.Models.LeaseOccupant", b =>
-                {
-                    b.HasOne("Smart_Rental___Accomodation_Management_System.Models.Lease", "Lease")
-                        .WithMany("Occupants")
-                        .HasForeignKey("LeaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Lease");
-                });
-
             modelBuilder.Entity("Smart_Rental___Accomodation_Management_System.Models.MessFeedback", b =>
                 {
                     b.HasOne("Smart_Rental___Accomodation_Management_System.Models.Property", "Property")
@@ -940,8 +905,6 @@ namespace Smart_Rental___Accomodation_Management_System.Migrations
 
             modelBuilder.Entity("Smart_Rental___Accomodation_Management_System.Models.Lease", b =>
                 {
-                    b.Navigation("Occupants");
-
                     b.Navigation("RentInvoices");
                 });
 

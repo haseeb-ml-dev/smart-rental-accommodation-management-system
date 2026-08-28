@@ -54,6 +54,44 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             return View(vm);
         }
 
+        [Authorize(Roles = "Tenant")]
+        public async Task<IActionResult> Details(int unitId)
+        {
+            var tenantId = _userManager.GetUserId(User)!;
+
+            var unit = await _context.Units
+                .Include(u => u.Property)
+                .Include(u => u.Leases)
+                .Include(u => u.Bookings)
+                .Include(u => u.Images)
+                .FirstOrDefaultAsync(u => u.Id == unitId && u.Property!.IsActive);
+
+            if (unit == null)
+            {
+                return NotFound();
+            }
+
+            var vm = new UnitDetailViewModel
+            {
+                UnitId = unit.Id,
+                PropertyName = unit.Property?.Name ?? string.Empty,
+                Address = unit.Property?.Address ?? string.Empty,
+                Latitude = unit.Property?.Latitude,
+                Longitude = unit.Property?.Longitude,
+                UnitName = unit.Name,
+                UnitType = unit.UnitType,
+                BhkType = unit.BhkType,
+                MonthlyRent = unit.MonthlyRent,
+                Capacity = unit.Capacity,
+                BookableSlots = unit.BookableSlots,
+                ActiveLeaseCount = unit.Leases.Count(l => l.EndDate == null),
+                HasPendingRequestFromCurrentTenant = unit.Bookings.Any(b => b.TenantId == tenantId && b.Status == BookingStatus.Pending),
+                Images = unit.Images.OrderByDescending(i => i.IsCover).ThenBy(i => i.Id).ToList()
+            };
+
+            return View(vm);
+        }
+
         [HttpPost]
         [Authorize(Roles = "Tenant")]
         [ValidateAntiForgeryToken]
@@ -145,6 +183,32 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 .ToListAsync();
 
             return View(bookings);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Tenant")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelBooking(int bookingId)
+        {
+            var tenantId = _userManager.GetUserId(User)!;
+
+            var booking = await _context.Bookings
+                .FirstOrDefaultAsync(b => b.Id == bookingId && b.TenantId == tenantId);
+
+            if (booking == null)
+            {
+                return NotFound();
+            }
+
+            if (booking.Status == BookingStatus.Pending)
+            {
+                booking.Status = BookingStatus.Cancelled;
+                booking.DecisionDate = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+                TempData["Message"] = "Booking request cancelled.";
+            }
+
+            return RedirectToAction(nameof(MyBookings));
         }
 
         [HttpPost]

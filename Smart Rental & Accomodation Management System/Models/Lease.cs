@@ -19,5 +19,6 @@ namespace Smart_Rental___Accomodation_Management_System.Models
         public DateTime? EndDate { get; set; }
 
         public List<RentInvoice> RentInvoices { get; set; } = new();
+        public List<LeaseOccupant> Occupants { get; set; } = new();
     }
 }

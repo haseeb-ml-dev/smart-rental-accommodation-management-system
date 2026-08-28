@@ -4,7 +4,8 @@ namespace Smart_Rental___Accomodation_Management_System.Models
     {
         Pending,
         Approved,
-        Rejected
+        Rejected,
+        Cancelled
     }
 
     public class Booking

@@ -28,14 +28,16 @@
             {
                 <tr>
                     <td>
-                        @if (unit.CoverImageFileName != null)
-                        {
-                            <img src="/uploads/units/@unit.UnitId/@unit.CoverImageFileName" style="width: 3.5rem; height: 3.5rem; object-fit: cover;" class="rounded" alt="@unit.UnitName" />
-                        }
-                        else
-                        {
-                            <div class="bg-light rounded d-flex align-items-center justify-content-center text-muted" style="width: 3.5rem; height: 3.5rem; font-size: 0.7rem;">No photo</div>
-                        }
+                        <a asp-action="Details" asp-route-unitId="@unit.UnitId">
+                            @if (unit.CoverImageFileName != null)
+                            {
+                                <img src="/uploads/units/@unit.UnitId/@unit.CoverImageFileName" style="width: 3.5rem; height: 3.5rem; object-fit: cover;" class="rounded" alt="@unit.UnitName" />
+                            }
+                            else
+                            {
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center text-muted" style="width: 3.5rem; height: 3.5rem; font-size: 0.7rem;">No photo</div>
+                            }
+                        </a>
                     </td>
                     <td>
                         @unit.PropertyName
@@ -44,7 +46,7 @@
                             <a href="https://www.google.com/maps?q=@(unit.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)),@(unit.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))" target="_blank" rel="noopener" class="small ms-1">(map)</a>
                         }
                     </td>
-                    <td>@unit.UnitName</td>
+                    <td><a asp-action="Details" asp-route-unitId="@unit.UnitId">@unit.UnitName</a></td>
                     <td>
                         @unit.UnitType.Humanize()
                         @if (unit.UnitType != UnitType.SharedRoom)
@@ -68,13 +70,9 @@
                         {
                             <span class="text-muted small">Request pending</span>
                         }
-                        else if (unit.IsAvailable)
+                        else
                         {
-                            <form asp-action="RequestBooking" method="post" class="d-flex gap-2">
-                                <input type="hidden" name="unitId" value="@unit.UnitId" />
-                                <input type="date" name="startDate" class="form-control form-control-sm" value="@DateTime.UtcNow.ToString("yyyy-MM-dd")" style="width: auto;" />
-                                <button type="submit" class="btn btn-sm btn-primary">Request to book</button>
-                            </form>
+                            <a asp-action="Details" asp-route-unitId="@unit.UnitId" class="btn btn-sm btn-primary">View / Book</a>
                         }
                     </td>
                 </tr>

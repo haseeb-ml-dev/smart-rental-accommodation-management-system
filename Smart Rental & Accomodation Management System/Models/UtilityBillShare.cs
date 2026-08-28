@@ -33,6 +33,10 @@ namespace Smart_Rental___Accomodation_Management_System.Models
         public bool IsPaid { get; set; }
         public DateTime? PaidDate { get; set; }
 
+        // Set when the tenant claims they've paid, ahead of landlord confirmation via MarkSharePaid.
+        public DateTime? TenantMarkedPaidAt { get; set; }
+        public string? PaymentSlipFileName { get; set; }
+
         public DisputeStatus DisputeStatus { get; set; } = DisputeStatus.None;
         [StringLength(500)]
         public string? DisputeReason { get; set; }

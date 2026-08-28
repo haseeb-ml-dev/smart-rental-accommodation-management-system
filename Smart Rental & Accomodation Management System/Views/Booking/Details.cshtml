@@ -1,0 +1,107 @@
+@model UnitDetailViewModel
+@{
+    ViewData["Title"] = $"{Model.UnitName} — {Model.PropertyName}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>@Model.UnitName <span class="text-muted fs-5">@Model.PropertyName</span></h1>
+    <a asp-action="Browse" class="btn btn-outline-secondary">Back to Browse</a>
+</div>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">@TempData["Message"]</div>
+}
+
+<div class="row g-4">
+    <div class="col-md-7">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Photos</h5>
+                @if (Model.Images.Any())
+                {
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (var image in Model.Images)
+                        {
+                            <img src="/uploads/units/@Model.UnitId/@image.FileName" style="width: 10rem; height: 8rem; object-fit: cover;" class="rounded" alt="@Model.UnitName" />
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No images available.</p>
+                }
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Location</h5>
+                <p class="mb-1">@Model.Address</p>
+                @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+                {
+                    <a href="https://www.google.com/maps?q=@(Model.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)),@(Model.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))" target="_blank" rel="noopener">View on map</a>
+                }
+                else
+                {
+                    <span class="text-muted">Not mapped yet.</span>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Details</h5>
+                <dl class="row mb-0">
+                    <dt class="col-6">Type</dt>
+                    <dd class="col-6">
+                        @Model.UnitType.Humanize()
+                        @if (Model.BhkType != null)
+                        {
+                            <text> — @Model.BhkType.Value.Humanize()</text>
+                        }
+                    </dd>
+                    <dt class="col-6">Monthly rent</dt>
+                    <dd class="col-6">@Model.MonthlyRent.ToString("C")</dd>
+                    <dt class="col-6">Capacity</dt>
+                    <dd class="col-6">@Model.Capacity</dd>
+                    <dt class="col-6">Availability</dt>
+                    <dd class="col-6">
+                        @if (Model.IsAvailable)
+                        {
+                            <span class="badge text-bg-success">Available (@Model.ActiveLeaseCount/@Model.BookableSlots)</span>
+                        }
+                        else
+                        {
+                            <span class="badge text-bg-secondary">Full (@Model.ActiveLeaseCount/@Model.BookableSlots)</span>
+                        }
+                    </dd>
+                </dl>
+
+                <hr />
+
+                @if (Model.HasPendingRequestFromCurrentTenant)
+                {
+                    <div class="text-muted">You already have a pending request for this unit.</div>
+                }
+                else if (Model.IsAvailable)
+                {
+                    <form asp-action="RequestBooking" method="post">
+                        <input type="hidden" name="unitId" value="@Model.UnitId" />
+                        <div class="mb-2">
+                            <label class="form-label">Move-in date</label>
+                            <input type="date" name="startDate" class="form-control" value="@DateTime.UtcNow.ToString("yyyy-MM-dd")" />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Request to book</button>
+                    </form>
+                }
+                else
+                {
+                    <div class="text-muted">This unit is currently full.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

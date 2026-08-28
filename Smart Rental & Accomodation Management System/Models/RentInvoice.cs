@@ -27,5 +27,9 @@ namespace Smart_Rental___Accomodation_Management_System.Models
         public InvoiceStatus Status { get; set; } = InvoiceStatus.Pending;
 
         public DateTime? PaidDate { get; set; }
+
+        // Set when the tenant claims they've paid, ahead of landlord confirmation via MarkInvoicePaid.
+        public DateTime? TenantMarkedPaidAt { get; set; }
+        public string? PaymentSlipFileName { get; set; }
     }
 }

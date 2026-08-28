@@ -14,6 +14,7 @@
                 <th>Requested start</th>
                 <th>Status</th>
                 <th>Requested on</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -29,17 +30,27 @@
                             {
                                 BookingStatus.Approved => "text-bg-success",
                                 BookingStatus.Rejected => "text-bg-danger",
+                                BookingStatus.Cancelled => "text-bg-secondary",
                                 _ => "text-bg-warning"
                             };
                         }
                         <span class="badge @badgeClass">@booking.Status.Humanize()</span>
                     </td>
                     <td>@booking.CreatedAt.ToString("MMM d, yyyy")</td>
+                    <td>
+                        @if (booking.Status == BookingStatus.Pending)
+                        {
+                            <form asp-action="CancelBooking" method="post" onsubmit="return confirm('Cancel this booking request?');">
+                                <input type="hidden" name="bookingId" value="@booking.BookingId" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                            </form>
+                        }
+                    </td>
                 </tr>
             }
             @if (!Model.Any())
             {
-                <tr><td colspan="5" class="text-muted">You haven't requested any bookings yet.</td></tr>
+                <tr><td colspan="6" class="text-muted">You haven't requested any bookings yet.</td></tr>
             }
         </tbody>
     </table>

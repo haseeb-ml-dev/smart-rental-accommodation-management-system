@@ -37,6 +37,16 @@
                                 <td>@invoice.Amount.ToString("C")</td>
                                 <td>@invoice.DueDate.ToString("MMM d, yyyy")</td>
                                 <td>
+                                    @if (invoice.TenantMarkedPaidAt != null)
+                                    {
+                                        <div class="small text-info mb-1">
+                                            Tenant marked paid
+                                            @if (invoice.PaymentSlipFileName != null)
+                                            {
+                                                <a href="/uploads/payment-slips/rent/@invoice.Id/@invoice.PaymentSlipFileName" target="_blank" rel="noopener">(view slip)</a>
+                                            }
+                                        </div>
+                                    }
                                     <form asp-action="MarkInvoicePaid" method="post">
                                         <input type="hidden" name="invoiceId" value="@invoice.Id" />
                                         <button type="submit" class="btn btn-sm btn-outline-success">Mark paid</button>
@@ -60,6 +70,16 @@
                                 <td>@share.ShareAmount.ToString("C")</td>
                                 <td>@share.UtilityBill.DueDate.ToString("MMM d, yyyy")</td>
                                 <td>
+                                    @if (share.TenantMarkedPaidAt != null)
+                                    {
+                                        <div class="small text-info mb-1">
+                                            Tenant marked paid
+                                            @if (share.PaymentSlipFileName != null)
+                                            {
+                                                <a href="/uploads/payment-slips/utility/@share.Id/@share.PaymentSlipFileName" target="_blank" rel="noopener">(view slip)</a>
+                                            }
+                                        </div>
+                                    }
                                     <form asp-controller="UtilityBill" asp-action="MarkSharePaid" method="post">
                                         <input type="hidden" name="shareId" value="@share.Id" />
                                         <button type="submit" class="btn btn-sm btn-outline-success">Mark paid</button>

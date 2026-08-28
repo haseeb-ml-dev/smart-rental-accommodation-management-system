@@ -105,6 +105,16 @@
                             <td>
                                 @if (invoice.Status != InvoiceStatus.Paid)
                                 {
+                                    @if (invoice.TenantMarkedPaidAt != null)
+                                    {
+                                        <div class="small text-info mb-1">
+                                            Tenant marked paid @invoice.TenantMarkedPaidAt.Value.ToString("MMM d")
+                                            @if (invoice.PaymentSlipFileName != null)
+                                            {
+                                                <a href="/uploads/payment-slips/rent/@invoice.Id/@invoice.PaymentSlipFileName" target="_blank" rel="noopener">(view slip)</a>
+                                            }
+                                        </div>
+                                    }
                                     <form asp-action="MarkInvoicePaid" method="post">
                                         <input type="hidden" name="invoiceId" value="@invoice.Id" />
                                         <button type="submit" class="btn btn-sm btn-outline-success">Mark paid</button>

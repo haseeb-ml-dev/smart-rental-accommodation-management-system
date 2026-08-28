@@ -15,7 +15,11 @@ namespace Smart_Rental___Accomodation_Management_System.Models
         [Display(Name = "Dispute Raised")]
         DisputeRaised,
         [Display(Name = "Dispute Resolved")]
-        DisputeResolved
+        DisputeResolved,
+        [Display(Name = "Rent Payment Claimed")]
+        RentPaymentClaimed,
+        [Display(Name = "Utility Payment Claimed")]
+        UtilityPaymentClaimed
     }
 
     public class Notification

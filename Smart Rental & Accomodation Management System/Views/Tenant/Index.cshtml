@@ -5,6 +5,11 @@
 
 <h1 class="mb-4">My Dashboard</h1>
 
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">@TempData["Message"]</div>
+}
+
 @if (!Model.HasActiveLease)
 {
     <div class="alert alert-info">
@@ -80,6 +85,7 @@ else
                             <th>Amount</th>
                             <th>Due date</th>
                             <th>Status</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -99,12 +105,26 @@ else
                                         };
                                     }
                                     <span class="badge @badgeClass">@invoice.Status.Humanize()</span>
+                                    @if (invoice.Status != InvoiceStatus.Paid && invoice.TenantMarkedPaidAt != null)
+                                    {
+                                        <span class="badge text-bg-info">Awaiting confirmation</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (invoice.Status != InvoiceStatus.Paid && invoice.TenantMarkedPaidAt == null)
+                                    {
+                                        <form asp-action="MarkInvoicePaidByTenant" method="post" enctype="multipart/form-data" class="d-flex gap-1 align-items-center">
+                                            <input type="hidden" name="invoiceId" value="@invoice.Id" />
+                                            <input type="file" name="slip" class="form-control form-control-sm" accept="image/jpeg,image/png,application/pdf" style="width: 160px;" title="Payment slip (optional)" />
+                                            <button type="submit" class="btn btn-sm btn-outline-success text-nowrap">I've paid</button>
+                                        </form>
+                                    }
                                 </td>
                             </tr>
                         }
                         @if (!Model.Invoices.Any())
                         {
-                            <tr><td colspan="4" class="text-muted">No invoices yet.</td></tr>
+                            <tr><td colspan="5" class="text-muted">No invoices yet.</td></tr>
                         }
                     </tbody>
                 </table>
@@ -129,6 +149,7 @@ else
                             <th>Your share</th>
                             <th>Due date</th>
                             <th>Status</th>
+                            <th></th>
                             <th>Dispute</th>
                         </tr>
                     </thead>
@@ -153,6 +174,20 @@ else
                                     {
                                         <span class="badge text-bg-warning">Pending</span>
                                     }
+                                    @if (!share.IsPaid && share.TenantMarkedPaidAt != null)
+                                    {
+                                        <span class="badge text-bg-info">Awaiting confirmation</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!share.IsPaid && share.TenantMarkedPaidAt == null)
+                                    {
+                                        <form asp-action="MarkUtilitySharePaidByTenant" method="post" enctype="multipart/form-data" class="d-flex gap-1 align-items-center">
+                                            <input type="hidden" name="shareId" value="@share.Id" />
+                                            <input type="file" name="slip" class="form-control form-control-sm" accept="image/jpeg,image/png,application/pdf" style="width: 150px;" title="Payment slip (optional)" />
+                                            <button type="submit" class="btn btn-sm btn-outline-success text-nowrap">I've paid</button>
+                                        </form>
+                                    }
                                 </td>
                                 <td>
                                     @if (share.DisputeStatus == DisputeStatus.None)
@@ -176,13 +211,58 @@ else
                         }
                         @if (!Model.UtilityShares.Any())
                         {
-                            <tr><td colspan="6" class="text-muted">No utility bills yet.</td></tr>
+                            <tr><td colspan="7" class="text-muted">No utility bills yet.</td></tr>
                         }
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
+    @if (Model.CanManageOccupants)
+    {
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Occupants</h5>
+                <div class="form-text mb-3">This unit is rented in your name as the head tenant. Add the people living with you here for the record.</div>
+
+                @if (Model.Occupants.Any())
+                {
+                    <ul class="list-group mb-3">
+                        @foreach (var occupant in Model.Occupants)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>@occupant.Name @(string.IsNullOrEmpty(occupant.Phone) ? "" : $"— {occupant.Phone}")</span>
+                                <form asp-action="RemoveOccupant" method="post" onsubmit="return confirm('Remove this occupant?');">
+                                    <input type="hidden" name="occupantId" value="@occupant.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted">No occupants added yet.</p>
+                }
+
+                <form asp-action="AddOccupant" method="post" class="row g-2 align-items-end">
+                    <input type="hidden" name="leaseId" value="@Model.LeaseId" />
+                    <div class="col-sm-5">
+                        <label class="form-label small mb-0">Name</label>
+                        <input type="text" name="name" class="form-control form-control-sm" maxlength="100" required />
+                    </div>
+                    <div class="col-sm-4">
+                        <label class="form-label small mb-0">Phone (optional)</label>
+                        <input type="text" name="phone" class="form-control form-control-sm" maxlength="30" />
+                    </div>
+                    <div class="col-sm-3">
+                        <button type="submit" class="btn btn-sm btn-outline-primary w-100">Add Occupant</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
 }
 
 @section Scripts {

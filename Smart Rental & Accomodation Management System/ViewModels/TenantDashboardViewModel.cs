@@ -19,5 +19,9 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
 
         public decimal UtilityOutstandingBalance { get; set; }
         public List<UtilityBillShare> UtilityShares { get; set; } = new();
+
+        public bool CanManageOccupants { get; set; }
+        public int? LeaseId { get; set; }
+        public List<LeaseOccupant> Occupants { get; set; } = new();
     }
 }
