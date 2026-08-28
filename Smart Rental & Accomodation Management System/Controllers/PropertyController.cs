@@ -15,12 +15,14 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly UnitImageStorage _imageStorage;
+        private readonly GeocodingService _geocodingService;
 
-        public PropertyController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, UnitImageStorage imageStorage)
+        public PropertyController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, UnitImageStorage imageStorage, GeocodingService geocodingService)
         {
             _context = context;
             _userManager = userManager;
             _imageStorage = imageStorage;
+            _geocodingService = geocodingService;
         }
 
         public async Task<IActionResult> Index()
@@ -57,6 +59,10 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 Name = model.Name,
                 Address = model.Address
             };
+
+            var geocode = await _geocodingService.GeocodeAsync(model.Address);
+            property.Latitude = geocode?.Latitude;
+            property.Longitude = geocode?.Longitude;
 
             _context.Properties.Add(property);
             await _context.SaveChangesAsync();
@@ -142,8 +148,18 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 return View(model);
             }
 
+            var addressChanged = !string.Equals(property.Address, model.Address, StringComparison.Ordinal);
+
             property.Name = model.Name;
             property.Address = model.Address;
+
+            if (addressChanged)
+            {
+                var geocode = await _geocodingService.GeocodeAsync(model.Address);
+                property.Latitude = geocode?.Latitude;
+                property.Longitude = geocode?.Longitude;
+            }
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));

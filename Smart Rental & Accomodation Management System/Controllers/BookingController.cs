@@ -38,6 +38,8 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 UnitId = u.Id,
                 CoverImageFileName = (u.Images.FirstOrDefault(i => i.IsCover) ?? u.Images.FirstOrDefault())?.FileName,
                 PropertyName = u.Property?.Name ?? string.Empty,
+                Latitude = u.Property?.Latitude,
+                Longitude = u.Property?.Longitude,
                 UnitName = u.Name,
                 UnitType = u.UnitType,
                 MonthlyRent = u.MonthlyRent,

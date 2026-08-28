@@ -16,6 +16,10 @@ namespace Smart_Rental___Accomodation_Management_System.Models
         [Required, StringLength(300)]
         public string Address { get; set; } = string.Empty;
 
+        // Populated by GeocodingService from Address; null if geocoding hasn't run yet, failed, or no API key is configured.
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
+
         public bool IsActive { get; set; } = true;
 
         public List<Unit> Units { get; set; } = new();

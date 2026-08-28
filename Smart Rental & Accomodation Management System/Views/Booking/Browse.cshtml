@@ -37,7 +37,13 @@
                             <div class="bg-light rounded d-flex align-items-center justify-content-center text-muted" style="width: 3.5rem; height: 3.5rem; font-size: 0.7rem;">No photo</div>
                         }
                     </td>
-                    <td>@unit.PropertyName</td>
+                    <td>
+                        @unit.PropertyName
+                        @if (unit.Latitude.HasValue && unit.Longitude.HasValue)
+                        {
+                            <a href="https://www.google.com/maps?q=@(unit.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)),@(unit.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))" target="_blank" rel="noopener" class="small ms-1">(map)</a>
+                        }
+                    </td>
                     <td>@unit.UnitName</td>
                     <td>
                         @unit.UnitType.Humanize()

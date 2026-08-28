@@ -7,6 +7,8 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public int UnitId { get; set; }
         public string? CoverImageFileName { get; set; }
         public string PropertyName { get; set; } = string.Empty;
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
         public string UnitName { get; set; } = string.Empty;
         public UnitType UnitType { get; set; }
         public decimal MonthlyRent { get; set; }

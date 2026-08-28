@@ -15,7 +15,17 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <h5 class="card-title mb-1">@property.Name</h5>
-                    <div class="text-muted small mb-3">@property.Address</div>
+                    <div class="text-muted small mb-3">
+                        @property.Address
+                        @if (property.Latitude.HasValue && property.Longitude.HasValue)
+                        {
+                            <a href="https://www.google.com/maps?q=@(property.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)),@(property.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))" target="_blank" rel="noopener" class="ms-1">View on map</a>
+                        }
+                        else
+                        {
+                            <span class="ms-1">(not mapped yet)</span>
+                        }
+                    </div>
                 </div>
                 <div class="d-flex gap-2">
                     <a asp-action="EditProperty" asp-route-id="@property.Id" class="btn btn-sm btn-outline-secondary">Edit</a>

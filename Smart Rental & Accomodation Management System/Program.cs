@@ -29,6 +29,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<BillingService>();
 builder.Services.AddHostedService<BillingBackgroundService>();
 builder.Services.AddSingleton<UnitImageStorage>();
+builder.Services.AddHttpClient<GeocodingService>();
 
 var app = builder.Build();
 
