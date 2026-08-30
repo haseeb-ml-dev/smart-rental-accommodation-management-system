@@ -7,10 +7,12 @@ namespace Smart_Rental___Accomodation_Management_System.Services
     public class BillingService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IEmailSender _emailSender;
 
-        public BillingService(ApplicationDbContext context)
+        public BillingService(ApplicationDbContext context, IEmailSender emailSender)
         {
             _context = context;
+            _emailSender = emailSender;
         }
 
         public async Task GenerateMonthlyInvoicesAsync()
@@ -56,6 +58,7 @@ namespace Smart_Rental___Accomodation_Management_System.Services
                 .Include(i => i.Lease)
                     .ThenInclude(l => l!.Unit)
                         .ThenInclude(u => u!.Property)
+                            .ThenInclude(p => p!.Landlord)
                 .Where(i => i.Status == InvoiceStatus.Pending && i.DueDate < today)
                 .ToListAsync();
 
@@ -67,28 +70,32 @@ namespace Smart_Rental___Accomodation_Management_System.Services
                 var tenantName = lease.Tenant?.FullName ?? "A tenant";
                 var period = $"{invoice.PeriodMonth}/{invoice.PeriodYear}";
 
+                var tenantMessage = $"Your rent for {period} ({invoice.Amount:C}) is now overdue.";
                 _context.Notifications.Add(new Notification
                 {
                     RecipientId = lease.TenantId,
                     Type = NotificationType.RentOverdue,
-                    Message = $"Your rent for {period} ({invoice.Amount:C}) is now overdue.",
+                    Message = tenantMessage,
                     LinkController = "Tenant",
                     LinkAction = "Index",
                     RelatedEntityId = invoice.Id
                 });
+                await TrySendEmailAsync(lease.Tenant?.Email, "Rent overdue", tenantMessage);
 
-                var landlordId = lease.Unit?.Property?.LandlordId;
-                if (landlordId != null)
+                var landlord = lease.Unit?.Property?.Landlord;
+                if (landlord != null)
                 {
+                    var landlordMessage = $"{tenantName}'s rent for {period} ({invoice.Amount:C}) is now overdue.";
                     _context.Notifications.Add(new Notification
                     {
-                        RecipientId = landlordId,
+                        RecipientId = landlord.Id,
                         Type = NotificationType.RentOverdue,
-                        Message = $"{tenantName}'s rent for {period} ({invoice.Amount:C}) is now overdue.",
+                        Message = landlordMessage,
                         LinkController = "Landlord",
                         LinkAction = "OverdueTenants",
                         RelatedEntityId = invoice.Id
                     });
+                    await TrySendEmailAsync(landlord.Email, "Tenant rent overdue", landlordMessage);
                 }
             }
 
@@ -106,6 +113,7 @@ namespace Smart_Rental___Accomodation_Management_System.Services
 
             var upcomingInvoices = await _context.RentInvoices
                 .Include(i => i.Lease)
+                    .ThenInclude(l => l!.Tenant)
                 .Where(i => i.Status == InvoiceStatus.Pending && i.DueDate >= today && i.DueDate <= horizon)
                 .ToListAsync();
 
@@ -119,15 +127,18 @@ namespace Smart_Rental___Accomodation_Management_System.Services
                     continue;
                 }
 
+                var message = $"Rent of {invoice.Amount:C} is due on {invoice.DueDate:MMM d, yyyy}.";
+
                 _context.Notifications.Add(new Notification
                 {
                     RecipientId = invoice.Lease!.TenantId,
                     Type = NotificationType.RentDueSoon,
-                    Message = $"Rent of {invoice.Amount:C} is due on {invoice.DueDate:MMM d, yyyy}.",
+                    Message = message,
                     LinkController = "Tenant",
                     LinkAction = "Index",
                     RelatedEntityId = invoice.Id
                 });
+                await TrySendEmailAsync(invoice.Lease!.Tenant?.Email, "Rent due soon", message);
             }
 
             if (upcomingInvoices.Count > 0)
@@ -144,6 +155,7 @@ namespace Smart_Rental___Accomodation_Management_System.Services
 
             var unpaidShares = await _context.UtilityBillShares
                 .Include(s => s.UtilityBill)
+                .Include(s => s.Tenant)
                 .Where(s => !s.IsPaid && s.UtilityBill!.DueDate <= horizon)
                 .ToListAsync();
 
@@ -173,12 +185,26 @@ namespace Smart_Rental___Accomodation_Management_System.Services
                     LinkAction = "Index",
                     RelatedEntityId = share.Id
                 });
+                await TrySendEmailAsync(share.Tenant?.Email, isOverdue ? "Utility bill overdue" : "Utility bill due soon", message);
             }
 
             if (unpaidShares.Count > 0)
             {
                 await _context.SaveChangesAsync();
             }
+        }
+
+        // A missing/unconfigured email address must never break the reminder pass — the in-app
+        // notification above already covers it, and IEmailSender itself logs instead of throwing
+        // when no SMTP host is configured.
+        private async Task TrySendEmailAsync(string? toEmail, string subject, string message)
+        {
+            if (string.IsNullOrWhiteSpace(toEmail))
+            {
+                return;
+            }
+
+            await _emailSender.SendEmailAsync(toEmail, subject, message);
         }
 
         // Falls back to the model defaults if the singleton settings row is somehow missing —
