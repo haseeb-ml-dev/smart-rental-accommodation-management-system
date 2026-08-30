@@ -1,37 +1,43 @@
+using System.Globalization;
 using System.Text.Json;
 
 namespace Smart_Rental___Accomodation_Management_System.Services
 {
     public record GeocodeResult(double Latitude, double Longitude);
 
-    // Wraps the Google Geocoding API. Every failure mode (no key configured, network error,
-    // bad address, quota exceeded) returns null rather than throwing — geocoding is a nice-to-have
-    // enrichment and must never block saving a property.
+    // Wraps OpenStreetMap's Nominatim geocoder — free and keyless, which suits a demo/small
+    // deployment, but its usage policy caps requests at ~1/second and requires a descriptive
+    // User-Agent (both set below). For higher volume, self-host Nominatim or switch to a paid
+    // provider (Google Geocoding, LocationIQ, OpenCage). Every failure mode (network error, bad
+    // address, no match, rate limiting) returns null rather than throwing — geocoding is a
+    // nice-to-have enrichment and must never block saving a property.
     public class GeocodingService
     {
+        private const string UserAgent = "SmartRentalAccommodationManagementSystem/1.0 (demo project)";
+
         private readonly HttpClient _httpClient;
-        private readonly IConfiguration _configuration;
         private readonly ILogger<GeocodingService> _logger;
 
-        public GeocodingService(HttpClient httpClient, IConfiguration configuration, ILogger<GeocodingService> logger)
+        public GeocodingService(HttpClient httpClient, ILogger<GeocodingService> logger)
         {
             _httpClient = httpClient;
-            _configuration = configuration;
             _logger = logger;
         }
 
         public async Task<GeocodeResult?> GeocodeAsync(string address)
         {
-            var apiKey = _configuration["GoogleMaps:ApiKey"];
-            if (string.IsNullOrWhiteSpace(address) || string.IsNullOrWhiteSpace(apiKey))
+            if (string.IsNullOrWhiteSpace(address))
             {
                 return null;
             }
 
             try
             {
-                var url = $"https://maps.googleapis.com/maps/api/geocode/json?address={Uri.EscapeDataString(address)}&key={apiKey}";
-                using var response = await _httpClient.GetAsync(url);
+                var url = $"https://nominatim.openstreetmap.org/search?q={Uri.EscapeDataString(address)}&format=json&limit=1";
+                using var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request.Headers.UserAgent.ParseAdd(UserAgent);
+
+                using var response = await _httpClient.SendAsync(request);
                 if (!response.IsSuccessStatusCode)
                 {
                     return null;
@@ -39,22 +45,19 @@ namespace Smart_Rental___Accomodation_Management_System.Services
 
                 await using var stream = await response.Content.ReadAsStreamAsync();
                 using var doc = await JsonDocument.ParseAsync(stream);
-                var root = doc.RootElement;
+                var results = doc.RootElement;
 
-                var status = root.GetProperty("status").GetString();
-                if (status != "OK" || root.GetProperty("results").GetArrayLength() == 0)
+                if (results.ValueKind != JsonValueKind.Array || results.GetArrayLength() == 0)
                 {
-                    if (status is not ("OK" or "ZERO_RESULTS"))
-                    {
-                        _logger.LogWarning("Geocoding request for {Address} returned status {Status}", address, status);
-                    }
                     return null;
                 }
 
-                var location = root.GetProperty("results")[0].GetProperty("geometry").GetProperty("location");
-                return new GeocodeResult(location.GetProperty("lat").GetDouble(), location.GetProperty("lng").GetDouble());
+                var first = results[0];
+                var lat = double.Parse(first.GetProperty("lat").GetString()!, CultureInfo.InvariantCulture);
+                var lon = double.Parse(first.GetProperty("lon").GetString()!, CultureInfo.InvariantCulture);
+                return new GeocodeResult(lat, lon);
             }
-            catch (Exception ex) when (ex is HttpRequestException or JsonException or TaskCanceledException)
+            catch (Exception ex) when (ex is HttpRequestException or JsonException or TaskCanceledException or FormatException)
             {
                 _logger.LogWarning(ex, "Geocoding request for {Address} failed", address);
                 return null;
