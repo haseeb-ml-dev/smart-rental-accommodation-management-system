@@ -31,4 +31,25 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         [Required]
         public string Role { get; set; } = "Tenant";
     }
+
+    public class ForgotPasswordViewModel
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; } = string.Empty;
+    }
+
+    public class ResetPasswordViewModel
+    {
+        [Required]
+        public string UserId { get; set; } = string.Empty;
+
+        [Required]
+        public string Token { get; set; } = string.Empty;
+
+        [Required, DataType(DataType.Password), StringLength(100, MinimumLength = 6), Display(Name = "New password")]
+        public string NewPassword { get; set; } = string.Empty;
+
+        [Required, DataType(DataType.Password), Compare(nameof(NewPassword)), Display(Name = "Confirm new password")]
+        public string ConfirmNewPassword { get; set; } = string.Empty;
+    }
 }

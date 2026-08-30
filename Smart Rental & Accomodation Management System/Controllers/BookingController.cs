@@ -11,6 +11,8 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
     [Authorize]
     public class BookingController : Controller
     {
+        private const int PageSize = 10;
+
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
@@ -21,36 +23,79 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         }
 
         [Authorize(Roles = "Tenant")]
-        public async Task<IActionResult> Browse()
+        public async Task<IActionResult> Browse(UnitSearchFilter filter)
         {
             var tenantId = _userManager.GetUserId(User)!;
             var today = DateTime.UtcNow.Date;
 
-            var units = await _context.Units
+            filter ??= new UnitSearchFilter();
+            if (filter.Page < 1)
+            {
+                filter.Page = 1;
+            }
+
+            var query = _context.Units
                 .Include(u => u.Property)
                 .Include(u => u.Leases)
                 .Include(u => u.Bookings)
                 .Include(u => u.Images)
                 .Where(u => u.Property!.IsActive)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filter.City))
+            {
+                query = query.Where(u => u.Property!.City == filter.City);
+            }
+            if (filter.MinRent.HasValue)
+            {
+                query = query.Where(u => u.MonthlyRent >= filter.MinRent.Value);
+            }
+            if (filter.MaxRent.HasValue)
+            {
+                query = query.Where(u => u.MonthlyRent <= filter.MaxRent.Value);
+            }
+            if (filter.UnitType.HasValue)
+            {
+                query = query.Where(u => u.UnitType == filter.UnitType.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var units = await query
+                .OrderBy(u => u.Property!.Name).ThenBy(u => u.Name)
+                .Skip((filter.Page - 1) * PageSize)
+                .Take(PageSize)
                 .ToListAsync();
 
-            var vm = units.Select(u => new UnitAvailabilityViewModel
+            var cities = await _context.Properties
+                .Where(p => p.IsActive && p.City != null)
+                .Select(p => p.City!)
+                .Distinct()
+                .OrderBy(c => c)
+                .ToListAsync();
+
+            var vm = new TenantBrowseViewModel
             {
-                UnitId = u.Id,
-                CoverImageFileName = (u.Images.FirstOrDefault(i => i.IsCover) ?? u.Images.FirstOrDefault())?.FileName,
-                PropertyName = u.Property?.Name ?? string.Empty,
-                Latitude = u.Property?.Latitude,
-                Longitude = u.Property?.Longitude,
-                UnitName = u.Name,
-                UnitType = u.UnitType,
-                MonthlyRent = u.MonthlyRent,
-                Capacity = u.Capacity,
-                BookableSlots = u.BookableSlots,
-                ActiveLeaseCount = u.Leases.Count(l => l.EndDate == null || l.EndDate >= today),
-                HasPendingRequestFromCurrentTenant = u.Bookings.Any(b => b.TenantId == tenantId && b.Status == BookingStatus.Pending)
-            })
-            .OrderBy(u => u.PropertyName).ThenBy(u => u.UnitName)
-            .ToList();
+                Filter = filter,
+                Cities = cities,
+                TotalCount = totalCount,
+                PageSize = PageSize,
+                Units = units.Select(u => new UnitAvailabilityViewModel
+                {
+                    UnitId = u.Id,
+                    CoverImageFileName = (u.Images.FirstOrDefault(i => i.IsCover) ?? u.Images.FirstOrDefault())?.FileName,
+                    PropertyName = u.Property?.Name ?? string.Empty,
+                    Latitude = u.Property?.Latitude,
+                    Longitude = u.Property?.Longitude,
+                    UnitName = u.Name,
+                    UnitType = u.UnitType,
+                    MonthlyRent = u.MonthlyRent,
+                    Capacity = u.Capacity,
+                    BookableSlots = u.BookableSlots,
+                    ActiveLeaseCount = u.Leases.Count(l => l.EndDate == null || l.EndDate >= today),
+                    HasPendingRequestFromCurrentTenant = u.Bookings.Any(b => b.TenantId == tenantId && b.Status == BookingStatus.Pending)
+                }).ToList()
+            };
 
             return View(vm);
         }

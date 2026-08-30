@@ -20,4 +20,14 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public int ActiveLeaseCount { get; set; }
         public bool IsAvailable => ActiveLeaseCount < BookableSlots;
     }
+
+    public class PublicBrowseViewModel
+    {
+        public UnitSearchFilter Filter { get; set; } = new();
+        public List<PublicListingViewModel> Units { get; set; } = new();
+        public List<string> Cities { get; set; } = new();
+        public int TotalCount { get; set; }
+        public int PageSize { get; set; }
+        public int TotalPages => PageSize == 0 ? 0 : (int)Math.Ceiling(TotalCount / (double)PageSize);
+    }
 }

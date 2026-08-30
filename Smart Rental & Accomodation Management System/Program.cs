@@ -19,6 +19,11 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
         options.Password.RequireNonAlphanumeric = false;
         options.Password.RequiredLength = 6;
+
+        options.SignIn.RequireConfirmedEmail = true;
+
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
@@ -35,6 +40,8 @@ builder.Services.AddSingleton<UnitImageStorage>();
 builder.Services.AddSingleton<PaymentSlipStorage>();
 builder.Services.AddHttpClient<GeocodingService>();
 builder.Services.AddSingleton<ReportExportService>();
+builder.Services.Configure<EmailSenderOptions>(builder.Configuration.GetSection("Email"));
+builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
 
 var app = builder.Build();
 

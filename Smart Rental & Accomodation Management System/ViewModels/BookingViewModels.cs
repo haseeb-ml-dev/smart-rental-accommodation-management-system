@@ -19,6 +19,16 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public bool HasPendingRequestFromCurrentTenant { get; set; }
     }
 
+    public class TenantBrowseViewModel
+    {
+        public UnitSearchFilter Filter { get; set; } = new();
+        public List<UnitAvailabilityViewModel> Units { get; set; } = new();
+        public List<string> Cities { get; set; } = new();
+        public int TotalCount { get; set; }
+        public int PageSize { get; set; }
+        public int TotalPages => PageSize == 0 ? 0 : (int)Math.Ceiling(TotalCount / (double)PageSize);
+    }
+
     public class UnitDetailViewModel
     {
         public int UnitId { get; set; }

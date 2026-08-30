@@ -1,4 +1,4 @@
-@model List<UnitAvailabilityViewModel>
+@model TenantBrowseViewModel
 @{
     ViewData["Title"] = "Browse & Book";
 }
@@ -9,6 +9,40 @@
 {
     <div class="alert alert-info">@TempData["Message"]</div>
 }
+
+<form method="get" class="row g-2 mb-4 align-items-end">
+    <div class="col-sm-3">
+        <label class="form-label">City</label>
+        <select name="City" class="form-select">
+            <option value="">All cities</option>
+            @foreach (var city in Model.Cities)
+            {
+                <option value="@city" selected="@(city == Model.Filter.City)">@city</option>
+            }
+        </select>
+    </div>
+    <div class="col-sm-2">
+        <label class="form-label">Min rent</label>
+        <input type="number" name="MinRent" class="form-control" min="0" step="1" value="@Model.Filter.MinRent" />
+    </div>
+    <div class="col-sm-2">
+        <label class="form-label">Max rent</label>
+        <input type="number" name="MaxRent" class="form-control" min="0" step="1" value="@Model.Filter.MaxRent" />
+    </div>
+    <div class="col-sm-3">
+        <label class="form-label">Unit type</label>
+        <select name="UnitType" class="form-select">
+            <option value="">All types</option>
+            @foreach (UnitType t in Enum.GetValues<UnitType>())
+            {
+                <option value="@t" selected="@(t == Model.Filter.UnitType)">@t.Humanize()</option>
+            }
+        </select>
+    </div>
+    <div class="col-sm-2">
+        <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+</form>
 
 <div class="table-responsive">
     <table class="table align-middle">
@@ -24,7 +58,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var unit in Model)
+            @foreach (var unit in Model.Units)
             {
                 <tr>
                     <td>
@@ -77,10 +111,30 @@
                     </td>
                 </tr>
             }
-            @if (!Model.Any())
+            @if (!Model.Units.Any())
             {
-                <tr><td colspan="7" class="text-muted">No units listed yet.</td></tr>
+                <tr><td colspan="7" class="text-muted">No units match your search.</td></tr>
             }
         </tbody>
     </table>
 </div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination">
+            @for (int p = 1; p <= Model.TotalPages; p++)
+            {
+                <li class="page-item @(p == Model.Filter.Page ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Browse"
+                       asp-route-City="@Model.Filter.City"
+                       asp-route-MinRent="@Model.Filter.MinRent"
+                       asp-route-MaxRent="@Model.Filter.MaxRent"
+                       asp-route-UnitType="@Model.Filter.UnitType"
+                       asp-route-Page="@p">@p</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
