@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using QuestPDF.Infrastructure;
 using Smart_Rental___Accomodation_Management_System.Data;
 using Smart_Rental___Accomodation_Management_System.Models;
@@ -41,7 +42,20 @@ builder.Services.AddSingleton<PaymentSlipStorage>();
 builder.Services.AddHttpClient<GeocodingService>();
 builder.Services.AddSingleton<ReportExportService>();
 builder.Services.Configure<EmailSenderOptions>(builder.Configuration.GetSection("Email"));
-builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
+builder.Services.Configure<MailgunOptions>(builder.Configuration.GetSection("Mailgun"));
+builder.Services.AddHttpClient<MailgunEmailSender>();
+builder.Services.AddSingleton<IEmailSender>(sp =>
+{
+    // Mailgun is used when configured; otherwise fall back to plain SMTP (which itself just logs
+    // when no host is set either) — see Services/MailgunEmailSender.cs and SmtpEmailSender.cs.
+    var mailgun = sp.GetRequiredService<IOptions<MailgunOptions>>().Value;
+    if (!string.IsNullOrWhiteSpace(mailgun.Domain) && !string.IsNullOrWhiteSpace(mailgun.ApiKey))
+    {
+        return sp.GetRequiredService<MailgunEmailSender>();
+    }
+
+    return ActivatorUtilities.CreateInstance<SmtpEmailSender>(sp);
+});
 
 var app = builder.Build();
 
