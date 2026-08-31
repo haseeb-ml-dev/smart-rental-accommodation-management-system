@@ -1,6 +1,29 @@
-﻿@{
+@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<h1 class="mb-4">Privacy Policy</h1>
+
+<div class="card">
+    <div class="card-body">
+        <p class="text-muted">Last updated @DateTime.Now.ToString("MMMM yyyy").</p>
+
+        <h5 class="mt-4">Information we collect</h5>
+        <p>When you register an account, we collect your full name, email address, phone number, and password. Your email doubles as your login username. If you list a property as a landlord, we store the property address, unit details, and photos you upload. If you book or lease a unit as a tenant, we store your booking requests, lease dates, rent and utility bill records, and any payment slip images you upload to confirm a payment.</p>
+
+        <h5 class="mt-4">How we use your information</h5>
+        <p>We use this information to run the core features of the platform: matching tenants with available units, generating and tracking rent and utility invoices, sending booking and payment reminders, and letting landlords and admins manage their properties and tenants. We send account-related emails such as confirming your email address, resetting your password, and reminding you about upcoming or overdue payments.</p>
+
+        <h5 class="mt-4">Property location data</h5>
+        <p>When a landlord enters a property address, we look up its approximate map coordinates using OpenStreetMap's free geocoding service so tenants can see the property's location. No third-party advertising or tracking service receives this data.</p>
+
+        <h5 class="mt-4">Who can see your information</h5>
+        <p>Landlords can see the contact details and payment history of tenants who lease or have requested to book their units. Tenants can see the property and unit details a landlord has listed. Platform administrators can see account and property information to moderate the platform and resolve disputes. We don't sell or share your information with outside advertisers.</p>
+
+        <h5 class="mt-4">Data retention and deletion</h5>
+        <p>We keep your account and transaction records for as long as your account is active, so that rent and utility payment history stays accurate. If you'd like your account and associated data removed, contact the administrator managing your platform instance.</p>
+
+        <h5 class="mt-4">Contact</h5>
+        <p>If you have questions about this policy or how your data is handled, reach out to your platform administrator.</p>
+    </div>
+</div>

@@ -28,7 +28,7 @@
                         @booking.StartDate.ToString("MMM d, yyyy")
                         @if (booking.RequestedEndDate.HasValue)
                         {
-                            <text> &ndash; @booking.RequestedEndDate.Value.ToString("MMM d, yyyy")</text>
+                            <text> to @booking.RequestedEndDate.Value.ToString("MMM d, yyyy")</text>
                         }
                     </td>
                     <td>

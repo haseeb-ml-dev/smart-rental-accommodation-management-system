@@ -134,7 +134,15 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             }
 
             ViewBag.Cities = await _context.SupportedCities.OrderBy(c => c.Name).Select(c => c.Name).ToListAsync();
-            return View(new PropertyFormViewModel { Id = property.Id, Name = property.Name, Address = property.Address, City = property.City });
+            return View(new PropertyFormViewModel
+            {
+                Id = property.Id,
+                Name = property.Name,
+                Address = property.Address,
+                City = property.City,
+                Latitude = property.Latitude,
+                Longitude = property.Longitude
+            });
         }
 
         [HttpPost]
@@ -150,6 +158,8 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             if (!ModelState.IsValid)
             {
                 ViewBag.Cities = await _context.SupportedCities.OrderBy(c => c.Name).Select(c => c.Name).ToListAsync();
+                model.Latitude = property.Latitude;
+                model.Longitude = property.Longitude;
                 return View(model);
             }
 

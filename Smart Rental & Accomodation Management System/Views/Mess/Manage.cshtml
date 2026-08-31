@@ -5,7 +5,7 @@
     var meals = Model.Entries.Select(e => e.MealType).Distinct().ToList();
 }
 
-<h1 class="mb-4">Weekly Mess Menu &mdash; @Model.PropertyName</h1>
+<h1 class="mb-4">Weekly Mess Menu &middot; @Model.PropertyName</h1>
 
 <form asp-action="Manage" method="post">
     <input type="hidden" asp-for="PropertyId" />

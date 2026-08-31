@@ -232,7 +232,7 @@ else
                         @foreach (var occupant in Model.Occupants)
                         {
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>@occupant.Name @(string.IsNullOrEmpty(occupant.Phone) ? "" : $"— {occupant.Phone}")</span>
+                                <span>@occupant.Name @(string.IsNullOrEmpty(occupant.Phone) ? "" : $"({occupant.Phone})")</span>
                                 <form asp-action="RemoveOccupant" method="post" onsubmit="return confirm('Remove this occupant?');">
                                     <input type="hidden" name="occupantId" value="@occupant.Id" />
                                     <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>

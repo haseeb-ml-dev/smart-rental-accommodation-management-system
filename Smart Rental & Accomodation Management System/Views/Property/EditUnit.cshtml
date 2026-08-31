@@ -5,7 +5,7 @@
 
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <h1 class="mb-4">Edit Unit &mdash; @Model.PropertyName</h1>
+        <h1 class="mb-4">Edit Unit &middot; @Model.PropertyName</h1>
         <form asp-action="EditUnit" method="post">
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="PropertyId" />
@@ -37,8 +37,8 @@
                 <label asp-for="Capacity" class="form-label"></label>
                 <input asp-for="Capacity" class="form-control" type="number" />
                 <div class="form-text">
-                    Shared Room: number of seats — each tenant books their own seat, up to this many at once.<br />
-                    Private Room / Family Unit: occupancy estimate only (e.g. "sleeps 6") — the unit is leased to a single tenant/family at a time, regardless of this number.
+                    Shared Room: number of seats, each tenant books their own seat, up to this many at once.<br />
+                    Private Room / Family Unit: occupancy estimate only (e.g. "sleeps 6"). The unit is leased to a single tenant or family at a time, regardless of this number.
                 </div>
                 <span asp-validation-for="Capacity" class="text-danger"></span>
             </div>

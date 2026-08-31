@@ -3,6 +3,11 @@
     ViewData["Title"] = "Edit Property";
 }
 
+@if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+{
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+}
+
 <div class="row justify-content-center">
     <div class="col-md-6">
         <h1 class="mb-4">Edit Property</h1>
@@ -27,7 +32,7 @@
                 @if (cities.Any())
                 {
                     <select asp-for="City" class="form-select">
-                        <option value="">— Select a city —</option>
+                        <option value="">Select a city</option>
                         @foreach (var city in cities)
                         {
                             <option value="@city">@city</option>
@@ -43,9 +48,37 @@
             <button type="submit" class="btn btn-primary">Save</button>
             <a asp-action="Index" class="btn btn-link">Cancel</a>
         </form>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Location on map</h5>
+                @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+                {
+                    <div id="propertyMap" class="map-container" style="height: 260px;"></div>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">Location not available yet. Save the property with an address to have it geocoded automatically.</p>
+                }
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+    {
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script>
+            (function () {
+                var map = L.map('propertyMap').setView([@Model.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture), @Model.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)], 15);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors',
+                    maxZoom: 19
+                }).addTo(map);
+                L.marker([@Model.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture), @Model.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)]).addTo(map);
+            })();
+        </script>
+    }
 }

@@ -11,7 +11,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="mb-1">Booking Calendar</h1>
-        <div class="text-muted">@Model.PropertyName &middot; @Model.RangeStart.ToString("MMM d, yyyy") &ndash; @Model.RangeEnd.ToString("MMM d, yyyy")</div>
+        <div class="text-muted">@Model.PropertyName &middot; @Model.RangeStart.ToString("MMM d, yyyy") to @Model.RangeEnd.ToString("MMM d, yyyy")</div>
     </div>
     <div class="d-flex gap-2">
         <a asp-action="Calendar" asp-route-propertyId="@Model.PropertyId" asp-route-monthOffset="@(Model.MonthOffset - 1)" class="btn btn-outline-secondary btn-sm">&laquo; Prev</a>
@@ -59,7 +59,7 @@
                         {
                             <div class="position-absolute top-0 bottom-0 rounded d-flex align-items-center overflow-hidden text-white px-2"
                                  style="left: @bar.LeftPercent.ToString("0.###")%; width: @bar.WidthPercent.ToString("0.###")%; background: @(bar.IsActive ? "#0d6efd" : "#adb5bd"); font-size: 0.72rem; line-height: 1.1; white-space: nowrap;"
-                                 title="@bar.TenantName &#10;@bar.StartDate.ToString("MMM d, yyyy") - @(bar.EndDate.HasValue ? bar.EndDate.Value.ToString("MMM d, yyyy") : "ongoing")">
+                                 title="@bar.TenantName &#10;@bar.StartDate.ToString("MMM d, yyyy") to @(bar.EndDate.HasValue ? bar.EndDate.Value.ToString("MMM d, yyyy") : "ongoing")">
                                 <span class="text-truncate">@bar.TenantName</span>
                             </div>
                         }

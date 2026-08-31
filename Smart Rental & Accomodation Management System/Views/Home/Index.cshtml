@@ -4,7 +4,7 @@
 }
 
 <div class="hero mb-5">
-    <div class="row align-items-center">
+    <div class="row align-items-center g-4">
         <div class="col-lg-8">
             <h1 class="display-6 fw-bold mb-3">Find your next place to stay</h1>
             <p class="fs-5 mb-4">
@@ -14,6 +14,21 @@
             <div class="d-flex gap-2">
                 <a asp-controller="Account" asp-action="Register" class="btn btn-light btn-lg fw-semibold">Get started</a>
                 <a asp-controller="Account" asp-action="Login" class="btn btn-outline-light btn-lg">Log in</a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-value">@Model.TotalCount</div>
+                    <div class="hero-stat-label">@(Model.TotalCount == 1 ? "unit listed" : "units listed")</div>
+                </div>
+                @if (Model.Cities.Any())
+                {
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">@Model.Cities.Count</div>
+                        <div class="hero-stat-label">@(Model.Cities.Count == 1 ? "city covered" : "cities covered")</div>
+                    </div>
+                }
             </div>
         </div>
     </div>

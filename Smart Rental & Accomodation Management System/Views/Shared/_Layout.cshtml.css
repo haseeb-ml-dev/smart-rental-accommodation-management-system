@@ -1,6 +1,1 @@
 /* Layout-scoped overrides. Most styling lives in wwwroot/css/site.css. */
-
-button.accept-policy {
-  font-size: 1rem;
-  line-height: inherit;
-}

@@ -74,6 +74,8 @@
                         {
                             var currentUserId = UserManager.GetUserId(User);
                             var unreadCount = await DbContext.Notifications.CountAsync(n => n.RecipientId == currentUserId && !n.IsRead);
+                            var currentUser = await UserManager.FindByIdAsync(currentUserId!);
+                            var displayName = string.IsNullOrWhiteSpace(currentUser?.FullName) ? User.Identity.Name : currentUser.FullName;
                             <li class="nav-item">
                                 <a class="@navClass("Notification")" asp-area="" asp-controller="Notification" asp-action="Index">
                                     🔔 Notifications
@@ -83,13 +85,19 @@
                                     }
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <span class="nav-link text-muted">Hi, @User.Identity.Name</span>
-                            </li>
-                            <li class="nav-item">
-                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-flex">
-                                    <button type="submit" class="btn btn-link nav-link text-dark border-0">Logout</button>
-                                </form>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    @displayName
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">Profile</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post">
+                                            <button type="submit" class="dropdown-item">Logout</button>
+                                        </form>
+                                    </li>
+                                </ul>
                             </li>
                         }
                         else

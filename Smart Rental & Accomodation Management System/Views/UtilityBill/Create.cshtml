@@ -5,7 +5,7 @@
 
 <div class="row justify-content-center">
     <div class="col-md-7">
-        <h1 class="mb-4">Add Utility Bill &mdash; @Model.PropertyName</h1>
+        <h1 class="mb-4">Add Utility Bill &middot; @Model.PropertyName</h1>
         <form asp-action="Create" method="post">
             <input type="hidden" asp-for="PropertyId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -75,7 +75,7 @@
                                     {
                                         <span class="badge text-bg-light border">💧 own meter</span>
                                     }
-                                    <span class="excluded-note text-muted small d-none">— excluded from this bill (own meter)</span>
+                                    <span class="excluded-note text-muted small d-none">(excluded from this bill: own meter)</span>
                                     <input type="hidden" asp-for="Tenants[i].TenantId" />
                                     <input type="hidden" asp-for="Tenants[i].TenantName" />
                                     <input type="hidden" asp-for="Tenants[i].ExcludedForElectricity" />

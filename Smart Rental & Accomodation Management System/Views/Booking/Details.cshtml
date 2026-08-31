@@ -1,6 +1,11 @@
 @model UnitDetailViewModel
 @{
-    ViewData["Title"] = $"{Model.UnitName} — {Model.PropertyName}";
+    ViewData["Title"] = $"{Model.UnitName} · {Model.PropertyName}";
+}
+
+@if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+{
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -37,14 +42,15 @@
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Location</h5>
-                <p class="mb-1">@Model.Address</p>
+                <p class="mb-2">@Model.Address</p>
                 @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
                 {
-                    <a href="https://www.google.com/maps?q=@(Model.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)),@(Model.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))" target="_blank" rel="noopener">View on map</a>
+                    <div id="unitMap" class="map-container mb-2" style="height: 260px;"></div>
+                    <a href="https://www.google.com/maps?q=@(Model.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)),@(Model.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))" target="_blank" rel="noopener">Open in Google Maps</a>
                 }
                 else
                 {
-                    <span class="text-muted">Not mapped yet.</span>
+                    <span class="text-muted">Location not available yet.</span>
                 }
             </div>
         </div>
@@ -60,7 +66,7 @@
                         @Model.UnitType.Humanize()
                         @if (Model.BhkType != null)
                         {
-                            <text> — @Model.BhkType.Value.Humanize()</text>
+                            <text> &middot; @Model.BhkType.Value.Humanize()</text>
                         }
                     </dd>
                     <dt class="col-6">Monthly rent</dt>
@@ -105,7 +111,7 @@
                         <div class="mb-3">
                             <label class="form-label">Propose a different monthly rent (optional)</label>
                             <input type="number" name="proposedRent" class="form-control" step="0.01" min="0" placeholder="e.g. @((Model.MonthlyRent * 0.9m).ToString("0"))" />
-                            <div class="form-text">Listed rent is @Model.MonthlyRent.ToString("C") / month. If you offer a different amount, the landlord sees it as a starting point — final terms are worked out with them directly.</div>
+                            <div class="form-text">Listed rent is @Model.MonthlyRent.ToString("C") / month. If you offer a different amount, the landlord sees it as a starting point, and final terms are worked out with them directly.</div>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Request to book</button>
                     </form>
@@ -120,6 +126,22 @@
 </div>
 
 @section Scripts {
+    @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+    {
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script>
+            (function () {
+                var map = L.map('unitMap').setView([@Model.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture), @Model.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)], 15);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors',
+                    maxZoom: 19
+                }).addTo(map);
+                L.marker([@Model.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture), @Model.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)])
+                    .addTo(map)
+                    .bindPopup(@Html.Raw(Json.Serialize(Model.PropertyName)));
+            })();
+        </script>
+    }
     <script>
         (function () {
             var monthlyRent = @Model.MonthlyRent.ToString(System.Globalization.CultureInfo.InvariantCulture);

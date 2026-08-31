@@ -26,7 +26,7 @@
                 @if (cities.Any())
                 {
                     <select asp-for="City" class="form-select">
-                        <option value="">— Select a city —</option>
+                        <option value="">Select a city</option>
                         @foreach (var city in cities)
                         {
                             <option value="@city">@city</option>
