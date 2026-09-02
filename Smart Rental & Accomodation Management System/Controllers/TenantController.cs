@@ -206,6 +206,47 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RaiseInvoiceDispute(int invoiceId, string reason)
+        {
+            var tenantId = _userManager.GetUserId(User)!;
+
+            var invoice = await _context.RentInvoices
+                .Include(i => i.Lease)
+                    .ThenInclude(l => l!.Unit)
+                        .ThenInclude(u => u!.Property)
+                .FirstOrDefaultAsync(i => i.Id == invoiceId && i.Lease!.TenantId == tenantId);
+
+            if (invoice == null)
+            {
+                return NotFound();
+            }
+
+            if (invoice.DisputeStatus == DisputeStatus.None)
+            {
+                invoice.DisputeStatus = DisputeStatus.Open;
+                invoice.DisputeReason = string.IsNullOrWhiteSpace(reason) ? null : reason.Trim();
+                invoice.DisputeRaisedAt = DateTime.UtcNow;
+
+                var landlordId = invoice.Lease!.Unit!.Property!.LandlordId;
+                _context.Notifications.Add(new Notification
+                {
+                    RecipientId = landlordId,
+                    Type = NotificationType.DisputeRaised,
+                    Message = $"A tenant disputed their {invoice.PeriodMonth}/{invoice.PeriodYear} rent charge of {invoice.Amount:C}.",
+                    LinkController = "Landlord",
+                    LinkAction = "Index",
+                    RelatedEntityId = invoice.Id
+                });
+
+                await _context.SaveChangesAsync();
+                TempData["Message"] = "Dispute submitted. The landlord has been notified.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddOccupant(int leaseId, string name, string? phone)
         {
             var lease = await GetOwnedFamilyUnitLeaseAsync(leaseId);

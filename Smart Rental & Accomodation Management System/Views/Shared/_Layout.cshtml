@@ -67,6 +67,12 @@
                             <li class="nav-item">
                                 <a class="@navClass("Mess", "Index")" asp-area="" asp-controller="Mess" asp-action="Index">Mess Menu</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="@navClass("Maintenance", "MyRequests")" asp-area="" asp-controller="Maintenance" asp-action="MyRequests">Maintenance</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="@navClass("Review", "MyReviews")" asp-area="" asp-controller="Review" asp-action="MyReviews">My Reviews</a>
+                            </li>
                         }
                         else if (User.IsInRole("Admin"))
                         {
@@ -131,11 +137,39 @@
             &copy; @DateTime.Now.Year Smart Rental &amp; Accommodation &middot; <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
+    <div class="modal fade" id="confirmActionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmActionModalTitle">Are you sure?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="confirmActionModalBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmActionModalConfirm">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="photoLightbox" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-dark">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close" style="z-index: 1;"></button>
+                <img id="photoLightboxImage" src="" class="w-100" style="max-height: 80vh; object-fit: contain;" alt="Photo" />
+            </div>
+        </div>
+    </div>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/address-autocomplete.js" asp-append-version="true"></script>
     <script src="~/js/cascading-select.js" asp-append-version="true"></script>
+    <script src="~/js/confirm-action.js" asp-append-version="true"></script>
+    <script src="~/js/photo-lightbox.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -1,0 +1,45 @@
+@model List<ReviewablePropertyViewModel>
+@{
+    ViewData["Title"] = "My Reviews";
+}
+
+<h1 class="mb-4">My Reviews</h1>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">@TempData["Message"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">You haven't leased a property yet, so there's nothing to review.</div>
+}
+
+@foreach (var property in Model)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title mb-3">@property.PropertyName</h5>
+            <form asp-action="Submit" method="post" class="row g-2 align-items-end">
+                <input type="hidden" name="propertyId" value="@property.PropertyId" />
+                <div class="col-sm-3">
+                    <label class="form-label">Rating</label>
+                    <select name="rating" class="form-select">
+                        <option value="5" selected="@(property.ExistingRating == 5)">5 (Excellent)</option>
+                        <option value="4" selected="@(property.ExistingRating == 4)">4 (Good)</option>
+                        <option value="3" selected="@(property.ExistingRating == 3)">3 (Okay)</option>
+                        <option value="2" selected="@(property.ExistingRating == 2)">2 (Poor)</option>
+                        <option value="1" selected="@(property.ExistingRating == 1)">1 (Bad)</option>
+                    </select>
+                </div>
+                <div class="col-sm-7">
+                    <label class="form-label">Comment (optional)</label>
+                    <input type="text" name="comment" class="form-control" maxlength="500" value="@property.ExistingComment" />
+                </div>
+                <div class="col-sm-2">
+                    <button type="submit" class="btn btn-primary w-100">@(property.ExistingRating.HasValue ? "Update" : "Submit")</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}

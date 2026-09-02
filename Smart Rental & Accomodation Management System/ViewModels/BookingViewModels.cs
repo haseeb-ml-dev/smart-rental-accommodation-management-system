@@ -18,6 +18,8 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public int ActiveLeaseCount { get; set; }
         public bool IsAvailable => ActiveLeaseCount < BookableSlots;
         public bool HasPendingRequestFromCurrentTenant { get; set; }
+        public double? AverageRating { get; set; }
+        public int ReviewCount { get; set; }
     }
 
     public class TenantBrowseViewModel
@@ -48,6 +50,9 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public bool IsAvailable => ActiveLeaseCount < BookableSlots;
         public bool HasPendingRequestFromCurrentTenant { get; set; }
         public List<UnitImage> Images { get; set; } = new();
+        public double? AverageRating { get; set; }
+        public int ReviewCount { get; set; }
+        public List<PropertyReviewRowViewModel> Reviews { get; set; } = new();
     }
 
     public class BookingListItemViewModel

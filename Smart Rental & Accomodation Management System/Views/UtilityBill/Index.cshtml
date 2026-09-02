@@ -77,10 +77,26 @@
                                             }
                                         </div>
                                     }
-                                    <form asp-action="MarkSharePaid" method="post" class="d-inline">
-                                        <input type="hidden" name="shareId" value="@share.Id" />
-                                        <button type="submit" class="btn btn-sm btn-outline-success">Mark paid</button>
-                                    </form>
+                                    @if (share.DisputeStatus != DisputeStatus.Open)
+                                    {
+                                        <div class="d-flex gap-1">
+                                            <form asp-action="MarkSharePaid" method="post" class="d-inline">
+                                                <input type="hidden" name="shareId" value="@share.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-success"
+                                                        data-confirm-title="Confirm this payment was received?"
+                                                        data-confirm-body="This marks the share paid and notifies the tenant.">Confirm received</button>
+                                            </form>
+                                            @if (share.TenantMarkedPaidAt != null)
+                                            {
+                                                <form asp-action="RejectSharePayment" method="post" class="d-inline">
+                                                    <input type="hidden" name="shareId" value="@share.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                            data-confirm-title="Mark this payment as not received?"
+                                                            data-confirm-body="This opens a dispute and notifies the tenant.">Not received</button>
+                                                </form>
+                                            }
+                                        </div>
+                                    }
                                 }
                             </td>
                         </tr>
@@ -101,7 +117,9 @@
                                                 <input type="number" step="0.01" name="adjustedAmount" class="form-control form-control-sm" />
                                             </div>
                                             <div class="col-md-3">
-                                                <button type="submit" class="btn btn-sm btn-primary">Resolve dispute</button>
+                                                <button type="submit" class="btn btn-sm btn-primary w-100"
+                                                        data-confirm-title="Resolve this dispute?"
+                                                        data-confirm-body="This marks the dispute resolved and notifies the tenant.">Resolve dispute</button>
                                             </div>
                                         </form>
                                     </div>

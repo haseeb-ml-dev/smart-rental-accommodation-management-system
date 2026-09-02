@@ -1,0 +1,77 @@
+@model List<MaintenanceRequestListItemViewModel>
+@{
+    ViewData["Title"] = "Maintenance Requests";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Maintenance Requests</h1>
+    <a asp-controller="Landlord" asp-action="Index" class="btn btn-link">Back to Dashboard</a>
+</div>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">@TempData["Message"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No maintenance requests yet.</div>
+}
+
+@foreach (var request in Model)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="card-title mb-1">@request.Title</h5>
+                            <div class="text-muted small mb-2">
+                                @request.PropertyName &middot; @request.UnitName &middot; @request.TenantName &middot; @request.Category.Humanize() &middot; @request.Priority.Humanize() priority
+                            </div>
+                        </div>
+                        @{
+                            var badgeClass = request.Status switch
+                            {
+                                MaintenanceStatus.Resolved => "text-bg-success",
+                                MaintenanceStatus.InProgress => "text-bg-warning",
+                                _ => "text-bg-secondary"
+                            };
+                        }
+                        <span class="badge @badgeClass">@request.Status.Humanize()</span>
+                    </div>
+                    <p class="mb-2">@request.Description</p>
+                    @if (request.PhotoFileName != null)
+                    {
+                        <img src="/uploads/payment-slips/maintenance/@request.Id/@request.PhotoFileName" style="width: 8rem; height: 6rem; object-fit: cover; cursor: pointer;" class="rounded photo-thumb" data-full-src="/uploads/payment-slips/maintenance/@request.Id/@request.PhotoFileName" alt="@request.Title" />
+                    }
+                    <div class="text-muted small mt-2">Reported @request.CreatedAt.ToString("MMM d, yyyy")</div>
+                </div>
+                <div class="col-md-4">
+                    <form asp-action="UpdateStatus" method="post">
+                        <input type="hidden" name="requestId" value="@request.Id" />
+                        <div class="mb-2">
+                            <label class="form-label small mb-0">Status</label>
+                            <select name="status" class="form-select form-select-sm">
+                                @foreach (MaintenanceStatus s in Enum.GetValues<MaintenanceStatus>())
+                                {
+                                    <option value="@s" selected="@(s == request.Status)">@s.Humanize()</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small mb-0">Note (optional)</label>
+                            <input type="text" name="landlordNote" class="form-control form-control-sm" value="@request.LandlordNote" maxlength="500" />
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-outline-primary w-100"
+                                data-confirm-title="Update this request's status?"
+                                data-confirm-body="The tenant will be notified of the new status and note.">
+                            Update
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}

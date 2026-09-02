@@ -81,6 +81,9 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 .Where(s => !s.IsPaid && s.UtilityBill!.Property!.LandlordId == landlordId)
                 .SumAsync(s => s.ShareAmount);
 
+            vm.OpenMaintenanceRequestCount = await _context.MaintenanceRequests
+                .CountAsync(m => m.Unit!.Property!.LandlordId == landlordId && m.Status != MaintenanceStatus.Resolved);
+
             return View(vm);
         }
 
@@ -157,6 +160,103 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             {
                 invoice.Status = InvoiceStatus.Paid;
                 invoice.PaidDate = DateTime.UtcNow;
+
+                _context.Notifications.Add(new Notification
+                {
+                    RecipientId = invoice.Lease!.TenantId,
+                    Type = NotificationType.RentPaymentConfirmed,
+                    Message = $"Your {invoice.PeriodMonth}/{invoice.PeriodYear} rent payment ({invoice.Amount:C}) was confirmed received.",
+                    LinkController = "Tenant",
+                    LinkAction = "Index",
+                    RelatedEntityId = invoice.Id
+                });
+
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectInvoicePayment(int invoiceId)
+        {
+            var landlordId = _userManager.GetUserId(User)!;
+
+            var invoice = await _context.RentInvoices
+                .Include(i => i.Lease)
+                    .ThenInclude(l => l!.Unit)
+                        .ThenInclude(u => u!.Property)
+                .FirstOrDefaultAsync(i => i.Id == invoiceId && i.Lease!.Unit!.Property!.LandlordId == landlordId);
+
+            if (invoice == null)
+            {
+                return NotFound();
+            }
+
+            if (invoice.TenantMarkedPaidAt != null && invoice.DisputeStatus == DisputeStatus.None)
+            {
+                invoice.TenantMarkedPaidAt = null;
+                invoice.PaymentSlipFileName = null;
+                invoice.DisputeStatus = DisputeStatus.Open;
+                invoice.DisputeReason = "Landlord indicated this payment was not received.";
+                invoice.DisputeRaisedAt = DateTime.UtcNow;
+
+                _context.Notifications.Add(new Notification
+                {
+                    RecipientId = invoice.Lease!.TenantId,
+                    Type = NotificationType.DisputeRaised,
+                    Message = $"Your landlord said your {invoice.PeriodMonth}/{invoice.PeriodYear} rent payment ({invoice.Amount:C}) was not received.",
+                    LinkController = "Tenant",
+                    LinkAction = "Index",
+                    RelatedEntityId = invoice.Id
+                });
+
+                await _context.SaveChangesAsync();
+                TempData["Message"] = "Marked as not received. The tenant has been notified.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResolveInvoiceDispute(int invoiceId, string resolution, decimal? adjustedAmount)
+        {
+            var landlordId = _userManager.GetUserId(User)!;
+
+            var invoice = await _context.RentInvoices
+                .Include(i => i.Lease)
+                    .ThenInclude(l => l!.Unit)
+                        .ThenInclude(u => u!.Property)
+                .FirstOrDefaultAsync(i => i.Id == invoiceId && i.Lease!.Unit!.Property!.LandlordId == landlordId);
+
+            if (invoice == null)
+            {
+                return NotFound();
+            }
+
+            if (invoice.DisputeStatus == DisputeStatus.Open)
+            {
+                invoice.DisputeStatus = DisputeStatus.Resolved;
+                invoice.DisputeResolution = string.IsNullOrWhiteSpace(resolution) ? null : resolution.Trim();
+                invoice.DisputeResolvedAt = DateTime.UtcNow;
+
+                if (adjustedAmount is > 0)
+                {
+                    invoice.Amount = adjustedAmount.Value;
+                }
+
+                _context.Notifications.Add(new Notification
+                {
+                    RecipientId = invoice.Lease!.TenantId,
+                    Type = NotificationType.DisputeResolved,
+                    Message = $"Your rent dispute was resolved: {invoice.DisputeResolution ?? "no additional notes"}.",
+                    LinkController = "Tenant",
+                    LinkAction = "Index",
+                    RelatedEntityId = invoice.Id
+                });
+
                 await _context.SaveChangesAsync();
             }
 

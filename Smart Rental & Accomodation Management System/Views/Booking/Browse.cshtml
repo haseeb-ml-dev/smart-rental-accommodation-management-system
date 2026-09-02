@@ -95,6 +95,10 @@
                     </td>
                     <td>
                         @unit.PropertyName
+                        @if (unit.AverageRating.HasValue)
+                        {
+                            <span class="small text-nowrap ms-1"><i class="bi bi-star-fill text-warning"></i> @unit.AverageRating.Value.ToString("0.0")</span>
+                        }
                         @if (unit.Latitude.HasValue && unit.Longitude.HasValue)
                         {
                             <a href="https://www.google.com/maps?q=@(unit.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)),@(unit.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))" target="_blank" rel="noopener" class="small ms-1">(map)</a>

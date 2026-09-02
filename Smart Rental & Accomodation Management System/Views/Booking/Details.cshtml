@@ -39,7 +39,7 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-body">
                 <h5 class="card-title">Location</h5>
                 <p class="mb-2">@Model.Address</p>
@@ -51,6 +51,41 @@
                 else
                 {
                     <span class="text-muted">Location not available yet.</span>
+                }
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="card-title mb-0">Reviews</h5>
+                    @if (Model.AverageRating.HasValue)
+                    {
+                        <span><i class="bi bi-star-fill text-warning"></i> @Model.AverageRating.Value.ToString("0.0") <span class="text-muted small">(@Model.ReviewCount)</span></span>
+                    }
+                </div>
+                @if (Model.Reviews.Any())
+                {
+                    <ul class="list-unstyled mb-0">
+                        @foreach (var review in Model.Reviews)
+                        {
+                            <li class="mb-3">
+                                <div class="fw-semibold">
+                                    @review.TenantName
+                                    <span class="text-warning ms-1">@string.Concat(Enumerable.Repeat("★", review.Rating))@string.Concat(Enumerable.Repeat("☆", 5 - review.Rating))</span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(review.Comment))
+                                {
+                                    <div class="text-muted small">@review.Comment</div>
+                                }
+                                <div class="text-muted small">@review.CreatedAt.ToString("MMM yyyy")</div>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No reviews yet.</p>
                 }
             </div>
         </div>
@@ -125,31 +160,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="photoLightbox" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content bg-dark">
-            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close" style="z-index: 1;"></button>
-            <img id="photoLightboxImage" src="" class="w-100" style="max-height: 80vh; object-fit: contain;" alt="Unit photo" />
-        </div>
-    </div>
-</div>
-
 @section Scripts {
-    <script>
-        (function () {
-            var modalEl = document.getElementById('photoLightbox');
-            var modalImage = document.getElementById('photoLightboxImage');
-            if (!modalEl || !modalImage) return;
-
-            var modal = new bootstrap.Modal(modalEl);
-            document.querySelectorAll('.photo-thumb').forEach(function (thumb) {
-                thumb.addEventListener('click', function () {
-                    modalImage.src = thumb.getAttribute('data-full-src');
-                    modal.show();
-                });
-            });
-        })();
-    </script>
     @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
     {
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

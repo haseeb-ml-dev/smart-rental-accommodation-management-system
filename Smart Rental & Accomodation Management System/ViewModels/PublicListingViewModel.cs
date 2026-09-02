@@ -20,6 +20,8 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public int BookableSlots { get; set; }
         public int ActiveLeaseCount { get; set; }
         public bool IsAvailable => ActiveLeaseCount < BookableSlots;
+        public double? AverageRating { get; set; }
+        public int ReviewCount { get; set; }
     }
 
     public class PublicBrowseViewModel

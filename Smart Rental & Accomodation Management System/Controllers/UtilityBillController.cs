@@ -58,7 +58,60 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             {
                 share.IsPaid = true;
                 share.PaidDate = DateTime.UtcNow;
+
+                _context.Notifications.Add(new Notification
+                {
+                    RecipientId = share.TenantId,
+                    Type = NotificationType.UtilityPaymentConfirmed,
+                    Message = $"Your {share.UtilityBill!.BillType.Humanize()} share ({share.ShareAmount:C}) was confirmed received.",
+                    LinkController = "Tenant",
+                    LinkAction = "Index",
+                    RelatedEntityId = share.Id
+                });
+
                 await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Landlord")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectSharePayment(int shareId)
+        {
+            var landlordId = _userManager.GetUserId(User)!;
+
+            var share = await _context.UtilityBillShares
+                .Include(s => s.UtilityBill)
+                    .ThenInclude(b => b!.Property)
+                .FirstOrDefaultAsync(s => s.Id == shareId && s.UtilityBill!.Property!.LandlordId == landlordId);
+
+            if (share == null)
+            {
+                return NotFound();
+            }
+
+            if (share.TenantMarkedPaidAt != null && share.DisputeStatus == DisputeStatus.None)
+            {
+                share.TenantMarkedPaidAt = null;
+                share.PaymentSlipFileName = null;
+                share.DisputeStatus = DisputeStatus.Open;
+                share.DisputeReason = "Landlord indicated this payment was not received.";
+                share.DisputeRaisedAt = DateTime.UtcNow;
+
+                _context.Notifications.Add(new Notification
+                {
+                    RecipientId = share.TenantId,
+                    Type = NotificationType.DisputeRaised,
+                    Message = $"Your landlord said your {share.UtilityBill!.BillType.Humanize()} share ({share.ShareAmount:C}) was not received.",
+                    LinkController = "Tenant",
+                    LinkAction = "Index",
+                    RelatedEntityId = share.Id
+                });
+
+                await _context.SaveChangesAsync();
+                TempData["Message"] = "Marked as not received. The tenant has been notified.";
             }
 
             return RedirectToAction(nameof(Index));

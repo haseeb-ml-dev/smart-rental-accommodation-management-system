@@ -48,10 +48,30 @@
                                                 }
                                             </div>
                                         }
-                                        <form asp-action="MarkInvoicePaid" method="post">
-                                            <input type="hidden" name="invoiceId" value="@invoice.Id" />
-                                            <button type="submit" class="btn btn-sm btn-outline-success">Mark paid</button>
-                                        </form>
+                                        @if (invoice.DisputeStatus == DisputeStatus.Open)
+                                        {
+                                            <span class="badge text-bg-danger">Dispute open &mdash; resolve from Dashboard</span>
+                                        }
+                                        else
+                                        {
+                                            <div class="d-flex gap-1">
+                                                <form asp-action="MarkInvoicePaid" method="post">
+                                                    <input type="hidden" name="invoiceId" value="@invoice.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-success"
+                                                            data-confirm-title="Confirm this payment was received?"
+                                                            data-confirm-body="This marks the invoice paid and notifies the tenant.">Confirm received</button>
+                                                </form>
+                                                @if (invoice.TenantMarkedPaidAt != null)
+                                                {
+                                                    <form asp-action="RejectInvoicePayment" method="post">
+                                                        <input type="hidden" name="invoiceId" value="@invoice.Id" />
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                                data-confirm-title="Mark this payment as not received?"
+                                                                data-confirm-body="This opens a dispute and notifies the tenant.">Not received</button>
+                                                    </form>
+                                                }
+                                            </div>
+                                        }
                                     </td>
                                 </tr>
                             }
@@ -83,10 +103,30 @@
                                                 }
                                             </div>
                                         }
-                                        <form asp-controller="UtilityBill" asp-action="MarkSharePaid" method="post">
-                                            <input type="hidden" name="shareId" value="@share.Id" />
-                                            <button type="submit" class="btn btn-sm btn-outline-success">Mark paid</button>
-                                        </form>
+                                        @if (share.DisputeStatus == DisputeStatus.Open)
+                                        {
+                                            <span class="badge text-bg-danger">Dispute open &mdash; resolve from Utility Bills</span>
+                                        }
+                                        else
+                                        {
+                                            <div class="d-flex gap-1">
+                                                <form asp-controller="UtilityBill" asp-action="MarkSharePaid" method="post">
+                                                    <input type="hidden" name="shareId" value="@share.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-success"
+                                                            data-confirm-title="Confirm this payment was received?"
+                                                            data-confirm-body="This marks the share paid and notifies the tenant.">Confirm received</button>
+                                                </form>
+                                                @if (share.TenantMarkedPaidAt != null)
+                                                {
+                                                    <form asp-controller="UtilityBill" asp-action="RejectSharePayment" method="post">
+                                                        <input type="hidden" name="shareId" value="@share.Id" />
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                                data-confirm-title="Mark this payment as not received?"
+                                                                data-confirm-body="This opens a dispute and notifies the tenant.">Not received</button>
+                                                    </form>
+                                                }
+                                            </div>
+                                        }
                                     </td>
                                 </tr>
                             }

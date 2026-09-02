@@ -9,6 +9,7 @@
         <a asp-controller="Property" asp-action="Index" class="btn btn-outline-primary">My Properties</a>
         <a asp-controller="Booking" asp-action="Requests" class="btn btn-outline-primary">Booking Requests</a>
         <a asp-controller="UtilityBill" asp-action="Index" class="btn btn-outline-primary">Utility Bills</a>
+        <a asp-controller="Maintenance" asp-action="Index" class="btn btn-outline-primary">Maintenance Requests</a>
         <a asp-action="ExportExcel" class="btn btn-outline-secondary">Export Excel</a>
         <a asp-action="ExportPdf" class="btn btn-outline-secondary">Export PDF</a>
     </div>
@@ -62,6 +63,15 @@
             </div>
         </div>
     </div>
+    <div class="col-6 col-md-3">
+        <a asp-controller="Maintenance" asp-action="Index" class="stat-tile h-100">
+            <div class="stat-tile-icon @(Model.OpenMaintenanceRequestCount > 0 ? "stat-tile-icon-warning" : "stat-tile-icon-secondary")"><i class="bi bi-tools"></i></div>
+            <div class="stat-tile-body">
+                <div class="stat-tile-label">Open maintenance requests</div>
+                <div class="stat-tile-value">@Model.OpenMaintenanceRequestCount</div>
+            </div>
+        </a>
+    </div>
 </div>
 
 <div class="card mb-4">
@@ -107,7 +117,7 @@
                                 }
                                 <span class="badge @badgeClass">@invoice.Status.Humanize()</span>
                             </td>
-                            <td>
+                            <td style="min-width: 220px;">
                                 @if (invoice.Status != InvoiceStatus.Paid)
                                 {
                                     @if (invoice.TenantMarkedPaidAt != null)
@@ -120,10 +130,45 @@
                                             }
                                         </div>
                                     }
-                                    <form asp-action="MarkInvoicePaid" method="post">
-                                        <input type="hidden" name="invoiceId" value="@invoice.Id" />
-                                        <button type="submit" class="btn btn-sm btn-outline-success">Mark paid</button>
-                                    </form>
+                                    @if (invoice.DisputeStatus == DisputeStatus.Open)
+                                    {
+                                        <span class="badge text-bg-danger mb-1">Dispute open</span>
+                                        @if (!string.IsNullOrEmpty(invoice.DisputeReason))
+                                        {
+                                            <div class="small text-muted mb-1">@invoice.DisputeReason</div>
+                                        }
+                                        <form asp-action="ResolveInvoiceDispute" method="post" class="d-flex gap-1">
+                                            <input type="hidden" name="invoiceId" value="@invoice.Id" />
+                                            <input type="text" name="resolution" class="form-control form-control-sm" placeholder="Resolution note" required />
+                                            <button type="submit" class="btn btn-sm btn-outline-primary text-nowrap"
+                                                    data-confirm-title="Resolve this dispute?"
+                                                    data-confirm-body="This marks the dispute resolved and notifies the tenant.">Resolve</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <div class="d-flex gap-1">
+                                            <form asp-action="MarkInvoicePaid" method="post">
+                                                <input type="hidden" name="invoiceId" value="@invoice.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-success"
+                                                        data-confirm-title="Confirm this payment was received?"
+                                                        data-confirm-body="This marks the invoice paid and notifies the tenant.">Confirm received</button>
+                                            </form>
+                                            @if (invoice.TenantMarkedPaidAt != null)
+                                            {
+                                                <form asp-action="RejectInvoicePayment" method="post">
+                                                    <input type="hidden" name="invoiceId" value="@invoice.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                            data-confirm-title="Mark this payment as not received?"
+                                                            data-confirm-body="This opens a dispute and notifies the tenant.">Not received</button>
+                                                </form>
+                                            }
+                                        </div>
+                                    }
+                                }
+                                else if (invoice.DisputeStatus == DisputeStatus.Resolved)
+                                {
+                                    <span class="badge text-bg-secondary" title="@invoice.DisputeResolution">Dispute resolved</span>
                                 }
                             </td>
                         </tr>

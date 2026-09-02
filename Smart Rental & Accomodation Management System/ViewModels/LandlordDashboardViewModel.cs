@@ -25,6 +25,7 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public List<RentInvoice> RecentInvoices { get; set; } = new();
 
         public decimal OutstandingUtilities { get; set; }
+        public int OpenMaintenanceRequestCount { get; set; }
     }
 
     public class OverdueTenantGroupViewModel

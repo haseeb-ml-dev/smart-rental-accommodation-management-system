@@ -26,6 +26,8 @@ namespace Smart_Rental___Accomodation_Management_System.Data
         public DbSet<SupportedCity> SupportedCities { get; set; } = null!;
         public DbSet<SupportedArea> SupportedAreas { get; set; } = null!;
         public DbSet<LeaseOccupant> LeaseOccupants { get; set; } = null!;
+        public DbSet<MaintenanceRequest> MaintenanceRequests { get; set; } = null!;
+        public DbSet<PropertyReview> PropertyReviews { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -132,6 +134,34 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 .WithMany()
                 .HasForeignKey(a => a.SupportedCityId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<MaintenanceRequest>()
+                .HasOne(m => m.Unit)
+                .WithMany()
+                .HasForeignKey(m => m.UnitId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<MaintenanceRequest>()
+                .HasOne(m => m.Tenant)
+                .WithMany()
+                .HasForeignKey(m => m.TenantId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<PropertyReview>()
+                .HasOne(r => r.Property)
+                .WithMany()
+                .HasForeignKey(r => r.PropertyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<PropertyReview>()
+                .HasOne(r => r.Tenant)
+                .WithMany()
+                .HasForeignKey(r => r.TenantId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<PropertyReview>()
+                .HasIndex(r => new { r.PropertyId, r.TenantId })
+                .IsUnique();
         }
     }
 }

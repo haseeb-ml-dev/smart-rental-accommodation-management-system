@@ -48,11 +48,13 @@
                     <a asp-controller="Mess" asp-action="Manage" asp-route-propertyId="@property.Id" class="btn btn-sm btn-outline-secondary">Mess Menu</a>
                     <a asp-controller="Mess" asp-action="Feedback" asp-route-propertyId="@property.Id" class="btn btn-sm btn-outline-secondary">Mess Feedback</a>
                     <a asp-controller="Booking" asp-action="Calendar" asp-route-propertyId="@property.Id" class="btn btn-sm btn-outline-secondary">Booking Calendar</a>
-                    <form asp-action="ToggleActive" method="post" onsubmit="return confirm('@(property.IsActive ? "Delist this property? It will disappear from Browse until relisted." : "Relist this property?")');">
+                    <form asp-action="ToggleActive" method="post">
                         <input type="hidden" name="propertyId" value="@property.Id" />
                         @if (property.IsActive)
                         {
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Delist</button>
+                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    data-confirm-title="Delist this property?"
+                                    data-confirm-body="It will disappear from Browse until you relist it.">Delist</button>
                         }
                         else
                         {

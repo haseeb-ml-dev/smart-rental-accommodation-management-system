@@ -19,7 +19,15 @@ namespace Smart_Rental___Accomodation_Management_System.Models
         [Display(Name = "Rent Payment Claimed")]
         RentPaymentClaimed,
         [Display(Name = "Utility Payment Claimed")]
-        UtilityPaymentClaimed
+        UtilityPaymentClaimed,
+        [Display(Name = "Rent Payment Confirmed")]
+        RentPaymentConfirmed,
+        [Display(Name = "Utility Payment Confirmed")]
+        UtilityPaymentConfirmed,
+        [Display(Name = "Maintenance Request Created")]
+        MaintenanceRequestCreated,
+        [Display(Name = "Maintenance Status Updated")]
+        MaintenanceStatusUpdated
     }
 
     public class Notification

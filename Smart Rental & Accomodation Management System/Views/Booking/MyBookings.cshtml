@@ -54,9 +54,11 @@
                     <td>
                         @if (booking.Status == BookingStatus.Pending)
                         {
-                            <form asp-action="CancelBooking" method="post" onsubmit="return confirm('Cancel this booking request?');">
+                            <form asp-action="CancelBooking" method="post">
                                 <input type="hidden" name="bookingId" value="@booking.BookingId" />
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        data-confirm-title="Cancel this booking request?"
+                                        data-confirm-body="You can submit a new request again later if you change your mind.">Cancel</button>
                             </form>
                         }
                     </td>

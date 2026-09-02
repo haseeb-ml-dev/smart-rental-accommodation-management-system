@@ -90,6 +90,7 @@ else
                             <th>Due date</th>
                             <th>Status</th>
                             <th></th>
+                            <th>Dispute</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -124,11 +125,29 @@ else
                                         </form>
                                     }
                                 </td>
+                                <td>
+                                    @if (invoice.DisputeStatus == DisputeStatus.None)
+                                    {
+                                        <form asp-action="RaiseInvoiceDispute" method="post" class="d-flex gap-1">
+                                            <input type="hidden" name="invoiceId" value="@invoice.Id" />
+                                            <input type="text" name="reason" class="form-control form-control-sm" placeholder="Reason" style="width: 140px;" required />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Dispute</button>
+                                        </form>
+                                    }
+                                    else if (invoice.DisputeStatus == DisputeStatus.Open)
+                                    {
+                                        <span class="badge text-bg-warning">Dispute pending</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge text-bg-secondary" title="@invoice.DisputeResolution">Resolved</span>
+                                    }
+                                </td>
                             </tr>
                         }
                         @if (!Model.Invoices.Any())
                         {
-                            <tr><td colspan="5" class="text-muted">No invoices yet.</td></tr>
+                            <tr><td colspan="6" class="text-muted">No invoices yet.</td></tr>
                         }
                     </tbody>
                 </table>
@@ -237,9 +256,11 @@ else
                         {
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <span>@occupant.Name @(string.IsNullOrEmpty(occupant.Phone) ? "" : $"({occupant.Phone})")</span>
-                                <form asp-action="RemoveOccupant" method="post" onsubmit="return confirm('Remove this occupant?');">
+                                <form asp-action="RemoveOccupant" method="post">
                                     <input type="hidden" name="occupantId" value="@occupant.Id" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            data-confirm-title="Remove this occupant?"
+                                            data-confirm-body="This just removes them from your unit's record.">Remove</button>
                                 </form>
                             </li>
                         }

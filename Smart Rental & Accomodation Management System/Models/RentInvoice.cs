@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Smart_Rental___Accomodation_Management_System.Models
@@ -31,5 +32,13 @@ namespace Smart_Rental___Accomodation_Management_System.Models
         // Set when the tenant claims they've paid, ahead of landlord confirmation via MarkInvoicePaid.
         public DateTime? TenantMarkedPaidAt { get; set; }
         public string? PaymentSlipFileName { get; set; }
+
+        public DisputeStatus DisputeStatus { get; set; } = DisputeStatus.None;
+        [StringLength(500)]
+        public string? DisputeReason { get; set; }
+        public DateTime? DisputeRaisedAt { get; set; }
+        [StringLength(500)]
+        public string? DisputeResolution { get; set; }
+        public DateTime? DisputeResolvedAt { get; set; }
     }
 }

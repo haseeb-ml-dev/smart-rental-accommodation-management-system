@@ -78,6 +78,13 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 .Take(PageSize)
                 .ToListAsync();
 
+            var propertyIds = units.Select(u => u.PropertyId).Distinct().ToList();
+            var ratings = await _context.PropertyReviews
+                .Where(r => propertyIds.Contains(r.PropertyId))
+                .GroupBy(r => r.PropertyId)
+                .Select(g => new { PropertyId = g.Key, Average = g.Average(r => r.Rating), Count = g.Count() })
+                .ToDictionaryAsync(g => g.PropertyId);
+
             var vm = new TenantBrowseViewModel
             {
                 Filter = filter,
@@ -99,7 +106,9 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                     Capacity = u.Capacity,
                     BookableSlots = u.BookableSlots,
                     ActiveLeaseCount = u.Leases.Count(l => l.EndDate == null || l.EndDate >= today),
-                    HasPendingRequestFromCurrentTenant = u.Bookings.Any(b => b.TenantId == tenantId && b.Status == BookingStatus.Pending)
+                    HasPendingRequestFromCurrentTenant = u.Bookings.Any(b => b.TenantId == tenantId && b.Status == BookingStatus.Pending),
+                    AverageRating = ratings.TryGetValue(u.PropertyId, out var r) ? r.Average : null,
+                    ReviewCount = ratings.TryGetValue(u.PropertyId, out var rc) ? rc.Count : 0
                 }).ToList()
             };
 
@@ -124,6 +133,12 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 return NotFound();
             }
 
+            var reviews = await _context.PropertyReviews
+                .Include(r => r.Tenant)
+                .Where(r => r.PropertyId == unit.PropertyId)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+
             var vm = new UnitDetailViewModel
             {
                 UnitId = unit.Id,
@@ -139,7 +154,16 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 BookableSlots = unit.BookableSlots,
                 ActiveLeaseCount = unit.Leases.Count(l => l.EndDate == null || l.EndDate >= today),
                 HasPendingRequestFromCurrentTenant = unit.Bookings.Any(b => b.TenantId == tenantId && b.Status == BookingStatus.Pending),
-                Images = unit.Images.OrderByDescending(i => i.IsCover).ThenBy(i => i.Id).ToList()
+                Images = unit.Images.OrderByDescending(i => i.IsCover).ThenBy(i => i.Id).ToList(),
+                AverageRating = reviews.Any() ? reviews.Average(r => r.Rating) : null,
+                ReviewCount = reviews.Count,
+                Reviews = reviews.Select(r => new PropertyReviewRowViewModel
+                {
+                    TenantName = r.Tenant?.FullName ?? "A tenant",
+                    Rating = r.Rating,
+                    Comment = r.Comment,
+                    CreatedAt = r.CreatedAt
+                }).ToList()
             };
 
             return View(vm);

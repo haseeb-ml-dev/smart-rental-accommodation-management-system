@@ -60,9 +60,11 @@
                             <li class="list-group-item">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="fw-semibold">@city.Name</span>
-                                    <form asp-action="DeleteCity" method="post" onsubmit="return confirm('Remove this city? Its areas will be removed too.');">
+                                    <form asp-action="DeleteCity" method="post">
                                         <input type="hidden" name="cityId" value="@city.Id" />
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Remove city</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                data-confirm-title="Remove this city?"
+                                                data-confirm-body="Its areas will be removed too. Landlords will no longer be able to pick it for new properties.">Remove city</button>
                                     </form>
                                 </div>
 
@@ -74,9 +76,11 @@
                                             {
                                                 <li class="d-flex justify-content-between align-items-center py-1">
                                                     <span class="text-muted small">@area.Name</span>
-                                                    <form asp-action="DeleteArea" method="post" onsubmit="return confirm('Remove this area?');">
+                                                    <form asp-action="DeleteArea" method="post">
                                                         <input type="hidden" name="areaId" value="@area.Id" />
-                                                        <button type="submit" class="btn btn-sm btn-link text-danger p-0">Remove</button>
+                                                        <button type="submit" class="btn btn-sm btn-link text-danger p-0"
+                                                                data-confirm-title="Remove this area?"
+                                                                data-confirm-body="Landlords will no longer be able to pick it for new properties.">Remove</button>
                                                     </form>
                                                 </li>
                                             }

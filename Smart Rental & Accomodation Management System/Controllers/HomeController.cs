@@ -88,6 +88,13 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 .Take(PageSize)
                 .ToListAsync();
 
+            var propertyIds = units.Select(u => u.PropertyId).Distinct().ToList();
+            var ratings = await _context.PropertyReviews
+                .Where(r => propertyIds.Contains(r.PropertyId))
+                .GroupBy(r => r.PropertyId)
+                .Select(g => new { PropertyId = g.Key, Average = g.Average(r => r.Rating), Count = g.Count() })
+                .ToDictionaryAsync(g => g.PropertyId);
+
             var vm = new PublicBrowseViewModel
             {
                 Filter = filter,
@@ -111,7 +118,9 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                     MonthlyRent = u.MonthlyRent,
                     Capacity = u.Capacity,
                     BookableSlots = u.BookableSlots,
-                    ActiveLeaseCount = u.Leases.Count(l => l.EndDate == null || l.EndDate >= today)
+                    ActiveLeaseCount = u.Leases.Count(l => l.EndDate == null || l.EndDate >= today),
+                    AverageRating = ratings.TryGetValue(u.PropertyId, out var r) ? r.Average : null,
+                    ReviewCount = ratings.TryGetValue(u.PropertyId, out var rc) ? rc.Count : 0
                 }).ToList()
             };
 
