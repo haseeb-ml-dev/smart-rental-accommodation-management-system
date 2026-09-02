@@ -234,6 +234,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 DefaultUtilitySplitMethod = settings.DefaultUtilitySplitMethod,
                 RentReminderDaysBefore = settings.RentReminderDaysBefore,
                 UtilityReminderDaysBefore = settings.UtilityReminderDaysBefore,
+                MonthlySubscriptionFee = settings.MonthlySubscriptionFee,
                 Cities = await GetCitiesWithAreasAsync()
             };
 
@@ -254,6 +255,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             settings.DefaultUtilitySplitMethod = model.DefaultUtilitySplitMethod;
             settings.RentReminderDaysBefore = model.RentReminderDaysBefore;
             settings.UtilityReminderDaysBefore = model.UtilityReminderDaysBefore;
+            settings.MonthlySubscriptionFee = model.MonthlySubscriptionFee;
 
             await _context.SaveChangesAsync();
             TempData["Message"] = "Settings saved.";

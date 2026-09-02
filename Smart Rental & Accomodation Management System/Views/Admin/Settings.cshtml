@@ -35,6 +35,12 @@
                         <input asp-for="UtilityReminderDaysBefore" class="form-control" type="number" />
                         <span asp-validation-for="UtilityReminderDaysBefore" class="text-danger"></span>
                     </div>
+                    <div class="mb-3">
+                        <label asp-for="MonthlySubscriptionFee" class="form-label"></label>
+                        <input asp-for="MonthlySubscriptionFee" class="form-control" type="number" step="0.01" />
+                        <div class="form-text">Shown on the public Pricing page as the landlord subscription fee.</div>
+                        <span asp-validation-for="MonthlySubscriptionFee" class="text-danger"></span>
+                    </div>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </form>
             </div>

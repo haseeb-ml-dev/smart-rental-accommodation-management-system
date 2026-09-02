@@ -282,6 +282,37 @@ a.stat-tile {
   color: var(--ink-soft);
 }
 
+/* Blog card header (no cover-image upload, so a gradient + icon stands in) */
+.blog-card-header {
+  height: 8rem;
+  border-radius: 0.75rem 0.75rem 0 0;
+  background: linear-gradient(135deg, var(--brand) 0%, #7c3aed 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 2rem;
+}
+
+/* Marketing sections (Home, Pricing) */
+.feature-block {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+}
+
+.cta-band {
+  background: linear-gradient(135deg, var(--brand) 0%, #7c3aed 100%);
+  color: #fff;
+  border-radius: 1.25rem;
+  padding: 2.5rem;
+  text-align: center;
+}
+
+.cta-band p {
+  color: rgba(255, 255, 255, 0.9);
+}
+
 /* Error page */
 .error-icon {
   width: 4rem;

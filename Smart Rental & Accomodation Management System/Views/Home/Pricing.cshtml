@@ -1,0 +1,102 @@
+@model decimal
+@{
+    ViewData["Title"] = "Pricing";
+}
+
+<div class="text-center mb-5">
+    <h1 class="display-6 fw-bold mb-2">Simple, honest pricing</h1>
+    <p class="fs-5 text-muted">One flat monthly fee for landlords. Always free for tenants.</p>
+</div>
+
+<div class="row g-4 justify-content-center mb-5">
+    <div class="col-md-5">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <div class="text-muted small text-uppercase fw-semibold mb-1">For Landlords &amp; Agents</div>
+                <div class="mb-3">
+                    <span class="display-5 fw-bold">Rs. @Model.ToString("N0")</span>
+                    <span class="text-muted">/ month</span>
+                </div>
+                <p class="text-muted mb-4">Unlimited properties and units, no minimum term, cancel anytime.</p>
+                <ul class="list-unstyled mb-4">
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Unlimited property &amp; unit listings</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Rent collection with automatic due-soon &amp; overdue reminders</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Payment confirmation with a built-in dispute process</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Fair utility bill splitting (equal, percentage, or per-meter)</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Maintenance request tracking</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Booking requests, lease management &amp; tenant reviews</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Excel &amp; PDF reports</li>
+                </ul>
+                <a asp-controller="Account" asp-action="Register" class="btn btn-primary w-100">Get started</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <div class="text-muted small text-uppercase fw-semibold mb-1">For Tenants</div>
+                <div class="mb-3">
+                    <span class="display-5 fw-bold">Free</span>
+                </div>
+                <p class="text-muted mb-4">No setup fee, no recurring charge, no hidden cost.</p>
+                <ul class="list-unstyled mb-4">
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Search by city and area, with exact locations on a map</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Request bookings and message your landlord</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Pay rent and utility bills online</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Raise a dispute if something's wrong</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Report maintenance issues with photos</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Leave a review after your lease</li>
+                </ul>
+                <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary w-100">Create a free account</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h2 class="h4 mb-3 text-center">Frequently asked questions</h2>
+        <div class="accordion" id="pricingFaq">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                        Is there a setup fee or contract?
+                    </button>
+                </h2>
+                <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
+                    <div class="accordion-body">No. There's no minimum term and no setup fee — you can cancel your subscription at any time.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                        Do tenants ever pay RehLe directly?
+                    </button>
+                </h2>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
+                    <div class="accordion-body">No — RehLe is completely free for tenants. Only landlords and agents pay the monthly subscription.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                        Does the price change with the number of properties I list?
+                    </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
+                    <div class="accordion-body">No — it's one flat fee per landlord account, however many properties and units you manage.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                        Which cities are supported?
+                    </button>
+                </h2>
+                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
+                    <div class="accordion-body">RehLe works anywhere in Pakistan. Admins can add supported cities and areas so search stays accurate as we grow.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -28,6 +28,7 @@ namespace Smart_Rental___Accomodation_Management_System.Data
         public DbSet<LeaseOccupant> LeaseOccupants { get; set; } = null!;
         public DbSet<MaintenanceRequest> MaintenanceRequests { get; set; } = null!;
         public DbSet<PropertyReview> PropertyReviews { get; set; } = null!;
+        public DbSet<BlogPost> BlogPosts { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -161,6 +162,10 @@ namespace Smart_Rental___Accomodation_Management_System.Data
 
             builder.Entity<PropertyReview>()
                 .HasIndex(r => new { r.PropertyId, r.TenantId })
+                .IsUnique();
+
+            builder.Entity<BlogPost>()
+                .HasIndex(b => b.Slug)
                 .IsUnique();
         }
     }

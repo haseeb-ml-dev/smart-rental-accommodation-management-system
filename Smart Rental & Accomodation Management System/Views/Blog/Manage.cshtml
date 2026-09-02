@@ -1,0 +1,57 @@
+@model List<BlogPost>
+@{
+    ViewData["Title"] = "Manage Blog Posts";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Blog Posts</h1>
+    <div class="d-flex gap-2">
+        <a asp-action="Create" class="btn btn-primary">New Post</a>
+        <a asp-controller="Admin" asp-action="Index" class="btn btn-link">Back to Dashboard</a>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Published</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var post in Model)
+            {
+                <tr>
+                    <td>@post.Title</td>
+                    <td>
+                        @if (post.IsPublished)
+                        {
+                            <span class="badge text-bg-success">Published</span>
+                        }
+                        else
+                        {
+                            <span class="badge text-bg-secondary">Draft</span>
+                        }
+                    </td>
+                    <td>@(post.PublishedAt?.ToString("MMM d, yyyy") ?? "—")</td>
+                    <td class="text-end">
+                        <a asp-action="Edit" asp-route-id="@post.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <form asp-action="Delete" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@post.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    data-confirm-title="Delete this post?"
+                                    data-confirm-body="This can't be undone.">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Any())
+            {
+                <tr><td colspan="4" class="text-muted">No posts yet.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

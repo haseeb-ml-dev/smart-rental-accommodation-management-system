@@ -1,0 +1,19 @@
+@model BlogPost
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <a asp-action="Index" class="btn btn-link ps-0 mb-3">&larr; Back to Blog</a>
+        <div class="blog-card-header mb-4" style="height: 12rem; border-radius: 1rem; font-size: 3rem;"><i class="bi bi-journal-text"></i></div>
+        <h1 class="mb-2">@Model.Title</h1>
+        <div class="text-muted small mb-4">@Model.PublishedAt?.ToString("MMMM d, yyyy")</div>
+        <div class="fs-5">
+            @foreach (var paragraph in Model.Content.Split(new[] { "\r\n\r\n", "\n\n" }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                <p>@paragraph.Trim()</p>
+            }
+        </div>
+    </div>
+</div>

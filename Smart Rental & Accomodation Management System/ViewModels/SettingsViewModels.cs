@@ -14,6 +14,9 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         [Range(0, 30), Display(Name = "Utility due-soon reminder (days before due date)")]
         public int UtilityReminderDaysBefore { get; set; }
 
+        [Range(0, 100000), Display(Name = "Monthly subscription fee (per landlord account)")]
+        public decimal MonthlySubscriptionFee { get; set; }
+
         public List<CityWithAreasViewModel> Cities { get; set; } = new();
     }
 

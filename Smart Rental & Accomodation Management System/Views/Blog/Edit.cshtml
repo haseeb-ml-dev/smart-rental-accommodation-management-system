@@ -1,0 +1,46 @@
+@model BlogPostFormViewModel
+@{
+    ViewData["Title"] = "Edit Blog Post";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h1 class="mb-4">Edit Blog Post</h1>
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Slug" class="form-label"></label>
+                <input asp-for="Slug" class="form-control" />
+                <span asp-validation-for="Slug" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Excerpt" class="form-label"></label>
+                <textarea asp-for="Excerpt" class="form-control" rows="2"></textarea>
+                <div class="form-text">Shown on the Blog listing card.</div>
+                <span asp-validation-for="Excerpt" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Content" class="form-label"></label>
+                <textarea asp-for="Content" class="form-control" rows="14"></textarea>
+                <div class="form-text">Separate paragraphs with a blank line.</div>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+            <div class="mb-3 form-check">
+                <input asp-for="IsPublished" class="form-check-input" />
+                <label asp-for="IsPublished" class="form-check-label"></label>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-action="Manage" class="btn btn-link">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

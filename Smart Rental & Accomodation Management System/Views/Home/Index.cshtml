@@ -34,6 +34,39 @@
     </div>
 </div>
 
+<div class="row g-4 mb-5">
+    <div class="col-md-6">
+        <h2 class="h5 mb-3"><i class="bi bi-building text-primary me-1"></i> For Landlords &amp; Agents</h2>
+        <div class="feature-block mb-3">
+            <div class="feature-icon"><i class="bi bi-megaphone"></i></div>
+            <div><strong>List for free, unlimited.</strong><div class="text-muted small">Add as many properties and units as you manage, at one flat monthly price.</div></div>
+        </div>
+        <div class="feature-block mb-3">
+            <div class="feature-icon"><i class="bi bi-cash-coin"></i></div>
+            <div><strong>Collect rent without chasing it.</strong><div class="text-muted small">Automatic due-soon and overdue reminders, with a confirm/dispute flow so nothing gets lost.</div></div>
+        </div>
+        <div class="feature-block">
+            <div class="feature-icon"><i class="bi bi-tools"></i></div>
+            <div><strong>Track maintenance in one place.</strong><div class="text-muted small">Tenants report issues with photos; you track them through to resolved.</div></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <h2 class="h5 mb-3"><i class="bi bi-house-heart text-primary me-1"></i> For Tenants</h2>
+        <div class="feature-block mb-3">
+            <div class="feature-icon"><i class="bi bi-geo-alt"></i></div>
+            <div><strong>Search by city and area.</strong><div class="text-muted small">Narrow down to the neighborhood you actually want, with the exact location on a map.</div></div>
+        </div>
+        <div class="feature-block mb-3">
+            <div class="feature-icon"><i class="bi bi-credit-card"></i></div>
+            <div><strong>Pay rent online.</strong><div class="text-muted small">Mark a payment made, get confirmed by your landlord, and raise a dispute if something's off.</div></div>
+        </div>
+        <div class="feature-block">
+            <div class="feature-icon"><i class="bi bi-star"></i></div>
+            <div><strong>See real reviews.</strong><div class="text-muted small">Ratings from tenants who've actually lived there, before you commit.</div></div>
+        </div>
+    </div>
+</div>
+
 <h2 class="h4 mb-3">Available properties</h2>
 
 <form method="get" class="row g-2 mb-4 align-items-end">
@@ -176,3 +209,57 @@
         </ul>
     </nav>
 }
+
+<div class="row justify-content-center my-5">
+    <div class="col-lg-8">
+        <h2 class="h4 mb-3 text-center">Frequently asked questions</h2>
+        <div class="accordion" id="homeFaq">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#hfaq1">
+                        How much does RehLe cost?
+                    </button>
+                </h2>
+                <div id="hfaq1" class="accordion-collapse collapse" data-bs-parent="#homeFaq">
+                    <div class="accordion-body">Landlords pay one flat monthly subscription, unlimited properties included. It's always free for tenants. See the <a asp-action="Pricing">Pricing</a> page for the current rate.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#hfaq2">
+                        How do rent payments work?
+                    </button>
+                </h2>
+                <div id="hfaq2" class="accordion-collapse collapse" data-bs-parent="#homeFaq">
+                    <div class="accordion-body">A tenant marks an invoice paid (optionally attaching a payment slip), and the landlord confirms it was received. If either side disagrees, a dispute opens automatically so it's never just left hanging.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#hfaq3">
+                        Can I split utility bills between roommates?
+                    </button>
+                </h2>
+                <div id="hfaq3" class="accordion-collapse collapse" data-bs-parent="#homeFaq">
+                    <div class="accordion-body">Yes — equally, by custom percentage, or by per-meter consumption, and tenants with their own meter are automatically excluded from the shared split.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#hfaq4">
+                        Where can I find rental advice?
+                    </button>
+                </h2>
+                <div id="hfaq4" class="accordion-collapse collapse" data-bs-parent="#homeFaq">
+                    <div class="accordion-body">Our <a asp-controller="Blog" asp-action="Index">Blog</a> covers practical guidance for landlords and tenants renting in Pakistan.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="cta-band mb-4">
+    <h2 class="h3 fw-bold mb-2">Ready to list your property?</h2>
+    <p class="mb-4">Join RehLe and start collecting rent, managing tenants, and tracking maintenance in one place.</p>
+    <a asp-controller="Account" asp-action="Register" class="btn btn-light btn-lg fw-semibold">Get started free</a>
+</div>

@@ -127,6 +127,12 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             return View(vm);
         }
 
+        public async Task<IActionResult> Pricing()
+        {
+            var settings = await _context.AppSettings.FirstOrDefaultAsync();
+            return View(settings?.MonthlySubscriptionFee ?? 999m);
+        }
+
         public IActionResult Privacy()
         {
             return View();

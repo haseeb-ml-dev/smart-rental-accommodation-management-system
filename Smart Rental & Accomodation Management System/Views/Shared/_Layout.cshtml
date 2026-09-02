@@ -8,7 +8,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] &middot; Smart Rental &amp; Accommodation</title>
+    <title>@ViewData["Title"] &middot; RehLe</title>
     <script type="importmap"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -27,7 +27,7 @@
                         <path d="M3 10.5 12 3l9 7.5" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                         <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                    Smart Rental
+                    RehLe
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,12 @@
                                 <a class="@navClass("Home", "Index")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
                         }
+                        <li class="nav-item">
+                            <a class="@navClass("Home", "Pricing")" asp-area="" asp-controller="Home" asp-action="Pricing">Pricing</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="@navClass("Blog", "Index")" asp-area="" asp-controller="Blog" asp-action="Index">Blog</a>
+                        </li>
                         @if (User.IsInRole("Landlord"))
                         {
                             <li class="nav-item">
@@ -134,7 +140,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; @DateTime.Now.Year Smart Rental &amp; Accommodation &middot; <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; @DateTime.Now.Year RehLe &middot; <a asp-area="" asp-controller="Home" asp-action="Pricing">Pricing</a> &middot; <a asp-area="" asp-controller="Blog" asp-action="Index">Blog</a> &middot; <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
 
