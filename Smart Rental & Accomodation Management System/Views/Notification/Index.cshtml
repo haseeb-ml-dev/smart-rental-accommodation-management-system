@@ -8,30 +8,32 @@
 
 <div class="card">
     <div class="card-body">
-        <table class="table table-sm align-middle mb-0">
-            <tbody>
-                @foreach (var notification in Model)
-                {
-                    var isNew = wasUnread.Contains(notification.Id);
-                    <tr class="@(isNew ? "table-light" : "")">
-                        <td style="width: 8px;" class="@(isNew ? "border-start border-3 border-primary" : "")"></td>
-                        <td class="@(isNew ? "fw-semibold" : "")">
-                            @notification.Message
-                            <div class="text-muted small fw-normal">@notification.CreatedAt.ToString("MMM d, yyyy h:mm tt")</div>
-                        </td>
-                        <td class="text-end">
-                            @if (!string.IsNullOrEmpty(notification.LinkController) && !string.IsNullOrEmpty(notification.LinkAction))
-                            {
-                                <a asp-controller="@notification.LinkController" asp-action="@notification.LinkAction" class="btn btn-sm btn-outline-primary">View</a>
-                            }
-                        </td>
-                    </tr>
-                }
-                @if (!Model.Any())
-                {
-                    <tr><td class="text-muted">No notifications yet.</td></tr>
-                }
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <tbody>
+                    @foreach (var notification in Model)
+                    {
+                        var isNew = wasUnread.Contains(notification.Id);
+                        <tr class="@(isNew ? "table-light" : "")">
+                            <td style="width: 8px;" class="@(isNew ? "border-start border-3 border-primary" : "")"></td>
+                            <td class="@(isNew ? "fw-semibold" : "")">
+                                @notification.Message
+                                <div class="text-muted small fw-normal">@notification.CreatedAt.ToString("MMM d, yyyy h:mm tt")</div>
+                            </td>
+                            <td class="text-end">
+                                @if (!string.IsNullOrEmpty(notification.LinkController) && !string.IsNullOrEmpty(notification.LinkAction))
+                                {
+                                    <a asp-controller="@notification.LinkController" asp-action="@notification.LinkAction" class="btn btn-sm btn-outline-primary">View</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr><td class="text-muted">No notifications yet.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

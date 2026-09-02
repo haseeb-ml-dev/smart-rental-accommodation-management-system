@@ -37,9 +37,9 @@
 <h2 class="h4 mb-3">Available properties</h2>
 
 <form method="get" class="row g-2 mb-4 align-items-end">
-    <div class="col-sm-3">
+    <div class="col-sm-3 col-lg-2">
         <label class="form-label">City</label>
-        <select name="City" class="form-select">
+        <select name="City" id="filterCity" class="form-select">
             <option value="">All cities</option>
             @foreach (var city in Model.Cities)
             {
@@ -47,15 +47,25 @@
             }
         </select>
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-3 col-lg-2">
+        <label class="form-label">Area</label>
+        <select name="Area" id="filterArea" class="form-select"
+                data-cascade-source="#filterCity"
+                data-cascade-options="@System.Text.Json.JsonSerializer.Serialize(Model.AreasByCity)"
+                data-cascade-placeholder="All areas"
+                data-cascade-initial="@Model.Filter.Area">
+            <option value="">All areas</option>
+        </select>
+    </div>
+    <div class="col-sm-3 col-lg-2">
         <label class="form-label">Min rent</label>
         <input type="number" name="MinRent" class="form-control" min="0" step="1" value="@Model.Filter.MinRent" />
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-3 col-lg-2">
         <label class="form-label">Max rent</label>
         <input type="number" name="MaxRent" class="form-control" min="0" step="1" value="@Model.Filter.MaxRent" />
     </div>
-    <div class="col-sm-3">
+    <div class="col-sm-4 col-lg-2">
         <label class="form-label">Unit type</label>
         <select name="UnitType" class="form-select">
             <option value="">All types</option>
@@ -65,7 +75,17 @@
             }
         </select>
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-4 col-lg-1">
+        <label class="form-label">BHK</label>
+        <select name="BhkType" class="form-select">
+            <option value="">Any</option>
+            @foreach (BhkType t in Enum.GetValues<BhkType>())
+            {
+                <option value="@t" selected="@(t == Model.Filter.BhkType)">@t.Humanize()</option>
+            }
+        </select>
+    </div>
+    <div class="col-sm-4 col-lg-1">
         <button type="submit" class="btn btn-primary w-100">Search</button>
     </div>
 </form>
@@ -91,7 +111,10 @@
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title mb-1">@unit.UnitName</h5>
                     <div class="text-muted small mb-2">
-                        @unit.PropertyName &middot; @(string.IsNullOrEmpty(unit.City) ? unit.Address : unit.City)
+                        @{
+                            var locationLabel = string.Join(", ", new[] { unit.Area, unit.City }.Where(s => !string.IsNullOrEmpty(s)));
+                        }
+                        @unit.PropertyName &middot; @(string.IsNullOrEmpty(locationLabel) ? unit.Address : locationLabel)
                         @if (unit.Latitude.HasValue && unit.Longitude.HasValue)
                         {
                             <a href="https://www.google.com/maps?q=@(unit.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)),@(unit.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))" target="_blank" rel="noopener" class="ms-1">(map)</a>
@@ -136,9 +159,11 @@
                     <a class="page-link"
                        asp-action="Index"
                        asp-route-City="@Model.Filter.City"
+                       asp-route-Area="@Model.Filter.Area"
                        asp-route-MinRent="@Model.Filter.MinRent"
                        asp-route-MaxRent="@Model.Filter.MaxRent"
                        asp-route-UnitType="@Model.Filter.UnitType"
+                       asp-route-BhkType="@Model.Filter.BhkType"
                        asp-route-Page="@p">@p</a>
                 </li>
             }

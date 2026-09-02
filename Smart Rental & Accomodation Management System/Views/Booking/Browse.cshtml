@@ -11,9 +11,9 @@
 }
 
 <form method="get" class="row g-2 mb-4 align-items-end">
-    <div class="col-sm-3">
+    <div class="col-sm-3 col-lg-2">
         <label class="form-label">City</label>
-        <select name="City" class="form-select">
+        <select name="City" id="filterCity" class="form-select">
             <option value="">All cities</option>
             @foreach (var city in Model.Cities)
             {
@@ -21,15 +21,25 @@
             }
         </select>
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-3 col-lg-2">
+        <label class="form-label">Area</label>
+        <select name="Area" id="filterArea" class="form-select"
+                data-cascade-source="#filterCity"
+                data-cascade-options="@System.Text.Json.JsonSerializer.Serialize(Model.AreasByCity)"
+                data-cascade-placeholder="All areas"
+                data-cascade-initial="@Model.Filter.Area">
+            <option value="">All areas</option>
+        </select>
+    </div>
+    <div class="col-sm-3 col-lg-2">
         <label class="form-label">Min rent</label>
         <input type="number" name="MinRent" class="form-control" min="0" step="1" value="@Model.Filter.MinRent" />
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-3 col-lg-2">
         <label class="form-label">Max rent</label>
         <input type="number" name="MaxRent" class="form-control" min="0" step="1" value="@Model.Filter.MaxRent" />
     </div>
-    <div class="col-sm-3">
+    <div class="col-sm-4 col-lg-2">
         <label class="form-label">Unit type</label>
         <select name="UnitType" class="form-select">
             <option value="">All types</option>
@@ -39,7 +49,17 @@
             }
         </select>
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-4 col-lg-1">
+        <label class="form-label">BHK</label>
+        <select name="BhkType" class="form-select">
+            <option value="">Any</option>
+            @foreach (BhkType t in Enum.GetValues<BhkType>())
+            {
+                <option value="@t" selected="@(t == Model.Filter.BhkType)">@t.Humanize()</option>
+            }
+        </select>
+    </div>
+    <div class="col-sm-4 col-lg-1">
         <button type="submit" class="btn btn-primary w-100">Search</button>
     </div>
 </form>
@@ -129,9 +149,11 @@
                     <a class="page-link"
                        asp-action="Browse"
                        asp-route-City="@Model.Filter.City"
+                       asp-route-Area="@Model.Filter.Area"
                        asp-route-MinRent="@Model.Filter.MinRent"
                        asp-route-MaxRent="@Model.Filter.MaxRent"
                        asp-route-UnitType="@Model.Filter.UnitType"
+                       asp-route-BhkType="@Model.Filter.BhkType"
                        asp-route-Page="@p">@p</a>
                 </li>
             }

@@ -10,18 +10,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] &middot; Smart Rental &amp; Accommodation</title>
     <script type="importmap"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Smart_Rental___Accomodation_Management_System.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom mb-3">
+        <nav class="navbar navbar-expand-lg navbar-toggleable-sm navbar-light bg-white border-bottom mb-3 sticky-top">
             <div class="container-fluid">
                 <a class="navbar-brand brand-mark" asp-area="" asp-controller="Home" asp-action="Index">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 10.5 12 3l9 7.5" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M3 10.5 12 3l9 7.5" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     Smart Rental
                 </a>
@@ -29,47 +33,49 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
                     @{
                         var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
-                        Func<string, string> navClass = c => "nav-link text-dark" + (string.Equals(currentController, c, StringComparison.OrdinalIgnoreCase) ? " active" : "");
+                        var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+                        Func<string, string, string> navClass = (c, a) => "nav-link text-dark" +
+                            (string.Equals(currentController, c, StringComparison.OrdinalIgnoreCase) && string.Equals(currentAction, a, StringComparison.OrdinalIgnoreCase) ? " active" : "");
                     }
                     <ul class="navbar-nav flex-grow-1">
                         @if (User.Identity == null || !User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="@navClass("Home")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                                <a class="@navClass("Home", "Index")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
                         }
                         @if (User.IsInRole("Landlord"))
                         {
                             <li class="nav-item">
-                                <a class="@navClass("Landlord")" asp-area="" asp-controller="Landlord" asp-action="Index">Dashboard</a>
+                                <a class="@navClass("Landlord", "Index")" asp-area="" asp-controller="Landlord" asp-action="Index">Dashboard</a>
                             </li>
                         }
                         else if (User.IsInRole("Tenant"))
                         {
                             <li class="nav-item">
-                                <a class="@navClass("Tenant")" asp-area="" asp-controller="Tenant" asp-action="Index">Dashboard</a>
+                                <a class="@navClass("Tenant", "Index")" asp-area="" asp-controller="Tenant" asp-action="Index">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@navClass("Booking")" asp-area="" asp-controller="Booking" asp-action="Browse">Browse &amp; Book</a>
+                                <a class="@navClass("Booking", "Browse")" asp-area="" asp-controller="Booking" asp-action="Browse">Browse &amp; Book</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@navClass("Booking")" asp-area="" asp-controller="Booking" asp-action="MyBookings">My Bookings</a>
+                                <a class="@navClass("Booking", "MyBookings")" asp-area="" asp-controller="Booking" asp-action="MyBookings">My Bookings</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@navClass("Mess")" asp-area="" asp-controller="Mess" asp-action="Index">Mess Menu</a>
+                                <a class="@navClass("Mess", "Index")" asp-area="" asp-controller="Mess" asp-action="Index">Mess Menu</a>
                             </li>
                         }
                         else if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="@navClass("Admin")" asp-area="" asp-controller="Admin" asp-action="Index">Dashboard</a>
+                                <a class="@navClass("Admin", "Index")" asp-area="" asp-controller="Admin" asp-action="Index">Dashboard</a>
                             </li>
                         }
                     </ul>
-                    <ul class="navbar-nav align-items-sm-center">
+                    <ul class="navbar-nav align-items-lg-center">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
                             var currentUserId = UserManager.GetUserId(User);
@@ -77,8 +83,8 @@
                             var currentUser = await UserManager.FindByIdAsync(currentUserId!);
                             var displayName = string.IsNullOrWhiteSpace(currentUser?.FullName) ? User.Identity.Name : currentUser.FullName;
                             <li class="nav-item">
-                                <a class="@navClass("Notification")" asp-area="" asp-controller="Notification" asp-action="Index">
-                                    🔔 Notifications
+                                <a class="@navClass("Notification", "Index")" asp-area="" asp-controller="Notification" asp-action="Index">
+                                    <i class="bi bi-bell"></i> Notifications
                                     @if (unreadCount > 0)
                                     {
                                         <span class="badge text-bg-danger rounded-pill">@unreadCount</span>
@@ -87,7 +93,7 @@
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    @displayName
+                                    <i class="bi bi-person-circle"></i> @displayName
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">Profile</a></li>
@@ -129,6 +135,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/address-autocomplete.js" asp-append-version="true"></script>
+    <script src="~/js/cascading-select.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

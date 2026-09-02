@@ -27,6 +27,7 @@
                     <text>&middot; @bill.TotalUnitsConsumed units total &middot; @((bill.Amount / bill.TotalUnitsConsumed.Value).ToString("C")) / unit</text>
                 }
             </div>
+            <div class="table-responsive">
             <table class="table table-sm mb-0">
                 <thead>
                     <tr><th>Tenant</th><th>Share</th><th>Status</th><th></th></tr>
@@ -110,6 +111,7 @@
                     }
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 }

@@ -14,6 +14,13 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         [Range(0, 30), Display(Name = "Utility due-soon reminder (days before due date)")]
         public int UtilityReminderDaysBefore { get; set; }
 
-        public List<SupportedCity> Cities { get; set; } = new();
+        public List<CityWithAreasViewModel> Cities { get; set; } = new();
+    }
+
+    public class CityWithAreasViewModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public List<SupportedArea> Areas { get; set; } = new();
     }
 }

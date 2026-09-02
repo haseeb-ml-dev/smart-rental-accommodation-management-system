@@ -16,44 +16,49 @@
 
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="text-muted small">Properties</div>
-                <div class="fs-3 fw-semibold">@Model.TotalProperties</div>
+        <div class="stat-tile h-100">
+            <div class="stat-tile-icon stat-tile-icon-primary"><i class="bi bi-building"></i></div>
+            <div class="stat-tile-body">
+                <div class="stat-tile-label">Properties</div>
+                <div class="stat-tile-value">@Model.TotalProperties</div>
             </div>
         </div>
     </div>
     <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="text-muted small">Units (occupied / vacant)</div>
-                <div class="fs-3 fw-semibold">@Model.TotalUnits</div>
-                <div class="text-muted small">@Model.OccupiedUnits occupied &middot; @Model.VacantUnits vacant</div>
+        <div class="stat-tile h-100">
+            <div class="stat-tile-icon stat-tile-icon-info"><i class="bi bi-door-open"></i></div>
+            <div class="stat-tile-body">
+                <div class="stat-tile-label">Units (occupied / vacant)</div>
+                <div class="stat-tile-value">@Model.TotalUnits</div>
+                <div class="stat-tile-sub">@Model.OccupiedUnits occupied &middot; @Model.VacantUnits vacant</div>
             </div>
         </div>
     </div>
     <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="text-muted small">Collected this month</div>
-                <div class="fs-3 fw-semibold text-success">@Model.CollectedThisMonth.ToString("C")</div>
+        <div class="stat-tile h-100">
+            <div class="stat-tile-icon stat-tile-icon-success"><i class="bi bi-cash-coin"></i></div>
+            <div class="stat-tile-body">
+                <div class="stat-tile-label">Collected this month</div>
+                <div class="stat-tile-value text-success">@Model.CollectedThisMonth.ToString("C")</div>
             </div>
         </div>
     </div>
     <div class="col-6 col-md-3">
-        <a asp-action="OverdueTenants" class="card h-100 text-decoration-none text-body">
-            <div class="card-body">
-                <div class="text-muted small">Overdue invoices</div>
-                <div class="fs-3 fw-semibold @(Model.OverdueInvoiceCount > 0 ? "text-danger" : "")">@Model.OverdueInvoiceCount</div>
-                <div class="text-muted small">Outstanding: @Model.OutstandingThisMonth.ToString("C")</div>
+        <a asp-action="OverdueTenants" class="stat-tile h-100">
+            <div class="stat-tile-icon @(Model.OverdueInvoiceCount > 0 ? "stat-tile-icon-danger" : "stat-tile-icon-secondary")"><i class="bi bi-exclamation-circle"></i></div>
+            <div class="stat-tile-body">
+                <div class="stat-tile-label">Overdue invoices</div>
+                <div class="stat-tile-value @(Model.OverdueInvoiceCount > 0 ? "text-danger" : "")">@Model.OverdueInvoiceCount</div>
+                <div class="stat-tile-sub">Outstanding: @Model.OutstandingThisMonth.ToString("C")</div>
             </div>
         </a>
     </div>
     <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="text-muted small">Outstanding utility bills</div>
-                <div class="fs-3 fw-semibold @(Model.OutstandingUtilities > 0 ? "text-danger" : "")">@Model.OutstandingUtilities.ToString("C")</div>
+        <div class="stat-tile h-100">
+            <div class="stat-tile-icon @(Model.OutstandingUtilities > 0 ? "stat-tile-icon-warning" : "stat-tile-icon-secondary")"><i class="bi bi-lightning-charge"></i></div>
+            <div class="stat-tile-body">
+                <div class="stat-tile-label">Outstanding utility bills</div>
+                <div class="stat-tile-value @(Model.OutstandingUtilities > 0 ? "text-danger" : "")">@Model.OutstandingUtilities.ToString("C")</div>
             </div>
         </div>
     </div>

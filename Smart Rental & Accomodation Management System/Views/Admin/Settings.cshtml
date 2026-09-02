@@ -57,12 +57,42 @@
                     <ul class="list-group">
                         @foreach (var city in Model.Cities)
                         {
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                @city.Name
-                                <form asp-action="DeleteCity" method="post" onsubmit="return confirm('Remove this city?');">
-                                    <input type="hidden" name="cityId" value="@city.Id" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
-                                </form>
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-semibold">@city.Name</span>
+                                    <form asp-action="DeleteCity" method="post" onsubmit="return confirm('Remove this city? Its areas will be removed too.');">
+                                        <input type="hidden" name="cityId" value="@city.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Remove city</button>
+                                    </form>
+                                </div>
+
+                                <div class="ms-3 mt-2">
+                                    @if (city.Areas.Any())
+                                    {
+                                        <ul class="list-unstyled mb-2">
+                                            @foreach (var area in city.Areas)
+                                            {
+                                                <li class="d-flex justify-content-between align-items-center py-1">
+                                                    <span class="text-muted small">@area.Name</span>
+                                                    <form asp-action="DeleteArea" method="post" onsubmit="return confirm('Remove this area?');">
+                                                        <input type="hidden" name="areaId" value="@area.Id" />
+                                                        <button type="submit" class="btn btn-sm btn-link text-danger p-0">Remove</button>
+                                                    </form>
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted small mb-2">No areas configured for this city yet.</p>
+                                    }
+
+                                    <form asp-action="AddArea" method="post" class="d-flex gap-2">
+                                        <input type="hidden" name="cityId" value="@city.Id" />
+                                        <input type="text" name="name" class="form-control form-control-sm" placeholder="e.g. Downtown" maxlength="100" required />
+                                        <button type="submit" class="btn btn-sm btn-outline-primary text-nowrap">Add Area</button>
+                                    </form>
+                                </div>
                             </li>
                         }
                     </ul>

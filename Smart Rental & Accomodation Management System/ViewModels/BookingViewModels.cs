@@ -11,6 +11,7 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public double? Longitude { get; set; }
         public string UnitName { get; set; } = string.Empty;
         public UnitType UnitType { get; set; }
+        public BhkType? BhkType { get; set; }
         public decimal MonthlyRent { get; set; }
         public int Capacity { get; set; }
         public int BookableSlots { get; set; }
@@ -24,6 +25,7 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public UnitSearchFilter Filter { get; set; } = new();
         public List<UnitAvailabilityViewModel> Units { get; set; } = new();
         public List<string> Cities { get; set; } = new();
+        public Dictionary<string, List<string>> AreasByCity { get; set; } = new();
         public int TotalCount { get; set; }
         public int PageSize { get; set; }
         public int TotalPages => PageSize == 0 ? 0 : (int)Math.Ceiling(TotalCount / (double)PageSize);

@@ -16,13 +16,21 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly UnitImageStorage _imageStorage;
         private readonly GeocodingService _geocodingService;
+        private readonly LocationOptionsService _locationOptions;
 
-        public PropertyController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, UnitImageStorage imageStorage, GeocodingService geocodingService)
+        public PropertyController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, UnitImageStorage imageStorage, GeocodingService geocodingService, LocationOptionsService locationOptions)
         {
             _context = context;
             _userManager = userManager;
             _imageStorage = imageStorage;
             _geocodingService = geocodingService;
+            _locationOptions = locationOptions;
+        }
+
+        private async Task PopulateLocationViewBagAsync()
+        {
+            ViewBag.Cities = await _locationOptions.GetSupportedCityNamesAsync();
+            ViewBag.AreasByCity = await _locationOptions.GetSupportedAreasByCityAsync();
         }
 
         public async Task<IActionResult> Index()
@@ -41,7 +49,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            ViewBag.Cities = await _context.SupportedCities.OrderBy(c => c.Name).Select(c => c.Name).ToListAsync();
+            await PopulateLocationViewBagAsync();
             return View(new PropertyFormViewModel());
         }
 
@@ -51,7 +59,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Cities = await _context.SupportedCities.OrderBy(c => c.Name).Select(c => c.Name).ToListAsync();
+                await PopulateLocationViewBagAsync();
                 return View(model);
             }
 
@@ -60,12 +68,21 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 LandlordId = _userManager.GetUserId(User)!,
                 Name = model.Name,
                 Address = model.Address,
-                City = string.IsNullOrWhiteSpace(model.City) ? null : model.City.Trim()
+                City = string.IsNullOrWhiteSpace(model.City) ? null : model.City.Trim(),
+                Area = string.IsNullOrWhiteSpace(model.Area) ? null : model.Area.Trim()
             };
 
-            var geocode = await _geocodingService.GeocodeAsync(model.Address);
-            property.Latitude = geocode?.Latitude;
-            property.Longitude = geocode?.Longitude;
+            if (model.LocationConfirmed && model.Latitude.HasValue && model.Longitude.HasValue)
+            {
+                property.Latitude = model.Latitude;
+                property.Longitude = model.Longitude;
+            }
+            else
+            {
+                var geocode = await _geocodingService.GeocodeAsync(model.Address);
+                property.Latitude = geocode?.Latitude;
+                property.Longitude = geocode?.Longitude;
+            }
 
             _context.Properties.Add(property);
             await _context.SaveChangesAsync();
@@ -133,13 +150,14 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 return NotFound();
             }
 
-            ViewBag.Cities = await _context.SupportedCities.OrderBy(c => c.Name).Select(c => c.Name).ToListAsync();
+            await PopulateLocationViewBagAsync();
             return View(new PropertyFormViewModel
             {
                 Id = property.Id,
                 Name = property.Name,
                 Address = property.Address,
                 City = property.City,
+                Area = property.Area,
                 Latitude = property.Latitude,
                 Longitude = property.Longitude
             });
@@ -157,7 +175,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
 
             if (!ModelState.IsValid)
             {
-                ViewBag.Cities = await _context.SupportedCities.OrderBy(c => c.Name).Select(c => c.Name).ToListAsync();
+                await PopulateLocationViewBagAsync();
                 model.Latitude = property.Latitude;
                 model.Longitude = property.Longitude;
                 return View(model);
@@ -168,14 +186,38 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             property.Name = model.Name;
             property.Address = model.Address;
             property.City = string.IsNullOrWhiteSpace(model.City) ? null : model.City.Trim();
+            property.Area = string.IsNullOrWhiteSpace(model.Area) ? null : model.Area.Trim();
 
-            if (addressChanged)
+            if (model.LocationConfirmed && model.Latitude.HasValue && model.Longitude.HasValue)
             {
+                // Coordinate came from an autocomplete pick or a manual pin drag this submission — trust it.
+                property.Latitude = model.Latitude;
+                property.Longitude = model.Longitude;
+            }
+            else if (addressChanged)
+            {
+                // Address was hand-edited without re-picking a suggestion; the old coordinates no longer apply.
                 var geocode = await _geocodingService.GeocodeAsync(model.Address);
                 property.Latitude = geocode?.Latitude;
                 property.Longitude = geocode?.Longitude;
             }
 
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleActive(int propertyId)
+        {
+            var property = await GetOwnedPropertyAsync(propertyId);
+            if (property == null)
+            {
+                return NotFound();
+            }
+
+            property.IsActive = !property.IsActive;
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));

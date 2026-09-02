@@ -9,6 +9,7 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public string PropertyName { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
         public string? City { get; set; }
+        public string? Area { get; set; }
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
         public string UnitName { get; set; } = string.Empty;
@@ -26,6 +27,7 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public UnitSearchFilter Filter { get; set; } = new();
         public List<PublicListingViewModel> Units { get; set; } = new();
         public List<string> Cities { get; set; } = new();
+        public Dictionary<string, List<string>> AreasByCity { get; set; } = new();
         public int TotalCount { get; set; }
         public int PageSize { get; set; }
         public int TotalPages => PageSize == 0 ? 0 : (int)Math.Ceiling(TotalCount / (double)PageSize);

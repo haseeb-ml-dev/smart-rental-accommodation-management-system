@@ -15,49 +15,54 @@
 
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="text-muted small">Landlords</div>
-                <div class="fs-3 fw-semibold">@Model.TotalLandlords</div>
+        <div class="stat-tile h-100">
+            <div class="stat-tile-icon stat-tile-icon-primary"><i class="bi bi-person-badge"></i></div>
+            <div class="stat-tile-body">
+                <div class="stat-tile-label">Landlords</div>
+                <div class="stat-tile-value">@Model.TotalLandlords</div>
             </div>
         </div>
     </div>
     <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="text-muted small">Tenants</div>
-                <div class="fs-3 fw-semibold">@Model.TotalTenants</div>
+        <div class="stat-tile h-100">
+            <div class="stat-tile-icon stat-tile-icon-info"><i class="bi bi-people"></i></div>
+            <div class="stat-tile-body">
+                <div class="stat-tile-label">Tenants</div>
+                <div class="stat-tile-value">@Model.TotalTenants</div>
             </div>
         </div>
     </div>
     <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="text-muted small">Properties / Units</div>
-                <div class="fs-3 fw-semibold">@Model.TotalProperties / @Model.TotalUnits</div>
+        <div class="stat-tile h-100">
+            <div class="stat-tile-icon stat-tile-icon-primary"><i class="bi bi-building"></i></div>
+            <div class="stat-tile-body">
+                <div class="stat-tile-label">Properties / Units</div>
+                <div class="stat-tile-value">@Model.TotalProperties / @Model.TotalUnits</div>
             </div>
         </div>
     </div>
     <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="text-muted small">Overdue invoices</div>
-                <div class="fs-3 fw-semibold @(Model.OverdueInvoiceCount > 0 ? "text-danger" : "")">@Model.OverdueInvoiceCount</div>
+        <div class="stat-tile h-100">
+            <div class="stat-tile-icon @(Model.OverdueInvoiceCount > 0 ? "stat-tile-icon-danger" : "stat-tile-icon-secondary")"><i class="bi bi-exclamation-circle"></i></div>
+            <div class="stat-tile-body">
+                <div class="stat-tile-label">Overdue invoices</div>
+                <div class="stat-tile-value @(Model.OverdueInvoiceCount > 0 ? "text-danger" : "")">@Model.OverdueInvoiceCount</div>
             </div>
         </div>
     </div>
     <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="text-muted small">Top-rated mess</div>
+        <div class="stat-tile h-100">
+            <div class="stat-tile-icon stat-tile-icon-warning"><i class="bi bi-star"></i></div>
+            <div class="stat-tile-body">
+                <div class="stat-tile-label">Top-rated mess</div>
                 @if (Model.TopRatedPropertyName != null)
                 {
-                    <div class="fs-3 fw-semibold">@Model.TopRatedPropertyAverage!.Value.ToString("0.0") <span class="fs-6 text-muted">/ 5</span></div>
-                    <div class="text-muted small text-truncate">@Model.TopRatedPropertyName</div>
+                    <div class="stat-tile-value">@Model.TopRatedPropertyAverage!.Value.ToString("0.0") <span class="fs-6 text-muted fw-normal">/ 5</span></div>
+                    <div class="stat-tile-sub text-truncate">@Model.TopRatedPropertyName</div>
                 }
                 else
                 {
-                    <div class="text-muted small">Not enough ratings yet</div>
+                    <div class="stat-tile-sub">Not enough ratings yet</div>
                 }
             </div>
         </div>
@@ -66,18 +71,20 @@
 
 <div class="row g-3 mb-4">
     <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="text-muted small">Collected this month (system-wide)</div>
-                <div class="fs-3 fw-semibold text-success">@Model.CollectedThisMonth.ToString("C")</div>
+        <div class="stat-tile h-100">
+            <div class="stat-tile-icon stat-tile-icon-success"><i class="bi bi-cash-coin"></i></div>
+            <div class="stat-tile-body">
+                <div class="stat-tile-label">Collected this month (system-wide)</div>
+                <div class="stat-tile-value text-success">@Model.CollectedThisMonth.ToString("C")</div>
             </div>
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="text-muted small">Outstanding this month (system-wide)</div>
-                <div class="fs-3 fw-semibold text-danger">@Model.OutstandingThisMonth.ToString("C")</div>
+        <div class="stat-tile h-100">
+            <div class="stat-tile-icon stat-tile-icon-danger"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-tile-body">
+                <div class="stat-tile-label">Outstanding this month (system-wide)</div>
+                <div class="stat-tile-value text-danger">@Model.OutstandingThisMonth.ToString("C")</div>
             </div>
         </div>
     </div>

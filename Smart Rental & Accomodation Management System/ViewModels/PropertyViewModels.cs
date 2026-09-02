@@ -16,8 +16,16 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         [StringLength(100)]
         public string? City { get; set; }
 
+        [StringLength(100)]
+        public string? Area { get; set; }
+
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
+
+        // Set by the client whenever Latitude/Longitude came from a trustworthy source this
+        // submission (an autocomplete suggestion pick or a manual pin drag) rather than being a
+        // stale echo of a since-edited address. See address-autocomplete.js.
+        public bool LocationConfirmed { get; set; }
     }
 
     public class UnitFormViewModel

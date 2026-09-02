@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Smart_Rental___Accomodation_Management_System.Data;
 using Smart_Rental___Accomodation_Management_System.Models;
+using Smart_Rental___Accomodation_Management_System.Services;
 using Smart_Rental___Accomodation_Management_System.ViewModels;
 
 namespace Smart_Rental___Accomodation_Management_System.Controllers
@@ -15,11 +16,13 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
 
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly LocationOptionsService _locationOptions;
 
-        public BookingController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public BookingController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, LocationOptionsService locationOptions)
         {
             _context = context;
             _userManager = userManager;
+            _locationOptions = locationOptions;
         }
 
         [Authorize(Roles = "Tenant")]
@@ -46,6 +49,10 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             {
                 query = query.Where(u => u.Property!.City == filter.City);
             }
+            if (!string.IsNullOrWhiteSpace(filter.Area))
+            {
+                query = query.Where(u => u.Property!.Area == filter.Area);
+            }
             if (filter.MinRent.HasValue)
             {
                 query = query.Where(u => u.MonthlyRent >= filter.MinRent.Value);
@@ -58,6 +65,10 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             {
                 query = query.Where(u => u.UnitType == filter.UnitType.Value);
             }
+            if (filter.BhkType.HasValue)
+            {
+                query = query.Where(u => u.BhkType == filter.BhkType.Value);
+            }
 
             var totalCount = await query.CountAsync();
 
@@ -67,17 +78,11 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 .Take(PageSize)
                 .ToListAsync();
 
-            var cities = await _context.Properties
-                .Where(p => p.IsActive && p.City != null)
-                .Select(p => p.City!)
-                .Distinct()
-                .OrderBy(c => c)
-                .ToListAsync();
-
             var vm = new TenantBrowseViewModel
             {
                 Filter = filter,
-                Cities = cities,
+                Cities = await _locationOptions.GetActiveCitiesAsync(),
+                AreasByCity = await _locationOptions.GetActiveAreasByCityAsync(),
                 TotalCount = totalCount,
                 PageSize = PageSize,
                 Units = units.Select(u => new UnitAvailabilityViewModel
@@ -89,6 +94,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                     Longitude = u.Property?.Longitude,
                     UnitName = u.Name,
                     UnitType = u.UnitType,
+                    BhkType = u.BhkType,
                     MonthlyRent = u.MonthlyRent,
                     Capacity = u.Capacity,
                     BookableSlots = u.BookableSlots,

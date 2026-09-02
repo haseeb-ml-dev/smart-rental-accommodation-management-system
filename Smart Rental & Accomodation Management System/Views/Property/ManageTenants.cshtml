@@ -19,40 +19,42 @@
 <div class="card mb-4">
     <div class="card-body">
         <h5 class="card-title">Active tenants</h5>
-        <table class="table table-sm align-middle mb-0">
-            <thead>
-                <tr><th>Tenant</th><th>Lease start</th><th>Lease end</th><th></th></tr>
-            </thead>
-            <tbody>
-                @foreach (var lease in Model.ActiveLeases)
-                {
-                    <tr>
-                        <td>@lease.TenantName</td>
-                        <td>@lease.StartDate.ToString("MMM d, yyyy")</td>
-                        <td>
-                            @if (lease.EndDate.HasValue)
-                            {
-                                @lease.EndDate.Value.ToString("MMM d, yyyy")
-                            }
-                            else
-                            {
-                                <span class="text-muted">Open-ended</span>
-                            }
-                        </td>
-                        <td>
-                            <form asp-action="EndLease" method="post" class="d-inline">
-                                <input type="hidden" name="leaseId" value="@lease.LeaseId" />
-                                <button type="submit" class="btn btn-sm btn-outline-danger">End lease</button>
-                            </form>
-                        </td>
-                    </tr>
-                }
-                @if (!Model.ActiveLeases.Any())
-                {
-                    <tr><td colspan="4" class="text-muted">No active tenants on this unit.</td></tr>
-                }
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                    <tr><th>Tenant</th><th>Lease start</th><th>Lease end</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var lease in Model.ActiveLeases)
+                    {
+                        <tr>
+                            <td>@lease.TenantName</td>
+                            <td>@lease.StartDate.ToString("MMM d, yyyy")</td>
+                            <td>
+                                @if (lease.EndDate.HasValue)
+                                {
+                                    @lease.EndDate.Value.ToString("MMM d, yyyy")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Open-ended</span>
+                                }
+                            </td>
+                            <td>
+                                <form asp-action="EndLease" method="post" class="d-inline">
+                                    <input type="hidden" name="leaseId" value="@lease.LeaseId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">End lease</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.ActiveLeases.Any())
+                    {
+                        <tr><td colspan="4" class="text-muted">No active tenants on this unit.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

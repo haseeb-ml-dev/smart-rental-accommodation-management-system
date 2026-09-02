@@ -228,14 +228,13 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         public async Task<IActionResult> Settings()
         {
             var settings = await GetOrCreateSettingsAsync();
-            var cities = await _context.SupportedCities.OrderBy(c => c.Name).ToListAsync();
 
             var vm = new SettingsFormViewModel
             {
                 DefaultUtilitySplitMethod = settings.DefaultUtilitySplitMethod,
                 RentReminderDaysBefore = settings.RentReminderDaysBefore,
                 UtilityReminderDaysBefore = settings.UtilityReminderDaysBefore,
-                Cities = cities
+                Cities = await GetCitiesWithAreasAsync()
             };
 
             return View(vm);
@@ -247,7 +246,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         {
             if (!ModelState.IsValid)
             {
-                model.Cities = await _context.SupportedCities.OrderBy(c => c.Name).ToListAsync();
+                model.Cities = await GetCitiesWithAreasAsync();
                 return View(model);
             }
 
@@ -292,6 +291,54 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             }
 
             return RedirectToAction(nameof(Settings));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddArea(int cityId, string name)
+        {
+            var trimmed = name?.Trim();
+            var cityExists = await _context.SupportedCities.AnyAsync(c => c.Id == cityId);
+
+            if (cityExists && !string.IsNullOrEmpty(trimmed))
+            {
+                var exists = await _context.SupportedAreas
+                    .AnyAsync(a => a.SupportedCityId == cityId && a.Name.ToLower() == trimmed.ToLower());
+                if (!exists)
+                {
+                    _context.SupportedAreas.Add(new SupportedArea { SupportedCityId = cityId, Name = trimmed });
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            return RedirectToAction(nameof(Settings));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteArea(int areaId)
+        {
+            var area = await _context.SupportedAreas.FirstOrDefaultAsync(a => a.Id == areaId);
+            if (area != null)
+            {
+                _context.SupportedAreas.Remove(area);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Settings));
+        }
+
+        private async Task<List<CityWithAreasViewModel>> GetCitiesWithAreasAsync()
+        {
+            var cities = await _context.SupportedCities.OrderBy(c => c.Name).ToListAsync();
+            var areas = await _context.SupportedAreas.OrderBy(a => a.Name).ToListAsync();
+
+            return cities.Select(c => new CityWithAreasViewModel
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Areas = areas.Where(a => a.SupportedCityId == c.Id).ToList()
+            }).ToList();
         }
 
         private async Task<AppSetting> GetOrCreateSettingsAsync()

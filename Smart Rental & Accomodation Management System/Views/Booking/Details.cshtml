@@ -28,7 +28,7 @@
                     <div class="d-flex flex-wrap gap-2">
                         @foreach (var image in Model.Images)
                         {
-                            <img src="/uploads/units/@Model.UnitId/@image.FileName" style="width: 10rem; height: 8rem; object-fit: cover;" class="rounded" alt="@Model.UnitName" />
+                            <img src="/uploads/units/@Model.UnitId/@image.FileName" style="width: 10rem; height: 8rem; object-fit: cover; cursor: pointer;" class="rounded photo-thumb" data-full-src="/uploads/units/@Model.UnitId/@image.FileName" alt="@Model.UnitName" />
                         }
                     </div>
                 }
@@ -125,7 +125,31 @@
     </div>
 </div>
 
+<div class="modal fade" id="photoLightbox" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-dark">
+            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close" style="z-index: 1;"></button>
+            <img id="photoLightboxImage" src="" class="w-100" style="max-height: 80vh; object-fit: contain;" alt="Unit photo" />
+        </div>
+    </div>
+</div>
+
 @section Scripts {
+    <script>
+        (function () {
+            var modalEl = document.getElementById('photoLightbox');
+            var modalImage = document.getElementById('photoLightboxImage');
+            if (!modalEl || !modalImage) return;
+
+            var modal = new bootstrap.Modal(modalEl);
+            document.querySelectorAll('.photo-thumb').forEach(function (thumb) {
+                thumb.addEventListener('click', function () {
+                    modalImage.src = thumb.getAttribute('data-full-src');
+                    modal.show();
+                });
+            });
+        })();
+    </script>
     @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
     {
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

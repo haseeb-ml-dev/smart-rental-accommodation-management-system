@@ -24,6 +24,7 @@ namespace Smart_Rental___Accomodation_Management_System.Data
         public DbSet<UnitImage> UnitImages { get; set; } = null!;
         public DbSet<AppSetting> AppSettings { get; set; } = null!;
         public DbSet<SupportedCity> SupportedCities { get; set; } = null!;
+        public DbSet<SupportedArea> SupportedAreas { get; set; } = null!;
         public DbSet<LeaseOccupant> LeaseOccupants { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -124,6 +125,12 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 .HasOne(o => o.Lease)
                 .WithMany(l => l.Occupants)
                 .HasForeignKey(o => o.LeaseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<SupportedArea>()
+                .HasOne(a => a.SupportedCity)
+                .WithMany()
+                .HasForeignKey(a => a.SupportedCityId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

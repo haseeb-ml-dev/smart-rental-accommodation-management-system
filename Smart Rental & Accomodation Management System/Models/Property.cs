@@ -20,6 +20,10 @@ namespace Smart_Rental___Accomodation_Management_System.Models
         [StringLength(100)]
         public string? City { get; set; }
 
+        // Optional — picked from the admin-managed supported-areas list for the chosen City when one is configured.
+        [StringLength(100)]
+        public string? Area { get; set; }
+
         // Populated by GeocodingService from Address; null if geocoding hasn't run yet, failed, or no API key is configured.
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }

@@ -40,6 +40,7 @@ builder.Services.AddHostedService<BillingBackgroundService>();
 builder.Services.AddSingleton<UnitImageStorage>();
 builder.Services.AddSingleton<PaymentSlipStorage>();
 builder.Services.AddHttpClient<GeocodingService>();
+builder.Services.AddScoped<LocationOptionsService>();
 builder.Services.AddSingleton<ReportExportService>();
 builder.Services.Configure<EmailSenderOptions>(builder.Configuration.GetSection("Email"));
 builder.Services.Configure<MailgunOptions>(builder.Configuration.GetSection("Mailgun"));

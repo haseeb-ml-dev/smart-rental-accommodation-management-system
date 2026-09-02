@@ -52,45 +52,47 @@
             <div class="mb-3">
                 <label class="form-label">Active tenants</label>
                 <div class="form-text mb-1">Tenants whose unit has its own meter for the selected bill type are excluded from this shared split automatically.</div>
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>Tenant</th>
-                            <th style="width: 140px;" class="split-col" data-split="@((int)UtilityBillSplitMethod.CustomPercentage)">Percentage</th>
-                            <th style="width: 140px;" class="split-col" data-split="@((int)UtilityBillSplitMethod.PerUnitConsumption)">Units consumed</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (int i = 0; i < Model.Tenants.Count; i++)
-                        {
-                            <tr data-excluded-electricity="@Model.Tenants[i].ExcludedForElectricity.ToString().ToLowerInvariant()"
-                                data-excluded-water="@Model.Tenants[i].ExcludedForWater.ToString().ToLowerInvariant()">
-                                <td>
-                                    @Model.Tenants[i].TenantName
-                                    @if (Model.Tenants[i].ExcludedForElectricity)
-                                    {
-                                        <span class="badge text-bg-light border">⚡ own meter</span>
-                                    }
-                                    @if (Model.Tenants[i].ExcludedForWater)
-                                    {
-                                        <span class="badge text-bg-light border">💧 own meter</span>
-                                    }
-                                    <span class="excluded-note text-muted small d-none">(excluded from this bill: own meter)</span>
-                                    <input type="hidden" asp-for="Tenants[i].TenantId" />
-                                    <input type="hidden" asp-for="Tenants[i].TenantName" />
-                                    <input type="hidden" asp-for="Tenants[i].ExcludedForElectricity" />
-                                    <input type="hidden" asp-for="Tenants[i].ExcludedForWater" />
-                                </td>
-                                <td class="split-col" data-split="@((int)UtilityBillSplitMethod.CustomPercentage)">
-                                    <input asp-for="Tenants[i].Percentage" class="form-control form-control-sm" type="number" step="0.01" />
-                                </td>
-                                <td class="split-col" data-split="@((int)UtilityBillSplitMethod.PerUnitConsumption)">
-                                    <input asp-for="Tenants[i].UnitsConsumed" class="form-control form-control-sm" type="number" step="0.01" />
-                                </td>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Tenant</th>
+                                <th style="width: 140px;" class="split-col" data-split="@((int)UtilityBillSplitMethod.CustomPercentage)">Percentage</th>
+                                <th style="width: 140px;" class="split-col" data-split="@((int)UtilityBillSplitMethod.PerUnitConsumption)">Units consumed</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Tenants.Count; i++)
+                            {
+                                <tr data-excluded-electricity="@Model.Tenants[i].ExcludedForElectricity.ToString().ToLowerInvariant()"
+                                    data-excluded-water="@Model.Tenants[i].ExcludedForWater.ToString().ToLowerInvariant()">
+                                    <td>
+                                        @Model.Tenants[i].TenantName
+                                        @if (Model.Tenants[i].ExcludedForElectricity)
+                                        {
+                                            <span class="badge text-bg-light border">⚡ own meter</span>
+                                        }
+                                        @if (Model.Tenants[i].ExcludedForWater)
+                                        {
+                                            <span class="badge text-bg-light border">💧 own meter</span>
+                                        }
+                                        <span class="excluded-note text-muted small d-none">(excluded from this bill: own meter)</span>
+                                        <input type="hidden" asp-for="Tenants[i].TenantId" />
+                                        <input type="hidden" asp-for="Tenants[i].TenantName" />
+                                        <input type="hidden" asp-for="Tenants[i].ExcludedForElectricity" />
+                                        <input type="hidden" asp-for="Tenants[i].ExcludedForWater" />
+                                    </td>
+                                    <td class="split-col" data-split="@((int)UtilityBillSplitMethod.CustomPercentage)">
+                                        <input asp-for="Tenants[i].Percentage" class="form-control form-control-sm" type="number" step="0.01" />
+                                    </td>
+                                    <td class="split-col" data-split="@((int)UtilityBillSplitMethod.PerUnitConsumption)">
+                                        <input asp-for="Tenants[i].UnitsConsumed" class="form-control form-control-sm" type="number" step="0.01" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <button type="submit" class="btn btn-primary">Save</button>
