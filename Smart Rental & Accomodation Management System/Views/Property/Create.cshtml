@@ -15,7 +15,8 @@
             </div>
             <div class="mb-3">
                 <label asp-for="Address" class="form-label"></label>
-                <input asp-for="Address" class="form-control" />
+                <input asp-for="Address" class="form-control" data-autocomplete="address" placeholder="Start typing an address" />
+                <div class="form-text">Pick a suggestion for the most accurate map placement, or type your own.</div>
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>
             <div class="mb-3">
