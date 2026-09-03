@@ -235,6 +235,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 RentReminderDaysBefore = settings.RentReminderDaysBefore,
                 UtilityReminderDaysBefore = settings.UtilityReminderDaysBefore,
                 MonthlySubscriptionFee = settings.MonthlySubscriptionFee,
+                SubscriptionPaymentInstructions = settings.SubscriptionPaymentInstructions,
                 Cities = await GetCitiesWithAreasAsync()
             };
 
@@ -256,6 +257,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             settings.RentReminderDaysBefore = model.RentReminderDaysBefore;
             settings.UtilityReminderDaysBefore = model.UtilityReminderDaysBefore;
             settings.MonthlySubscriptionFee = model.MonthlySubscriptionFee;
+            settings.SubscriptionPaymentInstructions = string.IsNullOrWhiteSpace(model.SubscriptionPaymentInstructions) ? null : model.SubscriptionPaymentInstructions.Trim();
 
             await _context.SaveChangesAsync();
             TempData["Message"] = "Settings saved.";

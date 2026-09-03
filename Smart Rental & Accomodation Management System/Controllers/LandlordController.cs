@@ -27,6 +27,8 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         {
             var landlordId = _userManager.GetUserId(User)!;
             var today = DateTime.UtcNow.Date;
+            var landlordUser = await _userManager.GetUserAsync(User);
+            var now = DateTime.UtcNow;
 
             var units = await _context.Units
                 .Include(u => u.Property)
@@ -83,6 +85,10 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
 
             vm.OpenMaintenanceRequestCount = await _context.MaintenanceRequests
                 .CountAsync(m => m.Unit!.Property!.LandlordId == landlordId && m.Status != MaintenanceStatus.Resolved);
+
+            vm.IsTrialActive = landlordUser?.TrialEndsAt.HasValue == true && landlordUser.TrialEndsAt.Value > now;
+            vm.IsSubscriptionActive = landlordUser?.SubscriptionActiveUntil.HasValue == true && landlordUser.SubscriptionActiveUntil.Value > now;
+            vm.TrialEndsAt = landlordUser?.TrialEndsAt;
 
             return View(vm);
         }

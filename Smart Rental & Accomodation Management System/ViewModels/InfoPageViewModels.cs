@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using Smart_Rental___Accomodation_Management_System.Models;
 
 namespace Smart_Rental___Accomodation_Management_System.ViewModels
 {
-    public class BlogPostFormViewModel
+    public class InfoPageFormViewModel
     {
         public int Id { get; set; }
 
@@ -17,6 +18,8 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
 
         [Required]
         public string Content { get; set; } = string.Empty;
+
+        public InfoPageCategory Category { get; set; }
 
         [Display(Name = "Published")]
         public bool IsPublished { get; set; }

@@ -96,7 +96,8 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             {
                 UserName = model.Email,
                 Email = model.Email,
-                FullName = model.FullName
+                FullName = model.FullName,
+                TrialEndsAt = model.Role == "Landlord" ? DateTime.UtcNow.AddDays(30) : null
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -348,6 +349,40 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             await _signInManager.RefreshSignInAsync(user);
             TempData["Message"] = "Your password has been changed.";
             return RedirectToAction(nameof(Profile));
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Settings()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            return View(new AccountSettingsViewModel
+            {
+                EmailNotificationsEnabled = user.EmailNotificationsEnabled
+            });
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Settings(AccountSettingsViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            user.EmailNotificationsEnabled = model.EmailNotificationsEnabled;
+            await _userManager.UpdateAsync(user);
+
+            TempData["Message"] = "Your notification preferences have been saved.";
+            return RedirectToAction(nameof(Settings));
         }
 
         private async Task SendEmailConfirmationAsync(ApplicationUser user)

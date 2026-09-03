@@ -38,8 +38,14 @@
                     <div class="mb-3">
                         <label asp-for="MonthlySubscriptionFee" class="form-label"></label>
                         <input asp-for="MonthlySubscriptionFee" class="form-control" type="number" step="0.01" />
-                        <div class="form-text">Shown on the public Pricing page as the landlord subscription fee.</div>
+                        <div class="form-text">Shown to landlords on their Subscription page.</div>
                         <span asp-validation-for="MonthlySubscriptionFee" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="SubscriptionPaymentInstructions" class="form-label"></label>
+                        <textarea asp-for="SubscriptionPaymentInstructions" class="form-control" rows="3" placeholder="e.g. bank account or JazzCash/EasyPaisa number to send payment to"></textarea>
+                        <div class="form-text">Real payment details go here once you have them &mdash; shown verbatim on the landlord Subscription page.</div>
+                        <span asp-validation-for="SubscriptionPaymentInstructions" class="text-danger"></span>
                     </div>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </form>

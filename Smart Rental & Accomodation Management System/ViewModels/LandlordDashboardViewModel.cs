@@ -26,6 +26,10 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
 
         public decimal OutstandingUtilities { get; set; }
         public int OpenMaintenanceRequestCount { get; set; }
+
+        public bool IsTrialActive { get; set; }
+        public bool IsSubscriptionActive { get; set; }
+        public DateTime? TrialEndsAt { get; set; }
     }
 
     public class OverdueTenantGroupViewModel

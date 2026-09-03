@@ -1,11 +1,11 @@
-@model BlogPostFormViewModel
+@model InfoPageFormViewModel
 @{
-    ViewData["Title"] = "Edit Blog Post";
+    ViewData["Title"] = "Edit Resource Page";
 }
 
 <div class="row justify-content-center">
     <div class="col-lg-8">
-        <h1 class="mb-4">Edit Blog Post</h1>
+        <h1 class="mb-4">Edit Resource Page</h1>
         <form asp-action="Edit" method="post">
             <input type="hidden" asp-for="Id" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -20,9 +20,13 @@
                 <span asp-validation-for="Slug" class="text-danger"></span>
             </div>
             <div class="mb-3">
+                <label asp-for="Category" class="form-label"></label>
+                <select asp-for="Category" class="form-select" asp-items="Html.GetEnumSelectList<InfoPageCategory>()"></select>
+            </div>
+            <div class="mb-3">
                 <label asp-for="Excerpt" class="form-label"></label>
                 <textarea asp-for="Excerpt" class="form-control" rows="2"></textarea>
-                <div class="form-text">Shown on the Blog listing card.</div>
+                <div class="form-text">Shown on the Resources listing card.</div>
                 <span asp-validation-for="Excerpt" class="text-danger"></span>
             </div>
             <div class="mb-3">

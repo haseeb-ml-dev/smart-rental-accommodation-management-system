@@ -1,12 +1,12 @@
-@model List<BlogPost>
+@model List<InfoPage>
 @{
-    ViewData["Title"] = "Manage Blog Posts";
+    ViewData["Title"] = "Manage Resources";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Blog Posts</h1>
+    <h1>Resources</h1>
     <div class="d-flex gap-2">
-        <a asp-action="Create" class="btn btn-primary">New Post</a>
+        <a asp-action="Create" class="btn btn-primary">New Page</a>
         <a asp-controller="Admin" asp-action="Index" class="btn btn-link">Back to Dashboard</a>
     </div>
 </div>
@@ -16,18 +16,19 @@
         <thead>
             <tr>
                 <th>Title</th>
+                <th>Category</th>
                 <th>Status</th>
-                <th>Published</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var post in Model)
+            @foreach (var article in Model)
             {
                 <tr>
-                    <td>@post.Title</td>
+                    <td>@article.Title</td>
+                    <td>@article.Category.Humanize()</td>
                     <td>
-                        @if (post.IsPublished)
+                        @if (article.IsPublished)
                         {
                             <span class="badge text-bg-success">Published</span>
                         }
@@ -36,13 +37,12 @@
                             <span class="badge text-bg-secondary">Draft</span>
                         }
                     </td>
-                    <td>@(post.PublishedAt?.ToString("MMM d, yyyy") ?? "—")</td>
                     <td class="text-end">
-                        <a asp-action="Edit" asp-route-id="@post.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <a asp-action="Edit" asp-route-id="@article.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
                         <form asp-action="Delete" method="post" class="d-inline">
-                            <input type="hidden" name="id" value="@post.Id" />
+                            <input type="hidden" name="id" value="@article.Id" />
                             <button type="submit" class="btn btn-sm btn-outline-danger"
-                                    data-confirm-title="Delete this post?"
+                                    data-confirm-title="Delete this page?"
                                     data-confirm-body="This can't be undone.">Delete</button>
                         </form>
                     </td>
@@ -50,7 +50,7 @@
             }
             @if (!Model.Any())
             {
-                <tr><td colspan="4" class="text-muted">No posts yet.</td></tr>
+                <tr><td colspan="4" class="text-muted">No pages yet.</td></tr>
             }
         </tbody>
     </table>

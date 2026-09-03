@@ -33,6 +33,22 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             ViewBag.AreasByCity = await _locationOptions.GetSupportedAreasByCityAsync();
         }
 
+        // Free trial or an active subscription both grant access; only adding a NEW property is
+        // gated on this — existing properties, rent collection, and tenant management stay
+        // available regardless, since that's all that was asked to be gated.
+        private async Task<bool> IsEntitledToAddPropertyAsync()
+        {
+            var landlord = await _userManager.GetUserAsync(User);
+            if (landlord == null)
+            {
+                return false;
+            }
+
+            var now = DateTime.UtcNow;
+            return (landlord.TrialEndsAt.HasValue && landlord.TrialEndsAt.Value > now)
+                || (landlord.SubscriptionActiveUntil.HasValue && landlord.SubscriptionActiveUntil.Value > now);
+        }
+
         public async Task<IActionResult> Index()
         {
             var landlordId = _userManager.GetUserId(User)!;
@@ -49,6 +65,12 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
+            if (!await IsEntitledToAddPropertyAsync())
+            {
+                TempData["Message"] = "Your free trial has ended. Subscribe to add more properties.";
+                return RedirectToAction("Index", "Subscription");
+            }
+
             await PopulateLocationViewBagAsync();
             return View(new PropertyFormViewModel());
         }
@@ -57,6 +79,12 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PropertyFormViewModel model)
         {
+            if (!await IsEntitledToAddPropertyAsync())
+            {
+                TempData["Message"] = "Your free trial has ended. Subscribe to add more properties.";
+                return RedirectToAction("Index", "Subscription");
+            }
+
             if (!ModelState.IsValid)
             {
                 await PopulateLocationViewBagAsync();

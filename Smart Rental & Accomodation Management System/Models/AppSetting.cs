@@ -13,8 +13,12 @@ namespace Smart_Rental___Accomodation_Management_System.Models
         public int RentReminderDaysBefore { get; set; } = 3;
         public int UtilityReminderDaysBefore { get; set; } = 3;
 
-        // Flat monthly subscription fee per landlord account, shown on the public Pricing page.
+        // Flat monthly subscription fee per landlord account, shown on the Subscription page.
         [Column(TypeName = "decimal(10,2)")]
         public decimal MonthlySubscriptionFee { get; set; } = 999m;
+
+        // Real bank/JazzCash/EasyPaisa payment details, shown verbatim on the Subscription page.
+        // Left blank until an admin fills in the real details — never fabricated by the app.
+        public string? SubscriptionPaymentInstructions { get; set; }
     }
 }

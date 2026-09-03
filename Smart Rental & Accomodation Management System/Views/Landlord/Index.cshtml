@@ -15,6 +15,22 @@
     </div>
 </div>
 
+@if (Model.IsTrialActive)
+{
+    var daysLeft = Math.Max(0, (Model.TrialEndsAt!.Value - DateTime.UtcNow).Days);
+    <div class="alert alert-info d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-gift"></i> Free trial &mdash; @daysLeft day@(daysLeft == 1 ? "" : "s") left.</span>
+        <a asp-controller="Subscription" asp-action="Index" class="btn btn-sm btn-outline-primary">View subscription</a>
+    </div>
+}
+else if (!Model.IsSubscriptionActive)
+{
+    <div class="alert alert-danger d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-exclamation-triangle"></i> Your free trial has ended. Subscribe to keep adding properties.</span>
+        <a asp-controller="Subscription" asp-action="Index" class="btn btn-sm btn-primary">Subscribe</a>
+    </div>
+}
+
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
         <div class="stat-tile h-100">

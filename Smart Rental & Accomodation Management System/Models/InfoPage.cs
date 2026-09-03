@@ -2,7 +2,18 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Smart_Rental___Accomodation_Management_System.Models
 {
-    public class BlogPost
+    public enum InfoPageCategory
+    {
+        [Display(Name = "For Landlords")]
+        ForLandlords,
+        [Display(Name = "For Tenants")]
+        ForTenants,
+        [Display(Name = "How It Works")]
+        HowItWorks,
+        General
+    }
+
+    public class InfoPage
     {
         public int Id { get; set; }
 
@@ -18,6 +29,8 @@ namespace Smart_Rental___Accomodation_Management_System.Models
         // Plain text; paragraphs are separated by a blank line and wrapped in <p> at render time.
         [Required]
         public string Content { get; set; } = string.Empty;
+
+        public InfoPageCategory Category { get; set; } = InfoPageCategory.General;
 
         public bool IsPublished { get; set; }
         public DateTime? PublishedAt { get; set; }

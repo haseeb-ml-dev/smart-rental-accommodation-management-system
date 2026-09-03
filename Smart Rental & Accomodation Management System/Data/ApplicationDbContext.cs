@@ -28,7 +28,8 @@ namespace Smart_Rental___Accomodation_Management_System.Data
         public DbSet<LeaseOccupant> LeaseOccupants { get; set; } = null!;
         public DbSet<MaintenanceRequest> MaintenanceRequests { get; set; } = null!;
         public DbSet<PropertyReview> PropertyReviews { get; set; } = null!;
-        public DbSet<BlogPost> BlogPosts { get; set; } = null!;
+        public DbSet<InfoPage> InfoPages { get; set; } = null!;
+        public DbSet<SubscriptionClaim> SubscriptionClaims { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -164,9 +165,15 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 .HasIndex(r => new { r.PropertyId, r.TenantId })
                 .IsUnique();
 
-            builder.Entity<BlogPost>()
-                .HasIndex(b => b.Slug)
+            builder.Entity<InfoPage>()
+                .HasIndex(p => p.Slug)
                 .IsUnique();
+
+            builder.Entity<SubscriptionClaim>()
+                .HasOne(c => c.Landlord)
+                .WithMany()
+                .HasForeignKey(c => c.LandlordId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

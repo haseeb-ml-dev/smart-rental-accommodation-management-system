@@ -17,6 +17,9 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         [Range(0, 100000), Display(Name = "Monthly subscription fee (per landlord account)")]
         public decimal MonthlySubscriptionFee { get; set; }
 
+        [StringLength(1000), Display(Name = "Subscription payment instructions (shown to landlords)")]
+        public string? SubscriptionPaymentInstructions { get; set; }
+
         public List<CityWithAreasViewModel> Cities { get; set; } = new();
     }
 

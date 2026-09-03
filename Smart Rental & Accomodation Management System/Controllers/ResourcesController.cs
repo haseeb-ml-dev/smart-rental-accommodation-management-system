@@ -8,11 +8,11 @@ using Smart_Rental___Accomodation_Management_System.ViewModels;
 
 namespace Smart_Rental___Accomodation_Management_System.Controllers
 {
-    public class BlogController : Controller
+    public class ResourcesController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public BlogController(ApplicationDbContext context)
+        public ResourcesController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -20,68 +20,70 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var posts = await _context.BlogPosts
+            var pages = await _context.InfoPages
                 .Where(p => p.IsPublished)
-                .OrderByDescending(p => p.PublishedAt)
+                .OrderBy(p => p.Category)
+                    .ThenBy(p => p.Title)
                 .ToListAsync();
 
-            return View(posts);
+            return View(pages);
         }
 
         [HttpGet]
         public async Task<IActionResult> Details(string slug)
         {
-            var post = await _context.BlogPosts
+            var page = await _context.InfoPages
                 .FirstOrDefaultAsync(p => p.Slug == slug && p.IsPublished);
 
-            if (post == null)
+            if (page == null)
             {
                 return NotFound();
             }
 
-            return View(post);
+            return View(page);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Manage()
         {
-            var posts = await _context.BlogPosts
+            var pages = await _context.InfoPages
                 .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
 
-            return View(posts);
+            return View(pages);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Create()
         {
-            return View(new BlogPostFormViewModel());
+            return View(new InfoPageFormViewModel());
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(BlogPostFormViewModel model)
+        public async Task<IActionResult> Create(InfoPageFormViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            var post = new BlogPost
+            var page = new InfoPage
             {
                 Title = model.Title.Trim(),
                 Excerpt = model.Excerpt.Trim(),
                 Content = model.Content.Trim(),
+                Category = model.Category,
                 IsPublished = model.IsPublished,
                 PublishedAt = model.IsPublished ? DateTime.UtcNow : null
             };
 
-            post.Slug = await BuildUniqueSlugAsync(string.IsNullOrWhiteSpace(model.Slug) ? model.Title : model.Slug);
+            page.Slug = await BuildUniqueSlugAsync(string.IsNullOrWhiteSpace(model.Slug) ? model.Title : model.Slug);
 
-            _context.BlogPosts.Add(post);
+            _context.InfoPages.Add(page);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Manage));
@@ -91,30 +93,31 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var post = await _context.BlogPosts.FirstOrDefaultAsync(p => p.Id == id);
-            if (post == null)
+            var page = await _context.InfoPages.FirstOrDefaultAsync(p => p.Id == id);
+            if (page == null)
             {
                 return NotFound();
             }
 
-            return View(new BlogPostFormViewModel
+            return View(new InfoPageFormViewModel
             {
-                Id = post.Id,
-                Title = post.Title,
-                Slug = post.Slug,
-                Excerpt = post.Excerpt,
-                Content = post.Content,
-                IsPublished = post.IsPublished
+                Id = page.Id,
+                Title = page.Title,
+                Slug = page.Slug,
+                Excerpt = page.Excerpt,
+                Content = page.Content,
+                Category = page.Category,
+                IsPublished = page.IsPublished
             });
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(BlogPostFormViewModel model)
+        public async Task<IActionResult> Edit(InfoPageFormViewModel model)
         {
-            var post = await _context.BlogPosts.FirstOrDefaultAsync(p => p.Id == model.Id);
-            if (post == null)
+            var page = await _context.InfoPages.FirstOrDefaultAsync(p => p.Id == model.Id);
+            if (page == null)
             {
                 return NotFound();
             }
@@ -125,20 +128,21 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             }
 
             var desiredSlug = string.IsNullOrWhiteSpace(model.Slug) ? model.Title : model.Slug;
-            if (!string.Equals(desiredSlug.Trim(), post.Slug, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(desiredSlug.Trim(), page.Slug, StringComparison.OrdinalIgnoreCase))
             {
-                post.Slug = await BuildUniqueSlugAsync(desiredSlug, post.Id);
+                page.Slug = await BuildUniqueSlugAsync(desiredSlug, page.Id);
             }
 
-            post.Title = model.Title.Trim();
-            post.Excerpt = model.Excerpt.Trim();
-            post.Content = model.Content.Trim();
+            page.Title = model.Title.Trim();
+            page.Excerpt = model.Excerpt.Trim();
+            page.Content = model.Content.Trim();
+            page.Category = model.Category;
 
-            if (model.IsPublished && !post.IsPublished)
+            if (model.IsPublished && !page.IsPublished)
             {
-                post.PublishedAt = DateTime.UtcNow;
+                page.PublishedAt = DateTime.UtcNow;
             }
-            post.IsPublished = model.IsPublished;
+            page.IsPublished = model.IsPublished;
 
             await _context.SaveChangesAsync();
 
@@ -150,10 +154,10 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var post = await _context.BlogPosts.FirstOrDefaultAsync(p => p.Id == id);
-            if (post != null)
+            var page = await _context.InfoPages.FirstOrDefaultAsync(p => p.Id == id);
+            if (page != null)
             {
-                _context.BlogPosts.Remove(post);
+                _context.InfoPages.Remove(page);
                 await _context.SaveChangesAsync();
             }
 
@@ -166,7 +170,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             var slug = baseSlug;
             var suffix = 2;
 
-            while (await _context.BlogPosts.AnyAsync(p => p.Slug == slug && p.Id != excludeId))
+            while (await _context.InfoPages.AnyAsync(p => p.Slug == slug && p.Id != excludeId))
             {
                 slug = $"{baseSlug}-{suffix}";
                 suffix++;
@@ -199,7 +203,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             {
                 slug = slug[..140].Trim('-');
             }
-            return string.IsNullOrEmpty(slug) ? "post" : slug;
+            return string.IsNullOrEmpty(slug) ? "page" : slug;
         }
     }
 }

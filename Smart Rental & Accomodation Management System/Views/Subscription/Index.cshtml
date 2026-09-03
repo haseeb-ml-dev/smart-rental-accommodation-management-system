@@ -1,0 +1,118 @@
+@model SubscriptionStatusViewModel
+@{
+    ViewData["Title"] = "My Subscription";
+}
+
+<h1 class="mb-4">My Subscription</h1>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">@TempData["Message"]</div>
+}
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Status</h5>
+                @if (Model.IsTrialActive)
+                {
+                    var daysLeft = (Model.TrialEndsAt!.Value - DateTime.UtcNow).Days;
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-gift"></i> Free trial &mdash; @Math.Max(0, daysLeft) day@(daysLeft == 1 ? "" : "s") left (until @Model.TrialEndsAt.Value.ToString("MMM d, yyyy")).
+                    </div>
+                }
+                else if (Model.IsSubscriptionActive)
+                {
+                    <div class="alert alert-success mb-0">
+                        <i class="bi bi-check-circle"></i> Active until @Model.SubscriptionActiveUntil!.Value.ToString("MMM d, yyyy").
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-danger mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Your free trial has ended. Subscribe to keep adding properties.
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Subscribe &mdash; Rs. @Model.MonthlyFee.ToString("N0") / month</h5>
+                @if (!string.IsNullOrWhiteSpace(Model.PaymentInstructions))
+                {
+                    <p class="text-muted">@Model.PaymentInstructions</p>
+                }
+                else
+                {
+                    <p class="text-muted">Payment instructions haven't been set up yet — contact support to arrange your subscription payment.</p>
+                }
+
+                @if (Model.PendingClaim != null)
+                {
+                    <div class="alert alert-warning mb-0">
+                        <i class="bi bi-hourglass-split"></i> Awaiting confirmation for your payment claimed on @Model.PendingClaim.ClaimedAt.ToString("MMM d, yyyy").
+                    </div>
+                }
+                else
+                {
+                    <form asp-action="Claim" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label">Receipt (optional)</label>
+                            <input type="file" name="proof" class="form-control" accept="image/jpeg,image/png,application/pdf" />
+                            <div class="form-text">JPG, PNG, or PDF up to 5 MB.</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">I've paid my subscription</button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Payment history</h5>
+                @if (Model.History.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr><th>Date</th><th>Amount</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var claim in Model.History)
+                                {
+                                    <tr>
+                                        <td>@claim.ClaimedAt.ToString("MMM d, yyyy")</td>
+                                        <td>Rs. @claim.Amount.ToString("N0")</td>
+                                        <td>
+                                            @{
+                                                var badgeClass = claim.Status switch
+                                                {
+                                                    SubscriptionClaimStatus.Confirmed => "text-bg-success",
+                                                    SubscriptionClaimStatus.Rejected => "text-bg-danger",
+                                                    _ => "text-bg-warning"
+                                                };
+                                            }
+                                            <span class="badge @badgeClass">@claim.Status.Humanize()</span>
+                                            @if (claim.Status == SubscriptionClaimStatus.Rejected && !string.IsNullOrEmpty(claim.AdminNote))
+                                            {
+                                                <div class="text-muted small">@claim.AdminNote</div>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No payments yet.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

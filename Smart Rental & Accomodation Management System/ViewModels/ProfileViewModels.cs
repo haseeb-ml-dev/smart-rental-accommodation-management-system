@@ -24,4 +24,10 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         [Required, DataType(DataType.Password), Compare(nameof(NewPassword)), Display(Name = "Confirm new password")]
         public string ConfirmNewPassword { get; set; } = string.Empty;
     }
+
+    public class AccountSettingsViewModel
+    {
+        [Display(Name = "Email me reminders (rent, utility bills, disputes, etc.)")]
+        public bool EmailNotificationsEnabled { get; set; } = true;
+    }
 }

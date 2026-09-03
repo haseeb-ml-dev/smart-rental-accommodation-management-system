@@ -1,0 +1,83 @@
+@model List<SubscriptionClaim>
+@{
+    ViewData["Title"] = "Subscriptions";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Subscriptions</h1>
+    <a asp-controller="Admin" asp-action="Index" class="btn btn-link">Back to Dashboard</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Landlord</th>
+                <th>Amount</th>
+                <th>Claimed</th>
+                <th>Receipt</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var claim in Model)
+            {
+                <tr>
+                    <td>@claim.Landlord?.FullName</td>
+                    <td>Rs. @claim.Amount.ToString("N0")</td>
+                    <td>@claim.ClaimedAt.ToString("MMM d, yyyy")</td>
+                    <td>
+                        @if (claim.ProofFileName != null)
+                        {
+                            <a href="/uploads/payment-slips/subscription/@claim.Id/@claim.ProofFileName" target="_blank" rel="noopener">View</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">&mdash;</span>
+                        }
+                    </td>
+                    <td>
+                        @{
+                            var badgeClass = claim.Status switch
+                            {
+                                SubscriptionClaimStatus.Confirmed => "text-bg-success",
+                                SubscriptionClaimStatus.Rejected => "text-bg-danger",
+                                _ => "text-bg-warning"
+                            };
+                        }
+                        <span class="badge @badgeClass">@claim.Status.Humanize()</span>
+                        @if (claim.Status == SubscriptionClaimStatus.Rejected && !string.IsNullOrEmpty(claim.AdminNote))
+                        {
+                            <div class="text-muted small">@claim.AdminNote</div>
+                        }
+                    </td>
+                    <td>
+                        @if (claim.Status == SubscriptionClaimStatus.Pending)
+                        {
+                            <div class="d-flex gap-1">
+                                <form asp-action="Confirm" method="post">
+                                    <input type="hidden" name="id" value="@claim.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-success"
+                                            data-confirm-title="Confirm this payment?"
+                                            data-confirm-body="This extends the landlord's subscription by 30 days and notifies them.">Confirm</button>
+                                </form>
+                                <form asp-action="Reject" method="post" class="d-flex gap-1">
+                                    <input type="hidden" name="id" value="@claim.Id" />
+                                    <input type="text" name="note" class="form-control form-control-sm" placeholder="Reason (optional)" style="width: 140px;" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            data-confirm-title="Reject this claim?"
+                                            data-confirm-body="The landlord will be notified and can submit a new claim.">Reject</button>
+                                </form>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+            @if (!Model.Any())
+            {
+                <tr><td colspan="6" class="text-muted">No subscription claims yet.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

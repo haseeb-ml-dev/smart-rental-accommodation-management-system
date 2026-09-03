@@ -27,7 +27,13 @@ namespace Smart_Rental___Accomodation_Management_System.Models
         [Display(Name = "Maintenance Request Created")]
         MaintenanceRequestCreated,
         [Display(Name = "Maintenance Status Updated")]
-        MaintenanceStatusUpdated
+        MaintenanceStatusUpdated,
+        [Display(Name = "Subscription Payment Claimed")]
+        SubscriptionClaimed,
+        [Display(Name = "Subscription Confirmed")]
+        SubscriptionConfirmed,
+        [Display(Name = "Subscription Rejected")]
+        SubscriptionRejected
     }
 
     public class Notification

@@ -30,9 +30,9 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 await context.SaveChangesAsync();
             }
 
-            if (!await context.BlogPosts.AnyAsync())
+            if (!await context.InfoPages.AnyAsync())
             {
-                await SeedBlogPostsAsync(context);
+                await SeedInfoPagesAsync(context);
             }
 
             if (await context.Properties.AnyAsync())
@@ -136,16 +136,80 @@ namespace Smart_Rental___Accomodation_Management_System.Data
             await context.SaveChangesAsync();
         }
 
-        private static async Task SeedBlogPostsAsync(ApplicationDbContext context)
+        private static async Task SeedInfoPagesAsync(ApplicationDbContext context)
         {
             var now = DateTime.UtcNow;
 
-            var posts = new List<BlogPost>
+            var posts = new List<InfoPage>
             {
+                new()
+                {
+                    Title = "For Landlords",
+                    Slug = "for-landlords",
+                    Category = InfoPageCategory.ForLandlords,
+                    Excerpt = "List unlimited properties, collect rent without chasing it, and manage everything from one dashboard.",
+                    Content = """
+                    RehLe is built for the parts of being a landlord that actually take up your time. List as many properties and units as you manage, with no per-listing fee — one flat monthly subscription covers all of them.
+
+                    Rent collection is built around a simple idea: a paper trail beats a memory. A tenant marks an invoice paid, you confirm it was received, and everything is timestamped. If a payment claim doesn't match what actually came in, you can mark it not received instead, which opens a dispute automatically rather than leaving it as an awkward conversation with no record.
+
+                    Utility bills split automatically — equally, by percentage, or by per-meter consumption — and a tenant with their own meter is excluded from the shared bill without you having to remember to adjust it manually every time.
+
+                    When a tenant reports a maintenance issue, it comes with a description and an optional photo, and you track it through Open, In Progress, and Resolved so nothing falls through the cracks. Booking requests, lease management, tenant reviews, and Excel/PDF reports round out the rest — everything a landlord actually needs, nothing you have to configure to get there.
+
+                    Every new landlord account starts with a 30-day free trial, no card required. After that, a small flat monthly subscription keeps everything running.
+                    """,
+                    IsPublished = true,
+                    PublishedAt = now.AddDays(-2),
+                    CreatedAt = now.AddDays(-2)
+                },
+                new()
+                {
+                    Title = "For Tenants",
+                    Slug = "for-tenants",
+                    Category = InfoPageCategory.ForTenants,
+                    Excerpt = "Search by city and area, see the exact location on a map, and pay rent without the awkward reminders.",
+                    Content = """
+                    Finding a place shouldn't mean scrolling through listings with no real filtering. RehLe lets you search by city and then narrow down to the specific area you actually want, with the exact location shown on a map before you ever contact the landlord — not just a vague neighborhood name.
+
+                    Every listing shows real availability, monthly rent, unit type, and — where tenants have actually lived there before — a rating and reviews, so you're not going in blind.
+
+                    Once you've moved in, rent and utility payments happen the same way: you mark a payment made, your landlord confirms it, and if something doesn't match, either side can raise it as a dispute instead of it just sitting unresolved. If you split a place with roommates, utility bills are divided fairly — equally, by percentage, or by actual per-meter usage.
+
+                    If something breaks, you can report it with a photo and a description, and track it through to resolved instead of wondering whether the landlord even saw your message.
+
+                    It's completely free for tenants — no account fee, no per-payment charge, nothing hidden.
+                    """,
+                    IsPublished = true,
+                    PublishedAt = now.AddDays(-2),
+                    CreatedAt = now.AddDays(-2)
+                },
+                new()
+                {
+                    Title = "How It Works",
+                    Slug = "how-it-works",
+                    Category = InfoPageCategory.HowItWorks,
+                    Excerpt = "From listing to move-in to rent day — how a lease actually flows through RehLe.",
+                    Content = """
+                    A landlord starts by adding a property and its units — private rooms, shared rooms, or full family units — with rent, capacity, and photos. Addresses are geocoded automatically, and the pin can be dragged to correct it if the automatic placement is slightly off.
+
+                    A tenant searches by city and area, filters by rent and unit type, and requests to book a unit that's available. The landlord reviews the request and approves or rejects it — approving automatically creates the lease.
+
+                    From there, rent invoices are generated on a schedule, with due-soon and overdue reminders sent automatically. The tenant marks a payment made, the landlord confirms it, and the whole history is kept — including any disputes and how they were resolved.
+
+                    Utility bills, when there are any, get split across active tenants using whichever method the landlord chooses. Maintenance issues get reported with photos and tracked through to resolved. And once a tenant's lease has run its course, they can leave a review that shows up for the next person considering that property.
+
+                    Every step generates a notification — in-app always, by email if you haven't turned that off in Settings — so nothing depends on someone remembering to check.
+                    """,
+                    IsPublished = true,
+                    PublishedAt = now.AddDays(-2),
+                    CreatedAt = now.AddDays(-2)
+                },
                 new()
                 {
                     Title = "5 Ways to Find Reliable Tenants as a First-Time Landlord",
                     Slug = "finding-reliable-tenants-first-time-landlord",
+                    Category = InfoPageCategory.ForLandlords,
                     Excerpt = "Screening well before you sign a lease saves you months of stress later. Here's what actually works.",
                     Content = """
                     Most landlord horror stories don't start with a bad tenant — they start with skipping the screening step because a vacant unit feels like it's losing money every day it sits empty. It's tempting to take the first applicant who seems reasonable. Resist it. A few extra days of vacancy is cheaper than months of chasing rent or repairing damage.
@@ -166,6 +230,7 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 {
                     Title = "Understanding Your Rent Agreement: What to Check Before Signing",
                     Slug = "understanding-rent-agreement-before-signing",
+                    Category = InfoPageCategory.ForTenants,
                     Excerpt = "A rent agreement protects both sides — but only if you actually read it first. Here's what to look for.",
                     Content = """
                     It's easy to skim a rent agreement, sign it, and move in the same day. Most of the time that's fine. The problem shows up later, when something goes wrong and neither side remembers what was actually agreed.
@@ -186,6 +251,7 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 {
                     Title = "Splitting Shared Utility Bills Fairly in a Shared Home",
                     Slug = "splitting-shared-utility-bills-fairly",
+                    Category = InfoPageCategory.General,
                     Excerpt = "Equal split, percentage split, or per-meter — which one is actually fair for your household?",
                     Content = """
                     Utility bills are the single most common source of friction in a shared house, and it's usually not about the money — it's about the split feeling unfair. Getting the method right upfront avoids most of the arguments later.
@@ -206,6 +272,7 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 {
                     Title = "Getting Your Security Deposit Back: A Tenant's Checklist",
                     Slug = "getting-security-deposit-back-checklist",
+                    Category = InfoPageCategory.ForTenants,
                     Excerpt = "Most deposit disputes come down to documentation. Do these things on move-in day, not move-out day.",
                     Content = """
                     Deposit disputes almost always come down to the same question: was this damage already there, or did the tenant cause it? Whoever has proof wins that argument, and proof only exists if you collected it before it mattered.
@@ -226,6 +293,7 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 {
                     Title = "Why Digital Rent Collection Beats Cash and Bank Transfers",
                     Slug = "digital-rent-collection-beats-cash",
+                    Category = InfoPageCategory.ForLandlords,
                     Excerpt = "Cash gets lost, bank transfers get \"forgotten.\" Here's why a paper trail matters for both sides.",
                     Content = """
                     Cash is still how a lot of rent gets paid, and it works fine right up until there's a disagreement about whether it was paid at all. No receipt, no record, and it comes down to one person's word against another's.
@@ -246,6 +314,7 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 {
                     Title = "Choosing the Right Area When You're Renting in a New City",
                     Slug = "choosing-the-right-area-renting-new-city",
+                    Category = InfoPageCategory.ForTenants,
                     Excerpt = "Rent isn't the only cost of a location. Here's what to actually weigh before you commit.",
                     Content = """
                     The cheapest listing in a city is rarely the cheapest place to actually live, once you factor in everything around it. Before committing to a unit, it's worth stepping back and looking at the area, not just the price.
@@ -264,7 +333,7 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 }
             };
 
-            context.BlogPosts.AddRange(posts);
+            context.InfoPages.AddRange(posts);
             await context.SaveChangesAsync();
         }
 

@@ -80,7 +80,7 @@ namespace Smart_Rental___Accomodation_Management_System.Services
                     LinkAction = "Index",
                     RelatedEntityId = invoice.Id
                 });
-                await TrySendEmailAsync(lease.Tenant?.Email, "Rent overdue", tenantMessage);
+                await TrySendEmailAsync(lease.Tenant, "Rent overdue", tenantMessage);
 
                 var landlord = lease.Unit?.Property?.Landlord;
                 if (landlord != null)
@@ -95,7 +95,7 @@ namespace Smart_Rental___Accomodation_Management_System.Services
                         LinkAction = "OverdueTenants",
                         RelatedEntityId = invoice.Id
                     });
-                    await TrySendEmailAsync(landlord.Email, "Tenant rent overdue", landlordMessage);
+                    await TrySendEmailAsync(landlord, "Tenant rent overdue", landlordMessage);
                 }
             }
 
@@ -138,7 +138,7 @@ namespace Smart_Rental___Accomodation_Management_System.Services
                     LinkAction = "Index",
                     RelatedEntityId = invoice.Id
                 });
-                await TrySendEmailAsync(invoice.Lease!.Tenant?.Email, "Rent due soon", message);
+                await TrySendEmailAsync(invoice.Lease!.Tenant, "Rent due soon", message);
             }
 
             if (upcomingInvoices.Count > 0)
@@ -185,7 +185,7 @@ namespace Smart_Rental___Accomodation_Management_System.Services
                     LinkAction = "Index",
                     RelatedEntityId = share.Id
                 });
-                await TrySendEmailAsync(share.Tenant?.Email, isOverdue ? "Utility bill overdue" : "Utility bill due soon", message);
+                await TrySendEmailAsync(share.Tenant, isOverdue ? "Utility bill overdue" : "Utility bill due soon", message);
             }
 
             if (unpaidShares.Count > 0)
@@ -196,15 +196,16 @@ namespace Smart_Rental___Accomodation_Management_System.Services
 
         // A missing/unconfigured email address must never break the reminder pass — the in-app
         // notification above already covers it, and IEmailSender itself logs instead of throwing
-        // when no SMTP host is configured.
-        private async Task TrySendEmailAsync(string? toEmail, string subject, string message)
+        // when no SMTP host is configured. Also skips entirely when the recipient has opted out
+        // via Account/Settings — the in-app notification still went out regardless.
+        private async Task TrySendEmailAsync(ApplicationUser? recipient, string subject, string message)
         {
-            if (string.IsNullOrWhiteSpace(toEmail))
+            if (recipient == null || !recipient.EmailNotificationsEnabled || string.IsNullOrWhiteSpace(recipient.Email))
             {
                 return;
             }
 
-            await _emailSender.SendEmailAsync(toEmail, subject, message);
+            await _emailSender.SendEmailAsync(recipient.Email, subject, message);
         }
 
         // Falls back to the model defaults if the singleton settings row is somehow missing —
