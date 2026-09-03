@@ -10,6 +10,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] &middot; RehLe</title>
     <script type="importmap"></script>
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico" asp-append-version="true" />
+    <link rel="icon" type="image/png" sizes="32x32" href="~/favicon-32x32.png" asp-append-version="true" />
+    <link rel="icon" type="image/png" sizes="16x16" href="~/favicon-16x16.png" asp-append-version="true" />
+    <link rel="apple-touch-icon" sizes="180x180" href="~/apple-touch-icon.png" asp-append-version="true" />
+    <link rel="manifest" href="~/site.webmanifest" asp-append-version="true" />
+    <meta name="theme-color" content="#4f46e5" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -24,8 +30,9 @@
             <div class="container-fluid">
                 <a class="navbar-brand brand-mark" asp-area="" asp-controller="Home" asp-action="Index">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 10.5 12 3l9 7.5" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <rect x="1" y="1" width="22" height="22" rx="6" fill="var(--brand)" />
+                        <path d="M12 5 18 10.2V18H6v-7.8Z" fill="#ffffff" />
+                        <rect x="10" y="13" width="4" height="5" rx="1" fill="var(--brand)" />
                     </svg>
                     RehLe
                 </a>
@@ -53,29 +60,40 @@
                                 <a class="@navClass("Home", "Pricing")" asp-area="" asp-controller="Home" asp-action="Pricing">Pricing</a>
                             </li>
                         }
+                        @{
+                            var showLandlordFeatures = !User.IsInRole("Tenant");
+                            var showTenantFeatures = !User.IsInRole("Landlord");
+                            var featureColClass = showLandlordFeatures && showTenantFeatures ? "col-6" : "col-12";
+                        }
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Features
                             </a>
                             <div class="dropdown-menu mega-dropdown">
                                 <div class="row g-3">
-                                    <div class="col-6">
-                                        <div class="mega-dropdown-group">
-                                            <a class="dropdown-item mega-dropdown-heading text-decoration-none" asp-controller="Resources" asp-action="Details" asp-route-slug="for-landlords">For Landlords</a>
-                                            <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="property-listings">Property Listings</a>
-                                            <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="rent-collection">Rent Collection</a>
-                                            <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="utility-bill-splitting">Utility Bill Splitting</a>
-                                            <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="maintenance-tracking">Maintenance Tracking</a>
+                                    @if (showLandlordFeatures)
+                                    {
+                                        <div class="@featureColClass">
+                                            <div class="mega-dropdown-group">
+                                                <a class="dropdown-item mega-dropdown-heading text-decoration-none" asp-controller="Resources" asp-action="Details" asp-route-slug="for-landlords">For Landlords</a>
+                                                <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="property-listings">Property Listings</a>
+                                                <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="rent-collection">Rent Collection</a>
+                                                <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="utility-bill-splitting">Utility Bill Splitting</a>
+                                                <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="maintenance-tracking">Maintenance Tracking</a>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="mega-dropdown-group">
-                                            <a class="dropdown-item mega-dropdown-heading text-decoration-none" asp-controller="Resources" asp-action="Details" asp-route-slug="for-tenants">For Tenants</a>
-                                            <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="search-and-booking">Search &amp; Booking</a>
-                                            <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="rent-payments">Rent Payments</a>
-                                            <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="reviews-and-ratings">Reviews &amp; Ratings</a>
+                                    }
+                                    @if (showTenantFeatures)
+                                    {
+                                        <div class="@featureColClass">
+                                            <div class="mega-dropdown-group">
+                                                <a class="dropdown-item mega-dropdown-heading text-decoration-none" asp-controller="Resources" asp-action="Details" asp-route-slug="for-tenants">For Tenants</a>
+                                                <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="search-and-booking">Search &amp; Booking</a>
+                                                <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="rent-payments">Rent Payments</a>
+                                                <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="reviews-and-ratings">Reviews &amp; Ratings</a>
+                                            </div>
                                         </div>
-                                    </div>
+                                    }
                                 </div>
                                 <hr class="dropdown-divider" />
                                 <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="how-it-works">How It Works</a>
@@ -172,9 +190,84 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="site-footer border-top">
         <div class="container">
-            &copy; @DateTime.Now.Year RehLe &middot; <a asp-area="" asp-controller="Resources" asp-action="Index">Features</a> &middot; <a asp-area="" asp-controller="Home" asp-action="Pricing">Pricing</a> &middot; <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row g-4 footer-top">
+                <div class="col-lg-4 col-md-12">
+                    <a class="footer-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="1" y="1" width="22" height="22" rx="6" fill="var(--brand)" />
+                            <path d="M12 5 18 10.2V18H6v-7.8Z" fill="#ffffff" />
+                            <rect x="10" y="13" width="4" height="5" rx="1" fill="var(--brand)" />
+                        </svg>
+                        RehLe
+                    </a>
+                    <p class="footer-tagline">One flat monthly price, unlimited properties. Rent collection, utility splitting, maintenance tracking, and bookings &mdash; all in one place.</p>
+                </div>
+                <div class="col-6 col-md-3 col-lg-2">
+                    <h6 class="footer-heading">Product</h6>
+                    <ul class="footer-links">
+                        <li><a asp-area="" asp-controller="Home" asp-action="Listings">Browse Listings</a></li>
+                        <li><a asp-area="" asp-controller="Home" asp-action="Pricing">Pricing</a></li>
+                        <li><a asp-area="" asp-controller="Resources" asp-action="Index">Features</a></li>
+                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="how-it-works">How It Works</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-md-3 col-lg-2">
+                    <h6 class="footer-heading">For Landlords</h6>
+                    <ul class="footer-links">
+                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="for-landlords">Overview</a></li>
+                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="property-listings">Property Listings</a></li>
+                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="rent-collection">Rent Collection</a></li>
+                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="utility-bill-splitting">Utility Bill Splitting</a></li>
+                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="maintenance-tracking">Maintenance Tracking</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-md-3 col-lg-2">
+                    <h6 class="footer-heading">For Tenants</h6>
+                    <ul class="footer-links">
+                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="for-tenants">Overview</a></li>
+                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="search-and-booking">Search &amp; Booking</a></li>
+                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="rent-payments">Rent Payments</a></li>
+                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="reviews-and-ratings">Reviews &amp; Ratings</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-md-3 col-lg-2">
+                    <h6 class="footer-heading">Account</h6>
+                    <ul class="footer-links">
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            @if (User.IsInRole("Landlord"))
+                            {
+                                <li><a asp-area="" asp-controller="Landlord" asp-action="Index">Dashboard</a></li>
+                            }
+                            else if (User.IsInRole("Tenant"))
+                            {
+                                <li><a asp-area="" asp-controller="Tenant" asp-action="Index">Dashboard</a></li>
+                            }
+                            else if (User.IsInRole("Admin"))
+                            {
+                                <li><a asp-area="" asp-controller="Admin" asp-action="Index">Dashboard</a></li>
+                            }
+                            <li><a asp-area="" asp-controller="Account" asp-action="Profile">Profile</a></li>
+                        }
+                        else
+                        {
+                            <li><a asp-area="" asp-controller="Account" asp-action="Login">Login</a></li>
+                            <li><a asp-area="" asp-controller="Account" asp-action="Register">Register</a></li>
+                        }
+                        <li><a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; @DateTime.Now.Year RehLe. All rights reserved.</span>
+                <span class="footer-bottom-links">
+                    <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                    <a asp-area="" asp-controller="Home" asp-action="Pricing">Pricing</a>
+                    <a asp-area="" asp-controller="Resources" asp-action="Index">Features</a>
+                </span>
+            </div>
         </div>
     </footer>
 

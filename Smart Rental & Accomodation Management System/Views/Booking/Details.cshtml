@@ -200,7 +200,7 @@
                 var months = Math.max(1, Math.ceil(days / 30.4375));
                 var total = months * monthlyRent;
 
-                valueEl.textContent = '$' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' (~' + months + ' month' + (months === 1 ? '' : 's') + ')';
+                valueEl.textContent = 'Rs. ' + total.toLocaleString('en-US', { maximumFractionDigits: 0 }) + ' (~' + months + ' month' + (months === 1 ? '' : 's') + ')';
                 box.classList.remove('d-none');
             }
 

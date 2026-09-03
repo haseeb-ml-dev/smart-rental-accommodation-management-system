@@ -35,6 +35,11 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 await SeedInfoPagesAsync(context);
             }
 
+            if (!await context.SupportedCities.AnyAsync())
+            {
+                await SeedLocationsAsync(context);
+            }
+
             if (await context.Properties.AnyAsync())
             {
                 return;
@@ -134,6 +139,33 @@ namespace Smart_Rental___Accomodation_Management_System.Data
             };
             context.MessFeedbacks.AddRange(feedback);
             await context.SaveChangesAsync();
+        }
+
+        private static async Task SeedLocationsAsync(ApplicationDbContext context)
+        {
+            var citiesWithAreas = new Dictionary<string, string[]>
+            {
+                ["Karachi"] = new[] { "Clifton", "DHA", "Gulshan-e-Iqbal", "North Nazimabad", "Saddar", "Malir" },
+                ["Lahore"] = new[] { "Gulberg", "DHA", "Johar Town", "Model Town", "Bahria Town", "Cantt" },
+                ["Islamabad"] = new[] { "F-6", "F-7", "F-8", "G-9", "G-11", "Bahria Town" },
+                ["Rawalpindi"] = new[] { "Saddar", "Bahria Town", "Satellite Town", "Cantt" },
+                ["Faisalabad"] = new[] { "Madina Town", "Peoples Colony", "Susan Road", "D Ground" },
+                ["Multan"] = new[] { "Cantt", "Gulgasht Colony", "Shah Rukn-e-Alam", "Model Town" },
+                ["Peshawar"] = new[] { "University Town", "Hayatabad", "Cantt", "Gulbahar" },
+                ["Quetta"] = new[] { "Cantt", "Jinnah Town", "Satellite Town" },
+                ["Sialkot"] = new[] { "Cantt", "Model Town", "Paris Road" },
+                ["Hyderabad"] = new[] { "Latifabad", "Qasimabad", "Cantt" }
+            };
+
+            foreach (var (cityName, areaNames) in citiesWithAreas)
+            {
+                var city = new SupportedCity { Name = cityName };
+                context.SupportedCities.Add(city);
+                await context.SaveChangesAsync();
+
+                context.SupportedAreas.AddRange(areaNames.Select(a => new SupportedArea { SupportedCityId = city.Id, Name = a }));
+                await context.SaveChangesAsync();
+            }
         }
 
         private static async Task SeedInfoPagesAsync(ApplicationDbContext context)

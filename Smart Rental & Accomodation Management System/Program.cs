@@ -8,6 +8,14 @@ using Smart_Rental___Accomodation_Management_System.Services;
 
 QuestPDF.Settings.License = LicenseType.Community;
 
+// The app only ever displays amounts in Pakistani Rupees, so bake that into the process-wide
+// currency culture rather than passing a format string through every ToString("C") call site.
+var pkrCulture = (System.Globalization.CultureInfo)System.Globalization.CultureInfo.GetCultureInfo("en-US").Clone();
+pkrCulture.NumberFormat.CurrencySymbol = "Rs. ";
+pkrCulture.NumberFormat.CurrencyDecimalDigits = 0;
+System.Globalization.CultureInfo.DefaultThreadCurrentCulture = pkrCulture;
+System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = pkrCulture;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

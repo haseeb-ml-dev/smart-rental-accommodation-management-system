@@ -11,10 +11,20 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
     public class ResourcesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _environment;
 
-        public ResourcesController(ApplicationDbContext context)
+        public ResourcesController(ApplicationDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
+            _environment = environment;
+        }
+
+        // Every seeded feature page has a hand-drawn illustration at wwwroot/images/features/{slug}.svg;
+        // a page created later through Admin > Manage falls back to a generic one instead of a broken image.
+        private string ResolveHeroImage(string slug)
+        {
+            var path = Path.Combine(_environment.WebRootPath, "images", "features", $"{slug}.svg");
+            return System.IO.File.Exists(path) ? $"/images/features/{slug}.svg" : "/images/features/default.svg";
         }
 
         [HttpGet]
@@ -25,6 +35,17 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 .OrderBy(p => p.Category)
                     .ThenBy(p => p.Title)
                 .ToListAsync();
+
+            if (User.IsInRole("Landlord"))
+            {
+                pages = pages.Where(p => p.Category is InfoPageCategory.ForLandlords or InfoPageCategory.HowItWorks).ToList();
+            }
+            else if (User.IsInRole("Tenant"))
+            {
+                pages = pages.Where(p => p.Category is InfoPageCategory.ForTenants or InfoPageCategory.HowItWorks).ToList();
+            }
+
+            ViewBag.HeroImages = pages.ToDictionary(p => p.Slug, p => ResolveHeroImage(p.Slug));
 
             return View(pages);
         }
@@ -40,7 +61,63 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 return NotFound();
             }
 
+            var cta = GetFeatureCta(page.Slug);
+            ViewBag.CtaController = cta?.Controller;
+            ViewBag.CtaAction = cta?.Action;
+            ViewBag.CtaText = cta?.Text;
+            ViewBag.HeroImage = ResolveHeroImage(page.Slug);
+
             return View(page);
+        }
+
+        private (string Controller, string Action, string Text)? GetFeatureCta(string slug)
+        {
+            var isLandlord = User.IsInRole("Landlord");
+            var isTenant = User.IsInRole("Tenant");
+            var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+
+            return slug switch
+            {
+                "for-landlords" => isLandlord
+                    ? ("Landlord", "Index", "Go to your dashboard")
+                    : !isAuthenticated ? ("Account", "Register", "Get started as a landlord") : null,
+
+                "for-tenants" => isTenant
+                    ? ("Tenant", "Index", "Go to your dashboard")
+                    : !isAuthenticated ? ("Account", "Register", "Get started as a tenant") : null,
+
+                "how-it-works" => isLandlord ? ("Landlord", "Index", "Go to your dashboard")
+                    : isTenant ? ("Booking", "Browse", "Browse & book a place")
+                    : !isAuthenticated ? ("Account", "Register", "Get started") : null,
+
+                "property-listings" => isLandlord
+                    ? ("Property", "Index", "Manage your properties")
+                    : ("Home", "Listings", "Browse listings"),
+
+                "rent-collection" => isLandlord ? ("Landlord", "Index", "Go to your dashboard")
+                    : isTenant ? ("Tenant", "Index", "Go to your dashboard")
+                    : ("Account", "Register", "Get started as a landlord"),
+
+                "utility-bill-splitting" => isLandlord ? ("UtilityBill", "Index", "Manage utility bills")
+                    : isTenant ? ("Tenant", "Index", "Go to your dashboard")
+                    : ("Account", "Register", "Get started"),
+
+                "maintenance-tracking" => isLandlord ? ("Maintenance", "Index", "View maintenance requests")
+                    : isTenant ? ("Maintenance", "MyRequests", "Report an issue")
+                    : ("Account", "Register", "Get started"),
+
+                "search-and-booking" => isTenant ? ("Booking", "Browse", "Browse & book a place")
+                    : isLandlord ? null : ("Home", "Listings", "Browse listings"),
+
+                "rent-payments" => isTenant ? ("Tenant", "Index", "Go to your dashboard")
+                    : isLandlord ? ("Landlord", "Index", "Go to your dashboard")
+                    : ("Account", "Register", "Get started as a tenant"),
+
+                "reviews-and-ratings" => isTenant ? ("Review", "MyReviews", "View your reviews")
+                    : isLandlord ? null : ("Home", "Listings", "Browse listings"),
+
+                _ => null
+            };
         }
 
         [Authorize(Roles = "Admin")]
