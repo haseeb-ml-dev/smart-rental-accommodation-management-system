@@ -34,4 +34,10 @@ namespace Smart_Rental___Accomodation_Management_System.ViewModels
         public int PageSize { get; set; }
         public int TotalPages => PageSize == 0 ? 0 : (int)Math.Ceiling(TotalCount / (double)PageSize);
     }
+
+    public class HomeStatsViewModel
+    {
+        public int TotalUnits { get; set; }
+        public int TotalCities { get; set; }
+    }
 }

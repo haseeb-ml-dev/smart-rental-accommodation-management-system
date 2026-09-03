@@ -207,20 +207,16 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 },
                 new()
                 {
-                    Title = "5 Ways to Find Reliable Tenants as a First-Time Landlord",
-                    Slug = "finding-reliable-tenants-first-time-landlord",
+                    Title = "Property Listings",
+                    Slug = "property-listings",
                     Category = InfoPageCategory.ForLandlords,
-                    Excerpt = "Screening well before you sign a lease saves you months of stress later. Here's what actually works.",
+                    Excerpt = "List unlimited properties and units, with photos, exact map locations, and no per-listing fee.",
                     Content = """
-                    Most landlord horror stories don't start with a bad tenant — they start with skipping the screening step because a vacant unit feels like it's losing money every day it sits empty. It's tempting to take the first applicant who seems reasonable. Resist it. A few extra days of vacancy is cheaper than months of chasing rent or repairing damage.
+                    Add as many properties and units as you manage — private rooms, shared rooms, or full family units — for one flat monthly price, not a fee per listing.
 
-                    Start by asking for proof of income, not just a number they tell you. A recent salary slip or bank statement showing regular deposits tells you far more than a verbal promise. As a rule of thumb, monthly rent shouldn't be more than a third of the tenant's take-home income — if it is, they're more likely to fall behind eventually.
+                    Each unit gets its own photos, rent, capacity, and availability. Addresses are geocoded automatically, and the pin can be dragged to correct it if the automatic placement is slightly off, so tenants see the exact location before they ever contact you.
 
-                    Call their current or previous landlord if you can. People are usually honest about someone else's tenant when they're not trying to get rid of them. Ask directly: did they pay on time, did they take care of the place, would you rent to them again.
-
-                    Meet in person before handing over keys, even if everything else has been over the phone. It's a simple step that filters out a surprising number of problem situations early, and it lets you set expectations face to face about rent due dates, house rules, and how maintenance requests get reported.
-
-                    Finally, put everything in writing. A verbal agreement about move-in date, deposit amount, or what's included isn't an agreement at all once there's a disagreement. RehLe keeps every lease, invoice, and message tied to the unit, so neither side has to rely on memory.
+                    Delist a property when it's no longer available and bring it back later without losing its history, reviews, or past leases.
                     """,
                     IsPublished = true,
                     PublishedAt = now.AddDays(-21),
@@ -228,41 +224,50 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 },
                 new()
                 {
-                    Title = "Understanding Your Rent Agreement: What to Check Before Signing",
-                    Slug = "understanding-rent-agreement-before-signing",
-                    Category = InfoPageCategory.ForTenants,
-                    Excerpt = "A rent agreement protects both sides — but only if you actually read it first. Here's what to look for.",
+                    Title = "Rent Collection",
+                    Slug = "rent-collection",
+                    Category = InfoPageCategory.ForLandlords,
+                    Excerpt = "A tenant marks a payment made, you confirm it, and every payment is timestamped — no more chasing.",
                     Content = """
-                    It's easy to skim a rent agreement, sign it, and move in the same day. Most of the time that's fine. The problem shows up later, when something goes wrong and neither side remembers what was actually agreed.
+                    Rent invoices are generated on a schedule, with due-soon and overdue reminders sent automatically so you don't have to send an awkward message every month.
 
-                    Check the rent amount and due date first, and make sure they match what you were verbally told. Then look for how the deposit is described — how much it is, and more importantly, the conditions under which it gets returned. Vague language like "subject to condition of the property" is worth clarifying before you sign, not after you move out.
+                    A tenant marks an invoice paid, optionally attaching a payment slip, and you confirm it was received. If something doesn't match, you mark it not received instead, which opens a dispute automatically rather than leaving it as an unresolved conversation.
 
-                    Look for who's responsible for what: routine maintenance, utility bills, and any shared spaces. If the unit has its own electricity or water meter, that should be reflected in how bills are split, so you're not paying a share of a neighbor's usage.
-
-                    Notice periods matter more than people think. Know how much notice you need to give before moving out, and how much notice a landlord owes you before ending the lease. These numbers are often different, and it's worth knowing both before you need them.
-
-                    None of this is about distrust — it's about making sure two people's memory of a conversation months ago doesn't become the basis for a dispute. Read it, ask questions about anything unclear, and keep a copy.
+                    Every payment, confirmation, and dispute is kept on record, tied to the tenant and the unit.
                     """,
                     IsPublished = true,
-                    PublishedAt = now.AddDays(-15),
-                    CreatedAt = now.AddDays(-15)
+                    PublishedAt = now.AddDays(-18),
+                    CreatedAt = now.AddDays(-18)
                 },
                 new()
                 {
-                    Title = "Splitting Shared Utility Bills Fairly in a Shared Home",
-                    Slug = "splitting-shared-utility-bills-fairly",
-                    Category = InfoPageCategory.General,
-                    Excerpt = "Equal split, percentage split, or per-meter — which one is actually fair for your household?",
+                    Title = "Utility Bill Splitting",
+                    Slug = "utility-bill-splitting",
+                    Category = InfoPageCategory.ForLandlords,
+                    Excerpt = "Equal split, percentage split, or per-meter — choose how shared utility bills are divided.",
                     Content = """
-                    Utility bills are the single most common source of friction in a shared house, and it's usually not about the money — it's about the split feeling unfair. Getting the method right upfront avoids most of the arguments later.
+                    Split a utility bill across your tenants equally, by a custom percentage per unit, or by actual per-meter consumption — whichever fits how the property is set up.
 
-                    An equal split is the simplest: divide the bill evenly across everyone sharing it. It works well when usage is genuinely similar, like a small shared flat where everyone's around the same amount during the day.
+                    A tenant with their own individual meter is automatically excluded from the shared building bill, so nobody pays for someone else's usage by mistake.
 
-                    A percentage split makes sense when rooms differ in size or occupancy — a family unit with four people shouldn't necessarily pay the same electricity share as a single occupant in a private room next door. Agreeing on the percentages once, upfront, avoids re-negotiating every month.
+                    Like rent, each tenant's share is marked paid and confirmed the same way, with the same dispute path if something doesn't add up.
+                    """,
+                    IsPublished = true,
+                    PublishedAt = now.AddDays(-14),
+                    CreatedAt = now.AddDays(-14)
+                },
+                new()
+                {
+                    Title = "Maintenance Tracking",
+                    Slug = "maintenance-tracking",
+                    Category = InfoPageCategory.ForLandlords,
+                    Excerpt = "Tenants report issues with a photo and description; you track them through to resolved.",
+                    Content = """
+                    When something breaks, a tenant reports it with a description and an optional photo — no more messages that get lost in a chat thread.
 
-                    Per-meter consumption is the fairest option when it's available, since it charges people for what they actually used rather than an estimate. It takes a bit more setup, but it removes the "why am I paying for their air conditioner" argument entirely.
+                    You track each request through Open, In Progress, and Resolved, so both sides can see where things stand without asking.
 
-                    One detail that's easy to miss: if a unit has its own individual meter, it shouldn't be included in the shared building bill at all. RehLe checks for this automatically when a bill is split, so a tenant with their own meter isn't double-charged.
+                    Nothing here requires a separate app or spreadsheet — it's tied directly to the unit and the tenant who reported it.
                     """,
                     IsPublished = true,
                     PublishedAt = now.AddDays(-10),
@@ -270,20 +275,33 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 },
                 new()
                 {
-                    Title = "Getting Your Security Deposit Back: A Tenant's Checklist",
-                    Slug = "getting-security-deposit-back-checklist",
+                    Title = "Search & Booking",
+                    Slug = "search-and-booking",
                     Category = InfoPageCategory.ForTenants,
-                    Excerpt = "Most deposit disputes come down to documentation. Do these things on move-in day, not move-out day.",
+                    Excerpt = "Search by city, narrow down to the area you want, and see the exact location on a map.",
                     Content = """
-                    Deposit disputes almost always come down to the same question: was this damage already there, or did the tenant cause it? Whoever has proof wins that argument, and proof only exists if you collected it before it mattered.
+                    Search by city, then filter down to the specific area, rent range, and unit type you actually want — not a long, unfiltered list.
 
-                    On move-in day, before you unpack a single box, walk through the unit and take photos or a short video of everything — walls, fixtures, appliances, flooring. Date-stamped photos are worth more than a memory nine months later. Send a copy to your landlord at the time, even a simple message, so there's a shared record from day one.
+                    Every listing shows the exact location on a map, real availability, and — where tenants have lived there before — a rating and reviews, so you're not going in blind.
 
-                    Report anything that's already broken immediately, in writing, rather than mentioning it verbally and assuming it's noted. A landlord can't be expected to remember a passing comment months later, and neither can you.
+                    Request to book a unit that's available, and the landlord reviews and approves it. Approval automatically creates your lease — no separate paperwork to chase.
+                    """,
+                    IsPublished = true,
+                    PublishedAt = now.AddDays(-15),
+                    CreatedAt = now.AddDays(-15)
+                },
+                new()
+                {
+                    Title = "Rent Payments",
+                    Slug = "rent-payments",
+                    Category = InfoPageCategory.ForTenants,
+                    Excerpt = "Mark a payment made, get confirmed by your landlord, and keep a timestamped record.",
+                    Content = """
+                    Once you've moved in, rent works the same simple way every month: you mark an invoice paid, optionally attaching a payment slip, and your landlord confirms it.
 
-                    Before you move out, do the same walkthrough again. Fix anything genuinely caused by normal wear versus what you're responsible for — a scuffed wall from years of living there is different from a hole punched in it.
+                    If something doesn't match, either side can raise it as a dispute instead of it just sitting unresolved — and the full history stays on record.
 
-                    Finally, agree on how the deposit will be returned and by when, and keep that conversation in writing. A platform like RehLe keeps the lease, photos, and messages tied to one unit and one tenant, so there's a clear record for both sides instead of a disagreement about who remembers what.
+                    Utility bills, when there are any, are split the same way — equally, by percentage, or by actual per-meter usage.
                     """,
                     IsPublished = true,
                     PublishedAt = now.AddDays(-6),
@@ -291,41 +309,16 @@ namespace Smart_Rental___Accomodation_Management_System.Data
                 },
                 new()
                 {
-                    Title = "Why Digital Rent Collection Beats Cash and Bank Transfers",
-                    Slug = "digital-rent-collection-beats-cash",
-                    Category = InfoPageCategory.ForLandlords,
-                    Excerpt = "Cash gets lost, bank transfers get \"forgotten.\" Here's why a paper trail matters for both sides.",
-                    Content = """
-                    Cash is still how a lot of rent gets paid, and it works fine right up until there's a disagreement about whether it was paid at all. No receipt, no record, and it comes down to one person's word against another's.
-
-                    Bank transfers are better, but they're easy to lose track of too. A landlord managing several tenants across a few properties can't be expected to reconcile every incoming transfer by hand every month, and a missed one often gets noticed weeks late — awkward for everyone.
-
-                    A digital system fixes the actual problem, which isn't the payment method itself but the lack of a shared, timestamped record both people can see. When a tenant marks an invoice paid, the landlord gets notified immediately and can confirm it — or flag that it wasn't received, which opens a dispute instead of an argument. Either way, there's a record, not a memory.
-
-                    It also removes the awkwardness of chasing rent in person. Automatic due-soon and overdue reminders mean a landlord doesn't have to be the one sending an uncomfortable message every month, and a tenant gets a heads-up before a payment is actually late rather than after.
-
-                    None of this requires trusting a stranger with your money — it's simply keeping the same conversation landlords and tenants already have, but with a record neither side has to take on faith.
-                    """,
-                    IsPublished = true,
-                    PublishedAt = now.AddDays(-3),
-                    CreatedAt = now.AddDays(-3)
-                },
-                new()
-                {
-                    Title = "Choosing the Right Area When You're Renting in a New City",
-                    Slug = "choosing-the-right-area-renting-new-city",
+                    Title = "Reviews & Ratings",
+                    Slug = "reviews-and-ratings",
                     Category = InfoPageCategory.ForTenants,
-                    Excerpt = "Rent isn't the only cost of a location. Here's what to actually weigh before you commit.",
+                    Excerpt = "See what previous tenants actually experienced before you commit to a place.",
                     Content = """
-                    The cheapest listing in a city is rarely the cheapest place to actually live, once you factor in everything around it. Before committing to a unit, it's worth stepping back and looking at the area, not just the price.
+                    Every listing shows a rating and reviews from tenants who've actually lived there — real feedback, not marketing copy.
 
-                    Commute time is the big one people underestimate. A unit that's a little more expensive but ten minutes from work or university often works out ahead once you account for daily transport cost and the time itself, which you don't get back.
+                    Once your own lease has run its course, you can leave a review for the property, helping the next person considering it make a more informed decision.
 
-                    Look at what's actually nearby, not just what's advertised as nearby. Groceries, a pharmacy, and reliable transport links matter more day-to-day than a landmark a few kilometers away. If you can, visit at a couple of different times of day — an area can feel completely different in the evening than it does at noon.
-
-                    Talk to people already living there if you get the chance, or read what previous tenants have said about the property itself. This is exactly why reviews matter: someone who's actually lived in a unit can tell you things a listing never will, from water pressure to how responsive the landlord actually is.
-
-                    Once you've narrowed it down to a city, searching by area rather than scrolling through every listing in town makes this whole process faster — which is why RehLe lets you filter down to the specific neighborhood you're actually considering.
+                    Reviews stay attached to the property, not the landlord's account, so they build an honest picture over time.
                     """,
                     IsPublished = true,
                     PublishedAt = now.AddDays(-1),

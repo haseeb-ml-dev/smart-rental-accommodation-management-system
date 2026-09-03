@@ -1,0 +1,50 @@
+@model AppSetting
+@{
+    ViewData["Title"] = "Pricing";
+}
+
+<div class="text-center mb-5">
+    <h1 class="fw-bold mb-2">Simple, <span class="two-tone">upfront pricing</span></h1>
+    <p class="text-muted fs-5">No per-listing fees, no hidden charges. Free for tenants, always.</p>
+</div>
+
+<div class="row g-4 justify-content-center mb-5">
+    <div class="col-md-5">
+        <div class="pricing-card pricing-card-solid h-100">
+            <div class="text-uppercase small fw-semibold mb-2" style="opacity: .85;">Landlords &amp; Agents</div>
+            <div class="mb-1"><span class="display-5 fw-bold">Rs. @Model.MonthlySubscriptionFee.ToString("N0")</span> <span style="opacity: .85;">/ month</span></div>
+            <p class="mb-4" style="opacity: .9;">30-day free trial, then one flat price for everything below.</p>
+            <ul class="checklist checklist-light mb-4">
+                <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>No minimum term or hidden fees</span></li>
+                <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Unlimited properties and units</span></li>
+                <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Rent collection with confirm/dispute tracking</span></li>
+                <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Utility bill splitting &mdash; equal, percentage, or per-meter</span></li>
+                <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Maintenance request tracking</span></li>
+                <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>+ more &mdash; see <a asp-controller="Resources" asp-action="Index" class="text-white text-decoration-underline">Features</a> below</span></li>
+            </ul>
+            <a asp-controller="Account" asp-action="Register" class="btn btn-light btn-lg fw-semibold w-100">Start free trial</a>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <div class="pricing-card pricing-card-outline h-100">
+            <div class="text-uppercase small fw-semibold mb-2 text-muted">Tenants</div>
+            <div class="mb-1"><span class="display-5 fw-bold">Free</span></div>
+            <p class="text-muted mb-4">No setup fee, no recurring fee, no hidden charges &mdash; ever.</p>
+            <ul class="checklist mb-4">
+                <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Search by city and area, with exact locations on a map</span></li>
+                <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Pay rent online with a timestamped payment history</span></li>
+                <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Split shared utility bills fairly with roommates</span></li>
+                <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Report maintenance issues with photos</span></li>
+                <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>+ more &mdash; see <a asp-controller="Resources" asp-action="Index">Features</a> below</span></li>
+            </ul>
+            <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary btn-lg fw-semibold w-100">Create free account</a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 text-center text-muted small">
+        Already a landlord on RehLe? Manage your subscription and payment status from
+        <a asp-controller="Subscription" asp-action="Index">My Subscription</a> once you're signed in.
+    </div>
+</div>

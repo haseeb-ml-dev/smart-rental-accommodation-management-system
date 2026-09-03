@@ -1,32 +1,38 @@
-@model PublicBrowseViewModel
+@model HomeStatsViewModel
 @{
-    ViewData["Title"] = "Find a place to stay";
+    ViewData["Title"] = "Rental & accommodation management";
 }
 
 <div class="hero mb-5">
     <div class="row align-items-center g-4">
         <div class="col-lg-8">
-            <h1 class="display-6 fw-bold mb-3">Find your next place to stay</h1>
+            <h1 class="display-5 fw-bold mb-3 lh-sm">
+                Manage properties.<br />
+                <span class="two-tone">Collect rent on time.</span>
+            </h1>
             <p class="fs-5 mb-4">
-                Browse private rooms, shared rooms, and family units. Create a free tenant account when you're
-                ready to request a booking.
+                One flat monthly price, unlimited properties. List units, screen bookings, collect rent, split
+                utility bills, and track maintenance &mdash; all in one place.
             </p>
-            <div class="d-flex gap-2">
+            <div class="d-flex flex-wrap gap-2 mb-3">
                 <a asp-controller="Account" asp-action="Register" class="btn btn-light btn-lg fw-semibold">Get started</a>
-                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-light btn-lg">Log in</a>
+                <a asp-controller="Home" asp-action="Pricing" class="btn btn-outline-light btn-lg">View pricing</a>
             </div>
+            <a asp-controller="Home" asp-action="Listings" class="text-white text-decoration-none small">
+                Looking for a place to rent? <i class="bi bi-arrow-right"></i>
+            </a>
         </div>
         <div class="col-lg-4">
             <div class="hero-stats">
                 <div class="hero-stat">
-                    <div class="hero-stat-value">@Model.TotalCount</div>
-                    <div class="hero-stat-label">@(Model.TotalCount == 1 ? "unit listed" : "units listed")</div>
+                    <div class="hero-stat-value">@Model.TotalUnits</div>
+                    <div class="hero-stat-label">@(Model.TotalUnits == 1 ? "unit listed" : "units listed")</div>
                 </div>
-                @if (Model.Cities.Any())
+                @if (Model.TotalCities > 0)
                 {
                     <div class="hero-stat">
-                        <div class="hero-stat-value">@Model.Cities.Count</div>
-                        <div class="hero-stat-label">@(Model.Cities.Count == 1 ? "city covered" : "cities covered")</div>
+                        <div class="hero-stat-value">@Model.TotalCities</div>
+                        <div class="hero-stat-label">@(Model.TotalCities == 1 ? "city covered" : "cities covered")</div>
                     </div>
                 }
             </div>
@@ -34,181 +40,64 @@
     </div>
 </div>
 
-<div class="row g-4 mb-5">
-    <div class="col-md-6">
-        <h2 class="h5 mb-3"><i class="bi bi-building text-primary me-1"></i> For Landlords &amp; Agents</h2>
-        <div class="feature-block mb-3">
-            <div class="feature-icon"><i class="bi bi-megaphone"></i></div>
-            <div><strong>List for free, unlimited.</strong><div class="text-muted small">Add as many properties and units as you manage, at one flat monthly price.</div></div>
-        </div>
-        <div class="feature-block mb-3">
-            <div class="feature-icon"><i class="bi bi-cash-coin"></i></div>
-            <div><strong>Collect rent without chasing it.</strong><div class="text-muted small">Automatic due-soon and overdue reminders, with a confirm/dispute flow so nothing gets lost.</div></div>
-        </div>
-        <div class="feature-block">
-            <div class="feature-icon"><i class="bi bi-tools"></i></div>
-            <div><strong>Track maintenance in one place.</strong><div class="text-muted small">Tenants report issues with photos; you track them through to resolved.</div></div>
-        </div>
+<div class="row g-4 mb-5 text-center">
+    <div class="col-sm-6 col-lg-3">
+        <div class="feature-icon mx-auto"><i class="bi bi-grid-1x2"></i></div>
+        <h3 class="h6 fw-bold mb-1">All-in-one platform</h3>
+        <p class="text-muted small mb-0">Listings, bookings, leases, rent, and maintenance in a single dashboard.</p>
     </div>
-    <div class="col-md-6">
-        <h2 class="h5 mb-3"><i class="bi bi-house-heart text-primary me-1"></i> For Tenants</h2>
-        <div class="feature-block mb-3">
-            <div class="feature-icon"><i class="bi bi-geo-alt"></i></div>
-            <div><strong>Search by city and area.</strong><div class="text-muted small">Narrow down to the neighborhood you actually want, with the exact location on a map.</div></div>
-        </div>
-        <div class="feature-block mb-3">
-            <div class="feature-icon"><i class="bi bi-credit-card"></i></div>
-            <div><strong>Pay rent online.</strong><div class="text-muted small">Mark a payment made, get confirmed by your landlord, and raise a dispute if something's off.</div></div>
-        </div>
-        <div class="feature-block">
-            <div class="feature-icon"><i class="bi bi-star"></i></div>
-            <div><strong>See real reviews.</strong><div class="text-muted small">Ratings from tenants who've actually lived there, before you commit.</div></div>
-        </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="feature-icon mx-auto"><i class="bi bi-cash-coin"></i></div>
+        <h3 class="h6 fw-bold mb-1">Direct rent tracking</h3>
+        <p class="text-muted small mb-0">Tenants mark payments made, landlords confirm &mdash; disputes never get lost.</p>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="feature-icon mx-auto"><i class="bi bi-people"></i></div>
+        <h3 class="h6 fw-bold mb-1">Built for both sides</h3>
+        <p class="text-muted small mb-0">A dedicated experience for landlords and for tenants, not a bolted-on afterthought.</p>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="feature-icon mx-auto"><i class="bi bi-tools"></i></div>
+        <h3 class="h6 fw-bold mb-1">Maintenance tracking</h3>
+        <p class="text-muted small mb-0">Issues reported with photos, tracked through to resolved.</p>
     </div>
 </div>
 
-<h2 class="h4 mb-3">Available properties</h2>
-
-<form method="get" class="row g-2 mb-4 align-items-end">
-    <div class="col-sm-3 col-lg-2">
-        <label class="form-label">City</label>
-        <select name="City" id="filterCity" class="form-select">
-            <option value="">All cities</option>
-            @foreach (var city in Model.Cities)
-            {
-                <option value="@city" selected="@(city == Model.Filter.City)">@city</option>
-            }
-        </select>
-    </div>
-    <div class="col-sm-3 col-lg-2">
-        <label class="form-label">Area</label>
-        <select name="Area" id="filterArea" class="form-select"
-                data-cascade-source="#filterCity"
-                data-cascade-options="@System.Text.Json.JsonSerializer.Serialize(Model.AreasByCity)"
-                data-cascade-placeholder="All areas"
-                data-cascade-initial="@Model.Filter.Area">
-            <option value="">All areas</option>
-        </select>
-    </div>
-    <div class="col-sm-3 col-lg-2">
-        <label class="form-label">Min rent</label>
-        <input type="number" name="MinRent" class="form-control" min="0" step="1" value="@Model.Filter.MinRent" />
-    </div>
-    <div class="col-sm-3 col-lg-2">
-        <label class="form-label">Max rent</label>
-        <input type="number" name="MaxRent" class="form-control" min="0" step="1" value="@Model.Filter.MaxRent" />
-    </div>
-    <div class="col-sm-4 col-lg-2">
-        <label class="form-label">Unit type</label>
-        <select name="UnitType" class="form-select">
-            <option value="">All types</option>
-            @foreach (UnitType t in Enum.GetValues<UnitType>())
-            {
-                <option value="@t" selected="@(t == Model.Filter.UnitType)">@t.Humanize()</option>
-            }
-        </select>
-    </div>
-    <div class="col-sm-4 col-lg-1">
-        <label class="form-label">BHK</label>
-        <select name="BhkType" class="form-select">
-            <option value="">Any</option>
-            @foreach (BhkType t in Enum.GetValues<BhkType>())
-            {
-                <option value="@t" selected="@(t == Model.Filter.BhkType)">@t.Humanize()</option>
-            }
-        </select>
-    </div>
-    <div class="col-sm-4 col-lg-1">
-        <button type="submit" class="btn btn-primary w-100">Search</button>
-    </div>
-</form>
-
-@if (!Model.Units.Any())
-{
-    <div class="alert alert-info">No listings match your search.</div>
-}
-
-<div class="row g-4">
-    @foreach (var unit in Model.Units)
-    {
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100">
-                @if (unit.CoverImageFileName != null)
-                {
-                    <img src="/uploads/units/@unit.UnitId/@unit.CoverImageFileName" class="card-img-top" style="height: 12rem; object-fit: cover;" alt="@unit.UnitName" />
-                }
-                else
-                {
-                    <div class="bg-light d-flex align-items-center justify-content-center text-muted" style="height: 12rem;">No photo</div>
-                }
-                <div class="card-body d-flex flex-column">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <h5 class="card-title mb-1">@unit.UnitName</h5>
-                        @if (unit.AverageRating.HasValue)
-                        {
-                            <span class="small text-nowrap ms-2"><i class="bi bi-star-fill text-warning"></i> @unit.AverageRating.Value.ToString("0.0") <span class="text-muted">(@unit.ReviewCount)</span></span>
-                        }
-                    </div>
-                    <div class="text-muted small mb-2">
-                        @{
-                            var locationLabel = string.Join(", ", new[] { unit.Area, unit.City }.Where(s => !string.IsNullOrEmpty(s)));
-                        }
-                        @unit.PropertyName &middot; @(string.IsNullOrEmpty(locationLabel) ? unit.Address : locationLabel)
-                        @if (unit.Latitude.HasValue && unit.Longitude.HasValue)
-                        {
-                            <a href="https://www.google.com/maps?q=@(unit.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)),@(unit.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))" target="_blank" rel="noopener" class="ms-1">(map)</a>
-                        }
-                    </div>
-                    <div class="mb-2">
-                        @unit.UnitType.Humanize()
-                        @if (unit.BhkType != null)
-                        {
-                            <text> &middot; @unit.BhkType.Value.Humanize()</text>
-                        }
-                        @if (unit.UnitType != UnitType.SharedRoom)
-                        {
-                            <span class="text-muted small"> (sleeps @unit.Capacity)</span>
-                        }
-                    </div>
-                    <div class="fs-5 fw-semibold mb-2">@unit.MonthlyRent.ToString("C") <span class="fs-6 text-muted fw-normal">/ month</span></div>
-                    <div class="mb-3">
-                        @if (unit.IsAvailable)
-                        {
-                            <span class="badge text-bg-success">Available</span>
-                        }
-                        else
-                        {
-                            <span class="badge text-bg-secondary">Full</span>
-                        }
-                    </div>
-                    <a asp-controller="Booking" asp-action="Details" asp-route-unitId="@unit.UnitId" class="btn btn-primary mt-auto">View / Book</a>
-                </div>
-            </div>
-        </div>
-    }
+<div class="text-center mb-4">
+    <h2 class="fw-bold">We&rsquo;re making renting <span class="two-tone">better for everyone</span></h2>
+    <p class="text-muted">Real tools for the day-to-day of renting &mdash; not just a listings board.</p>
 </div>
 
-@if (Model.TotalPages > 1)
-{
-    <nav aria-label="Page navigation" class="mt-4">
-        <ul class="pagination">
-            @for (int p = 1; p <= Model.TotalPages; p++)
-            {
-                <li class="page-item @(p == Model.Filter.Page ? "active" : "")">
-                    <a class="page-link"
-                       asp-action="Index"
-                       asp-route-City="@Model.Filter.City"
-                       asp-route-Area="@Model.Filter.Area"
-                       asp-route-MinRent="@Model.Filter.MinRent"
-                       asp-route-MaxRent="@Model.Filter.MaxRent"
-                       asp-route-UnitType="@Model.Filter.UnitType"
-                       asp-route-BhkType="@Model.Filter.BhkType"
-                       asp-route-Page="@p">@p</a>
-                </li>
-            }
+<div class="row g-5 mb-5">
+    <div class="col-md-6">
+        <h3 class="h5 fw-bold mb-3">Landlords &amp; Agents</h3>
+        <ul class="checklist">
+            <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>List unlimited properties and units for one flat monthly price</span></li>
+            <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Collect and track rent payments with a confirm/dispute flow</span></li>
+            <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Split utility bills equally, by percentage, or by per-meter usage</span></li>
+            <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Review and approve booking requests before a lease is created</span></li>
+            <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Track maintenance requests from report to resolved</span></li>
+            <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>See tenant reviews and ratings on your own properties</span></li>
+            <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Get notified in-app and by email for everything that needs attention</span></li>
+            <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Start with a 30-day free trial, no card required</span></li>
         </ul>
-    </nav>
-}
+        <a asp-controller="Resources" asp-action="Details" asp-route-slug="for-landlords" class="fw-semibold text-decoration-none">Learn more <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="col-md-6">
+        <h3 class="h5 fw-bold mb-3">Tenants</h3>
+        <ul class="checklist">
+            <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Search by city, then narrow down to the exact area you want</span></li>
+            <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>See the precise location on a map before you contact anyone</span></li>
+            <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Pay rent online and keep a timestamped record of every payment</span></li>
+            <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Split shared utility bills fairly with roommates</span></li>
+            <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Report maintenance issues with a photo and track their status</span></li>
+            <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Read real reviews from tenants who've actually lived there</span></li>
+            <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Leave your own review once your lease has run its course</span></li>
+            <li class="checklist-item"><span class="checklist-item-icon"><i class="bi bi-check-lg"></i></span><span>Completely free &mdash; no account fee, ever</span></li>
+        </ul>
+        <a asp-controller="Resources" asp-action="Details" asp-route-slug="for-tenants" class="fw-semibold text-decoration-none">Learn more <i class="bi bi-arrow-right"></i></a>
+    </div>
+</div>
 
 <div class="row justify-content-center my-5">
     <div class="col-lg-8">
@@ -221,7 +110,11 @@
                     </button>
                 </h2>
                 <div id="hfaq1" class="accordion-collapse collapse" data-bs-parent="#homeFaq">
-                    <div class="accordion-body">Landlords get a free first month, then a small flat monthly subscription, unlimited properties included. It's always free for tenants — you'll see the exact rate once you register as a landlord.</div>
+                    <div class="accordion-body">
+                        Landlords get a free first month, then a small flat monthly subscription, unlimited properties
+                        included. It's always free for tenants. See the full breakdown on our
+                        <a asp-controller="Home" asp-action="Pricing">Pricing</a> page.
+                    </div>
                 </div>
             </div>
             <div class="accordion-item">
@@ -241,17 +134,17 @@
                     </button>
                 </h2>
                 <div id="hfaq3" class="accordion-collapse collapse" data-bs-parent="#homeFaq">
-                    <div class="accordion-body">Yes — equally, by custom percentage, or by per-meter consumption, and tenants with their own meter are automatically excluded from the shared split.</div>
+                    <div class="accordion-body">Yes &mdash; equally, by custom percentage, or by per-meter consumption, and tenants with their own meter are automatically excluded from the shared split.</div>
                 </div>
             </div>
             <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#hfaq4">
-                        Where can I find rental advice?
+                        Where can I learn more about specific features?
                     </button>
                 </h2>
                 <div id="hfaq4" class="accordion-collapse collapse" data-bs-parent="#homeFaq">
-                    <div class="accordion-body">Our <a asp-controller="Resources" asp-action="Index">Resources</a> section covers practical guidance for landlords and tenants renting in Pakistan.</div>
+                    <div class="accordion-body">Our <a asp-controller="Resources" asp-action="Index">Features</a> section covers exactly what's included for landlords and for tenants.</div>
                 </div>
             </div>
         </div>

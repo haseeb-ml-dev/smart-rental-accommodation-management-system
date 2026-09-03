@@ -46,18 +46,41 @@
                             <li class="nav-item">
                                 <a class="@navClass("Home", "Index")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="@navClass("Home", "Listings")" asp-area="" asp-controller="Home" asp-action="Listings">Listings</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="@navClass("Home", "Pricing")" asp-area="" asp-controller="Home" asp-action="Pricing">Pricing</a>
+                            </li>
                         }
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Resources
+                                Features
                             </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="for-landlords">For Landlords</a></li>
-                                <li><a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="for-tenants">For Tenants</a></li>
-                                <li><a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="how-it-works">How It Works</a></li>
-                                <li><hr class="dropdown-divider" /></li>
-                                <li><a class="dropdown-item" asp-controller="Resources" asp-action="Index">All Articles</a></li>
-                            </ul>
+                            <div class="dropdown-menu mega-dropdown">
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <div class="mega-dropdown-group">
+                                            <a class="dropdown-item mega-dropdown-heading text-decoration-none" asp-controller="Resources" asp-action="Details" asp-route-slug="for-landlords">For Landlords</a>
+                                            <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="property-listings">Property Listings</a>
+                                            <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="rent-collection">Rent Collection</a>
+                                            <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="utility-bill-splitting">Utility Bill Splitting</a>
+                                            <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="maintenance-tracking">Maintenance Tracking</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="mega-dropdown-group">
+                                            <a class="dropdown-item mega-dropdown-heading text-decoration-none" asp-controller="Resources" asp-action="Details" asp-route-slug="for-tenants">For Tenants</a>
+                                            <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="search-and-booking">Search &amp; Booking</a>
+                                            <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="rent-payments">Rent Payments</a>
+                                            <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="reviews-and-ratings">Reviews &amp; Ratings</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr class="dropdown-divider" />
+                                <a class="dropdown-item" asp-controller="Resources" asp-action="Details" asp-route-slug="how-it-works">How It Works</a>
+                                <a class="dropdown-item" asp-controller="Resources" asp-action="Index">All Features</a>
+                            </div>
                         </li>
                         @if (User.IsInRole("Landlord"))
                         {
@@ -151,7 +174,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; @DateTime.Now.Year RehLe &middot; <a asp-area="" asp-controller="Resources" asp-action="Index">Resources</a> &middot; <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; @DateTime.Now.Year RehLe &middot; <a asp-area="" asp-controller="Resources" asp-action="Index">Features</a> &middot; <a asp-area="" asp-controller="Home" asp-action="Pricing">Pricing</a> &middot; <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
 

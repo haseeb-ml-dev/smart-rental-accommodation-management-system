@@ -1,0 +1,152 @@
+@model PublicBrowseViewModel
+@{
+    ViewData["Title"] = "Listings";
+}
+
+<div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+        <h1 class="h3 fw-bold mb-1">Available properties</h1>
+        <p class="text-muted mb-0">@Model.TotalCount @(Model.TotalCount == 1 ? "unit" : "units") listed across @Model.Cities.Count @(Model.Cities.Count == 1 ? "city" : "cities").</p>
+    </div>
+</div>
+
+<form method="get" class="row g-2 mb-4 align-items-end">
+    <div class="col-sm-3 col-lg-2">
+        <label class="form-label">City</label>
+        <select name="City" id="filterCity" class="form-select">
+            <option value="">All cities</option>
+            @foreach (var city in Model.Cities)
+            {
+                <option value="@city" selected="@(city == Model.Filter.City)">@city</option>
+            }
+        </select>
+    </div>
+    <div class="col-sm-3 col-lg-2">
+        <label class="form-label">Area</label>
+        <select name="Area" id="filterArea" class="form-select"
+                data-cascade-source="#filterCity"
+                data-cascade-options="@System.Text.Json.JsonSerializer.Serialize(Model.AreasByCity)"
+                data-cascade-placeholder="All areas"
+                data-cascade-initial="@Model.Filter.Area">
+            <option value="">All areas</option>
+        </select>
+    </div>
+    <div class="col-sm-3 col-lg-2">
+        <label class="form-label">Min rent</label>
+        <input type="number" name="MinRent" class="form-control" min="0" step="1" value="@Model.Filter.MinRent" />
+    </div>
+    <div class="col-sm-3 col-lg-2">
+        <label class="form-label">Max rent</label>
+        <input type="number" name="MaxRent" class="form-control" min="0" step="1" value="@Model.Filter.MaxRent" />
+    </div>
+    <div class="col-sm-4 col-lg-2">
+        <label class="form-label">Unit type</label>
+        <select name="UnitType" class="form-select">
+            <option value="">All types</option>
+            @foreach (UnitType t in Enum.GetValues<UnitType>())
+            {
+                <option value="@t" selected="@(t == Model.Filter.UnitType)">@t.Humanize()</option>
+            }
+        </select>
+    </div>
+    <div class="col-sm-4 col-lg-1">
+        <label class="form-label">BHK</label>
+        <select name="BhkType" class="form-select">
+            <option value="">Any</option>
+            @foreach (BhkType t in Enum.GetValues<BhkType>())
+            {
+                <option value="@t" selected="@(t == Model.Filter.BhkType)">@t.Humanize()</option>
+            }
+        </select>
+    </div>
+    <div class="col-sm-4 col-lg-1">
+        <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+</form>
+
+@if (!Model.Units.Any())
+{
+    <div class="alert alert-info">No listings match your search.</div>
+}
+
+<div class="row g-4">
+    @foreach (var unit in Model.Units)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                @if (unit.CoverImageFileName != null)
+                {
+                    <img src="/uploads/units/@unit.UnitId/@unit.CoverImageFileName" class="card-img-top" style="height: 12rem; object-fit: cover;" alt="@unit.UnitName" />
+                }
+                else
+                {
+                    <div class="bg-light d-flex align-items-center justify-content-center text-muted" style="height: 12rem;">No photo</div>
+                }
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h5 class="card-title mb-1">@unit.UnitName</h5>
+                        @if (unit.AverageRating.HasValue)
+                        {
+                            <span class="small text-nowrap ms-2"><i class="bi bi-star-fill text-warning"></i> @unit.AverageRating.Value.ToString("0.0") <span class="text-muted">(@unit.ReviewCount)</span></span>
+                        }
+                    </div>
+                    <div class="text-muted small mb-2">
+                        @{
+                            var locationLabel = string.Join(", ", new[] { unit.Area, unit.City }.Where(s => !string.IsNullOrEmpty(s)));
+                        }
+                        @unit.PropertyName &middot; @(string.IsNullOrEmpty(locationLabel) ? unit.Address : locationLabel)
+                        @if (unit.Latitude.HasValue && unit.Longitude.HasValue)
+                        {
+                            <a href="https://www.google.com/maps?q=@(unit.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)),@(unit.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture))" target="_blank" rel="noopener" class="ms-1">(map)</a>
+                        }
+                    </div>
+                    <div class="mb-2">
+                        @unit.UnitType.Humanize()
+                        @if (unit.BhkType != null)
+                        {
+                            <text> &middot; @unit.BhkType.Value.Humanize()</text>
+                        }
+                        @if (unit.UnitType != UnitType.SharedRoom)
+                        {
+                            <span class="text-muted small"> (sleeps @unit.Capacity)</span>
+                        }
+                    </div>
+                    <div class="fs-5 fw-semibold mb-2">Rs. @unit.MonthlyRent.ToString("N0") <span class="fs-6 text-muted fw-normal">/ month</span></div>
+                    <div class="mb-3">
+                        @if (unit.IsAvailable)
+                        {
+                            <span class="badge text-bg-success">Available</span>
+                        }
+                        else
+                        {
+                            <span class="badge text-bg-secondary">Full</span>
+                        }
+                    </div>
+                    <a asp-controller="Booking" asp-action="Details" asp-route-unitId="@unit.UnitId" class="btn btn-primary mt-auto">View / Book</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination">
+            @for (int p = 1; p <= Model.TotalPages; p++)
+            {
+                <li class="page-item @(p == Model.Filter.Page ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Listings"
+                       asp-route-City="@Model.Filter.City"
+                       asp-route-Area="@Model.Filter.Area"
+                       asp-route-MinRent="@Model.Filter.MinRent"
+                       asp-route-MaxRent="@Model.Filter.MaxRent"
+                       asp-route-UnitType="@Model.Filter.UnitType"
+                       asp-route-BhkType="@Model.Filter.BhkType"
+                       asp-route-Page="@p">@p</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

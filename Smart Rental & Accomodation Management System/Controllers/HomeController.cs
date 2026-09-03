@@ -21,7 +21,7 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             _locationOptions = locationOptions;
         }
 
-        public async Task<IActionResult> Index(UnitSearchFilter filter)
+        public async Task<IActionResult> Index()
         {
             if (User.Identity is { IsAuthenticated: true })
             {
@@ -39,6 +39,21 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
                 }
             }
 
+            var vm = new HomeStatsViewModel
+            {
+                TotalUnits = await _context.Units.CountAsync(u => u.Property!.IsActive),
+                TotalCities = await _context.Units
+                    .Where(u => u.Property!.IsActive && u.Property!.City != null)
+                    .Select(u => u.Property!.City)
+                    .Distinct()
+                    .CountAsync()
+            };
+
+            return View(vm);
+        }
+
+        public async Task<IActionResult> Listings(UnitSearchFilter filter)
+        {
             filter ??= new UnitSearchFilter();
             if (filter.Page < 1)
             {
@@ -125,6 +140,12 @@ namespace Smart_Rental___Accomodation_Management_System.Controllers
             };
 
             return View(vm);
+        }
+
+        public async Task<IActionResult> Pricing()
+        {
+            var settings = await _context.AppSettings.FirstOrDefaultAsync() ?? new AppSetting();
+            return View(settings);
         }
 
         public IActionResult Privacy()
