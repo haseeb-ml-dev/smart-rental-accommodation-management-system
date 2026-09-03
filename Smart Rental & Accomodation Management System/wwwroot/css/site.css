@@ -3,6 +3,7 @@
   --brand-dark: #4338ca;
   --brand-light: #eef2ff;
   --brand-rgb: 79, 70, 229;
+  --brand-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   --ink: #0f172a;
   --ink-soft: #475569;
   --ink-muted: #64748b;
@@ -150,11 +151,11 @@ a {
 
 /* Hero (home page) */
 .hero {
-  background: linear-gradient(135deg, var(--brand) 0%, #7c3aed 100%);
+  background: var(--brand-gradient);
   background-image:
     radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.14) 0, transparent 45%),
     radial-gradient(circle at 85% 90%, rgba(255, 255, 255, 0.12) 0, transparent 50%),
-    linear-gradient(135deg, var(--brand) 0%, #7c3aed 100%);
+    var(--brand-gradient);
   color: #fff;
   border-radius: 1.25rem;
   padding: 3.5rem 2.5rem;
@@ -335,7 +336,7 @@ a.stat-tile {
 }
 
 .cta-band {
-  background: linear-gradient(135deg, var(--brand) 0%, #7c3aed 100%);
+  background: var(--brand-gradient);
   color: #fff;
   border-radius: 1.25rem;
   padding: 2.5rem;
@@ -459,8 +460,12 @@ a.stat-tile {
 
 .site-footer {
   flex-shrink: 0;
-  background-color: var(--surface);
-  color: var(--ink-muted);
+  background: var(--brand-gradient);
+  background-image:
+    radial-gradient(circle at 12% 15%, rgba(255, 255, 255, 0.1) 0, transparent 45%),
+    radial-gradient(circle at 88% 85%, rgba(255, 255, 255, 0.08) 0, transparent 50%),
+    var(--brand-gradient);
+  color: rgba(255, 255, 255, 0.75);
   padding-top: 2.5rem;
   margin-top: 3rem;
 }
@@ -475,15 +480,24 @@ a.stat-tile {
   gap: 0.5rem;
   font-weight: 800;
   font-size: 1.1rem;
-  color: var(--ink) !important;
+  color: #ffffff !important;
   text-decoration: none;
+}
+
+.footer-brand svg .mark-bg,
+.footer-brand svg .mark-door {
+  fill: #ffffff;
+}
+
+.footer-brand svg .mark-house {
+  fill: var(--brand);
 }
 
 .footer-tagline {
   margin: 0.75rem 0 0;
   max-width: 32rem;
   font-size: 0.9rem;
-  color: var(--ink-muted);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .footer-heading {
@@ -491,7 +505,7 @@ a.stat-tile {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--ink);
+  color: #ffffff;
   margin-bottom: 0.9rem;
 }
 
@@ -505,13 +519,13 @@ a.stat-tile {
 }
 
 .footer-links a {
-  color: var(--ink-muted);
+  color: rgba(255, 255, 255, 0.75);
   text-decoration: none;
   font-size: 0.9rem;
 }
 
 .footer-links a:hover {
-  color: var(--brand);
+  color: #ffffff;
   text-decoration: underline;
 }
 
@@ -522,7 +536,7 @@ a.stat-tile {
   justify-content: space-between;
   gap: 0.75rem;
   padding: 1.25rem 0;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   font-size: 0.85rem;
 }
 
@@ -533,11 +547,11 @@ a.stat-tile {
 }
 
 .footer-bottom-links a {
-  color: var(--ink-muted);
+  color: rgba(255, 255, 255, 0.75);
   text-decoration: none;
 }
 
 .footer-bottom-links a:hover {
-  color: var(--brand);
+  color: #ffffff;
   text-decoration: underline;
 }
