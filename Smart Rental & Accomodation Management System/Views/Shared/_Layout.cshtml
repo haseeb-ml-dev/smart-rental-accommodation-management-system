@@ -213,25 +213,56 @@
                         <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="how-it-works">How It Works</a></li>
                     </ul>
                 </div>
-                <div class="col-6 col-md-3 col-lg-2">
-                    <h6 class="footer-heading">For Landlords</h6>
-                    <ul class="footer-links">
-                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="for-landlords">Overview</a></li>
-                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="property-listings">Property Listings</a></li>
-                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="rent-collection">Rent Collection</a></li>
-                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="utility-bill-splitting">Utility Bill Splitting</a></li>
-                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="maintenance-tracking">Maintenance Tracking</a></li>
-                    </ul>
-                </div>
-                <div class="col-6 col-md-3 col-lg-2">
-                    <h6 class="footer-heading">For Tenants</h6>
-                    <ul class="footer-links">
-                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="for-tenants">Overview</a></li>
-                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="search-and-booking">Search &amp; Booking</a></li>
-                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="rent-payments">Rent Payments</a></li>
-                        <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="reviews-and-ratings">Reviews &amp; Ratings</a></li>
-                    </ul>
-                </div>
+                @{
+                    var isLandlordUser = User.IsInRole("Landlord");
+                    var isTenantUser = User.IsInRole("Tenant");
+                }
+                @if (showLandlordFeatures)
+                {
+                    <div class="col-6 col-md-3 col-lg-2">
+                        <h6 class="footer-heading">For Landlords</h6>
+                        <ul class="footer-links">
+                            @if (isLandlordUser)
+                            {
+                                <li><a asp-area="" asp-controller="Landlord" asp-action="Index">Overview</a></li>
+                                <li><a asp-area="" asp-controller="Property" asp-action="Index">Property Listings</a></li>
+                                <li><a asp-area="" asp-controller="Landlord" asp-action="Index">Rent Collection</a></li>
+                                <li><a asp-area="" asp-controller="UtilityBill" asp-action="Index">Utility Bill Splitting</a></li>
+                                <li><a asp-area="" asp-controller="Maintenance" asp-action="Index">Maintenance Tracking</a></li>
+                            }
+                            else
+                            {
+                                <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="for-landlords">Overview</a></li>
+                                <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="property-listings">Property Listings</a></li>
+                                <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="rent-collection">Rent Collection</a></li>
+                                <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="utility-bill-splitting">Utility Bill Splitting</a></li>
+                                <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="maintenance-tracking">Maintenance Tracking</a></li>
+                            }
+                        </ul>
+                    </div>
+                }
+                @if (showTenantFeatures)
+                {
+                    <div class="col-6 col-md-3 col-lg-2">
+                        <h6 class="footer-heading">For Tenants</h6>
+                        <ul class="footer-links">
+                            @if (isTenantUser)
+                            {
+                                <li><a asp-area="" asp-controller="Tenant" asp-action="Index">Overview</a></li>
+                                <li><a asp-area="" asp-controller="Booking" asp-action="Browse">Search &amp; Booking</a></li>
+                                <li><a asp-area="" asp-controller="Tenant" asp-action="Index">Rent Payments</a></li>
+                                <li><a asp-area="" asp-controller="Review" asp-action="MyReviews">Reviews &amp; Ratings</a></li>
+                            }
+                            else
+                            {
+                                <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="for-tenants">Overview</a></li>
+                                <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="search-and-booking">Search &amp; Booking</a></li>
+                                <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="rent-payments">Rent Payments</a></li>
+                                <li><a asp-area="" asp-controller="Resources" asp-action="Details" asp-route-slug="reviews-and-ratings">Reviews &amp; Ratings</a></li>
+                            }
+                        </ul>
+                    </div>
+                }
                 <div class="col-6 col-md-3 col-lg-2">
                     <h6 class="footer-heading">Account</h6>
                     <ul class="footer-links">
